@@ -21,7 +21,7 @@ def compute_z_ratio(transcripts: pd.DataFrame, num_planes: int = 7, high_plane: 
     """
     Returns ratio of transcript counts between highest and lowest planes
     """
-    transcripts_per_z = ZPlane.get_transcripts_per_z(transcripts, num_planes)
+    transcripts_per_z = get_transcripts_per_z(transcripts, num_planes)
     
     if high_plane > num_planes-1:
         raise Exception(f"Specified high plane {high_plane} not in experiment z-plane range")
