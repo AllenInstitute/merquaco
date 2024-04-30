@@ -6,7 +6,7 @@ class Experiment:
 
     def __init__(self, transcripts: pd.DataFrame = None, transcripts_path: Union[str, Path] = None):
         """
-        Initilize an Experiment instance from transcripts dataframe 
+        Initialize an Experiment instance from transcripts dataframe 
         """
         if transcripts_path is not None and transcripts is None:
             # Read transcripts
