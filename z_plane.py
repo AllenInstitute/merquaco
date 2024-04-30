@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 
 
-@staticmethod
 def get_transcripts_per_z(transcripts: pd.DataFrame, num_planes: int = None) -> np.ndarray:
     """
     Helper function gets number of transcripts per z plane
@@ -18,7 +17,6 @@ def get_transcripts_per_z(transcripts: pd.DataFrame, num_planes: int = None) -> 
 
     return np.asarray(transcripts_per_z)
 
-@staticmethod
 def compute_z_ratio(transcripts: pd.DataFrame, num_planes: int = 7, high_plane: int = 6, low_plane: int = 0) -> float:
     """
     Returns ratio of transcript counts between highest and lowest planes
