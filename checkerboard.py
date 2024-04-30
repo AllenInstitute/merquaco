@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-from merquaco.experiment import Experiment as exp
-
 
 class Checkerboard:
     """
@@ -13,36 +11,28 @@ class Checkerboard:
         pass
 
     @staticmethod
-    def get_cb_vals_all_z(transcripts: pd.DataFrame):
-        """
-        Performs checkerboard analysis in all z-planes collapsed
-        """
-        pixel_dimensions = Checkerboard._get_pixel_dimensions(transcripts)
-        x = np.asarray(transcripts['x_location'])
-        y = np.asarray(transcripts['y_location'])
-
-        _, cb_chunk_x = Checkerboard._get_chunk_values(x, pixel_dimensions, Checkerboard.FOV_DIMENSIONS)
-        _, cb_chunk_y = Checkerboard._get_chunk_values(y, pixel_dimensions, Checkerboard.FOV_DIMENSIONS)
-        cb_x = np.min(cb_chunk_x) / np.max(cb_chunk_x)
-        cb_y = np.min(cb_chunk_y) / np.max(cb_chunk_y)
-        return (cb_x, cb_y)
-
-    @staticmethod
     def get_cb_list(transcripts: pd.DataFrame, num_planes: int = 7):
         """
         Performs checkerboard analysis across z-planes
         """
-        # Subtract all (x,y) values by min (x,y) values to bring images in plots closer
-        normalized_transcripts = exp.scale_transcripts_xy(transcripts)
-        pixel_dimensions = Checkerboard._get_pixel_dimensions(normalized_transcripts)
+        pixel_dimensions = Checkerboard.get_image_dimensions(transcripts)
 
-        # Analyze by plane
-        cb_list = Checkerboard._compute_checkerboard_list(normalized_transcripts, pixel_dimensions, num_planes)
+        cb_list = []
+        for plane_number in range(num_planes):
+            # Subset transcripts by z plane
+            plane = transcripts[transcripts['global_z'] == plane_number]
+            plane_x = np.asarray(plane['global_x'])
+            plane_y = np.asarray(plane['global_y'])
+            _, cb_chunk_x = Checkerboard.get_chunk_values(plane_x, pixel_dimensions)
+            _, cb_chunk_y = Checkerboard.get_chunk_values(plane_y, pixel_dimensions)
+            cb_x = np.min(cb_chunk_x) / np.max(cb_chunk_x)
+            cb_y = np.min(cb_chunk_y) / np.max(cb_chunk_y)
+            cb_list.append((cb_x, cb_y))
 
         return cb_list
 
     @staticmethod
-    def _get_chunk_values(transcripts: pd.DataFrame, pixel_dimensions: int):
+    def get_chunk_values(transcripts: pd.DataFrame, pixel_dimensions: int):
         """
         Calculates histogram and checkerboard chunk values for transcripts DataFrame
         """
@@ -68,41 +58,27 @@ class Checkerboard:
         return cb_hist, cb_chunk
 
     @staticmethod
-    def _get_pixel_dimensions(normalized_transcripts: pd.DataFrame):
+    def get_image_dimensions(normalized_transcripts: pd.DataFrame):
         """
-        Helper method to calculate pixel dimensions for image based on max (x,y) values
+        Helper method to calculate dimensions for image based on max (x,y) values
         """
         max_x = normalized_transcripts['global_x'].max()
         max_y = normalized_transcripts['global_y'].max()
+
         return np.round(max(max_x, max_y)) + 1000
-
+    
     @staticmethod
-    def _compute_checkerboard_list(normalized_transcripts: pd.DataFrame,
-                                   pixel_dimensions: tuple, num_planes: int = 7):
+    def get_cb_vals_all_z(transcripts: pd.DataFrame):
         """
-        Helper method to generate list of checkerboard values for each z-plane
+        Performs checkerboard analysis in all z-planes collapsed
         """
-        cb_list = []
-        for plane_number in range(num_planes):
-            # Subset transcripts by z plane
-            plane = normalized_transcripts[normalized_transcripts['global_z'] == plane_number]
-            plane_x = np.asarray(plane['global_x'])
-            plane_y = np.asarray(plane['global_y'])
-            _, cb_chunk_x = Checkerboard._get_chunk_values(plane_x, pixel_dimensions)
-            _, cb_chunk_y = Checkerboard._get_chunk_values(plane_y, pixel_dimensions)
-            cb_x = np.min(cb_chunk_x) / np.max(cb_chunk_x)
-            cb_y = np.min(cb_chunk_y) / np.max(cb_chunk_y)
-            cb_list.append((cb_x, cb_y))
+        pixel_dimensions = Checkerboard.get_image_dimensions(transcripts)
+        x = np.asarray(transcripts['global_x'])
+        y = np.asarray(transcripts['global_y'])
 
-        return cb_list
+        _, cb_chunk_x = Checkerboard.get_chunk_values(x, pixel_dimensions)
+        _, cb_chunk_y = Checkerboard.get_chunk_values(y, pixel_dimensions)
+        cb_x = np.nanmin(cb_chunk_x) / np.max(cb_chunk_x)
+        cb_y = np.nanmin(cb_chunk_y) / np.max(cb_chunk_y)
 
-    @staticmethod
-    def get_checkerboard_values(cb_list: list):
-        """
-        Computes mean, min, max checkerboard values
-        """
-        avg_cb = np.round(np.nanmean(cb_list), 3)
-        most_cb = np.round(np.nanmin(cb_list), 3)
-        least_cb = np.round(np.nanmax(cb_list), 3)
-
-        return (avg_cb, most_cb, least_cb)
+        return (cb_x, cb_y)
