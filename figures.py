@@ -51,7 +51,7 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     ax.set_ylim(ymin, ymax)
 
     # Remove borders
-    plt.axis('off')
+    ax.axis('off')
 
     if title != '':
         ax.set_title(title)
