@@ -8,6 +8,9 @@ class Experiment:
         """
         Initialize an Experiment instance from transcripts dataframe 
         """
+        if transcripts_path is None and transcripts is None:
+            raise Exception("Either transcripts_path or transcripts must be provided")
+        
         if transcripts_path is not None and transcripts is None:
             # Read transcripts
             transcripts = self.read_transcripts(self.transcripts_path)
@@ -28,6 +31,9 @@ class Experiment:
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
         self.fovs = self.get_fovs_dataframe(self.filtered_transcripts)
+
+        # TODO
+        # self.barcode = 
 
 
     @staticmethod
