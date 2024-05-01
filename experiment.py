@@ -1,6 +1,7 @@
 from typing import Union
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 class Experiment:
 
