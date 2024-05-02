@@ -270,13 +270,16 @@ def generate_transcript_mask(transcript_image_path: Union[str, Path],
                              ilastik_program_path: Union[str, Path],
                              pixel_classification_model_path: Union[str, Path],
                              object_classification_model_path: Union[str, Path],
-                             filtered_transcripts: pd.DataFrame):
+                             filtered_transcripts: pd.DataFrame = None):
     """
     Generate transcripts mask from transcripts table dataframe
     """
     if not os.path.exists(transcript_image_path):  # If transcript_image does not exist
-        # Convert transcripts to image and save
-        _ = create_transcript_image(filtered_transcripts, transcript_image_path)
+        if filtered_transcripts is not None:
+            # Convert transcripts to image and save
+            _ = create_transcript_image(filtered_transcripts, transcript_image_path)
+        else:
+            raise Exception("transcripts image does not exist, transcripts must be provided")
 
     generate_mask(ilastik_program_path, transcript_image_path, 
                   pixel_classification_model_path, object_classification_model_path)
