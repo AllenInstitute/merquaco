@@ -400,11 +400,13 @@ def generate_lifting_mask(transcript_mask_path: Union[str, Path],
     tiff.imwrite(lifting_mask_path, lifting_mask)
         
 
-def create_ventricle_genes_image(ventricle_genes: list,
-                                 ventricle_genes_image_path: Union[str, Path],
+def create_ventricle_genes_image(ventricle_genes_image_path: Union[str, Path],
                                  dapi_mask_path: Union[str, Path],
                                  transcript_mask_path: Union[str, Path],
                                  filtered_transcripts: pd.DataFrame,
+                                 ventricle_genes: list = ["Crb2","Glis3","Inhbb",
+                                                          "Naaa","Cd24a","Dsg2","Hdc",
+                                                          "Shroom3","Vit","Rgs12","Trp73"],
                                  threshold: int = 2):
     """
     Creates and saves image of ventricle genes superimposed on DAPI image
