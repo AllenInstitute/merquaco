@@ -11,7 +11,7 @@ from typing import Union
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
-                         rotation_degrees: int = -90, ax=None, out_path: str = '',
+                         rotation_degrees: int = -90, ax=None, out_file: Union[str,Path] = None,
                          ms: float = 1, alpha: float = 0.5, color: str = "black",
                          title: str = ''):
     """
@@ -56,8 +56,8 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     if title != '':
         ax.set_title(title)
 
-    if out_path != '':
-        plt.savefig(out_path)
+    if out_file != None:
+        plt.savefig(out_file)
 
     plt.show()
     plt.close();
@@ -104,6 +104,9 @@ def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotatio
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, lpha=alpha, color=color, ax=ax)
 
+    if title != '':
+        ax.set_title(title)
+
     if out_file != '':
         plt.savefig(out_file)
 
@@ -111,7 +114,8 @@ def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotatio
     plt.close();
 
 
-def plot_transcripts_per_z(transcripts_per_z: np.ndarray, ax=None, out_file: str = '', num_planes: int = 7):
+def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, ax=None, 
+                           title: str = "", out_file: str = ''):
     """
     Plot transcript counts for each z plane
 
@@ -146,6 +150,9 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, ax=None, out_file: str
     ax.set_ylabel('Transcript Counts')
     ax.set_title('Transcript Counts per Z-Plane')
 
+    if title != '':
+        ax.set_title(title)
+
     if out_file != '':
         plt.savefig(out_file)
 
@@ -153,228 +160,71 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, ax=None, out_file: str
     plt.close();
 
 
-# TODO: keep editing from here
-
-def wdr_table(data, ax=None):
-    """
-    Create table with relevant WDR metrics
-
-    Parameters
-    ----------
-    data : list
-        List of data to be displayed on table.
-        Columns are pre-defined, so data must be in same order as `columns` list.
-    ax : matplotlib.axes.Axes, optional
-        Axes on which to plot. Default is None.
-
-    Returns
-    -------
-    None
-    """
-    # Add thousands commas to transcript counts if it is an int or float
-    if isinstance(data[0], (int, float)):
-        data[0] = '{:,}'.format(data[0])
-
-    columns = ['Total Filtered Transcripts', 'Transcript Density \n(per $um^2$ per gene)',
-                'FOV Dropouts', 'Checkerboarding, most severe', 'Z-Plane Transcript Ratio']
-
-    if ax is None:
-        _, ax = plt.subplots(17, 2.67)  # Same aspect ratio as WDR figures
-    ax.axis('tight')
-    ax.axis('off')
-
-    table_data = [data]
-    table = ax.table(cellText=table_data, colLabels=columns, cellLoc='center', loc='center')
-
-    table.auto_set_font_size(False)
-    table.set_fontsize(12)
-    cellDict = table.get_celld()
-
-    header_color = '#001F3F'  # Navy blue
-    header_font_color = '#D3D3D3'  # Light gray
-
-    data_color = '#F5F5F5'    # Light gray
-    data_font_color = '#000000'  # Black
-
-    for j in range(len(columns)):
-        # Header properties
-        cell = cellDict[(0, j)]
-        cell.get_text().set_fontweight('bold')
-        cell.get_text().set_color(header_font_color)
-        cell.set_height(0.3)
-        cell.set_facecolor(header_color)
-
-        # Data  properties
-        cell = cellDict[(1, j)]
-        cell.get_text().set_fontweight('normal')
-        cell.get_text().set_color(data_font_color)
-        cell.set_height(0.3)
-        cell.set_facecolor(data_color)
-
-
-def plot_wdr_dists(metadata_path: Union[str, Path], z_ratio: float, most_cb: float, density: float,
-                    barcode: str, data: list, figures_path: Union[str, Path] = ''):
-    """
-    Plots transcripts per z, checkerboarding per z, and transcript density for an experiment
-    as lines on a distribution, as well as key metrics in WDR style.
-
-    Parameters
-    ----------
-    z_ratio : float
-        Ratio of Z6:Z0 transcript detection
-    most_cb : float
-        Most severe checkerboard value
-    density : float
-        Transcript density per um2 per gene
-    barcode : str
-        Experiment barcode, for saving and plot titles.
-    data : list
-        List of data to be displayed on table.
-        Columns are pre-defined, so data must be in same order as `columns` list.
-    figures_path : str, optional
-        Path to directory in which to save figures. Default is ''.
-
-    Returns
-    -------
-    None
-
-    Notes
-    -----
-    Each individual plot is not saved
-    """
-    _ = plt.figure(figsize=(17, 8))
-    gs = gridspec.GridSpec(2, 3, height_ratios=[1, 0.5], width_ratios=[17/3, 17/3, 17/3])
-
-    ax0 = plt.subplot(gs[0])
-    ax1 = plt.subplot(gs[1])
-    ax2 = plt.subplot(gs[2])
-    ax_table = plt.subplot(gs[3:])
-
-    plot_distribution(metadata_path, 'z_ratio', z_ratio, barcode, ax=ax0,
-                                        species_label_bool=True)
-    plot_distribution(metadata_path, 'most_checkerboard', most_cb, barcode, ax=ax1,
-                                        species_label_bool=True)
-    plot_distribution(metadata_path, 'transcript_density_um2_per_gene', density, barcode, ax=ax2,
-                                        species_label_bool=True)
-    wdr_table(data, ax=ax_table)
-    plt.suptitle(barcode, fontsize=18)
-
-    fig = plt.gcf()
-    fig.patch.set_alpha(0)
-    plt.tight_layout()
-    display(fig)
-    plt.savefig(f'{figures_path}/{barcode}_wdr_dist_fig.png', dpi=100)
-    plt.close()
-
-
-def plot_distribution(metadata_path: Union[str, Path], column: str, value: float = None, barcode: str = '',
-                        outfile: str = '', ax=None, species_label_bool=False):
-    """
-    Plots and saves KDE plot of given value for given metric against distribution of all previous experiments.
-
-    Subsets main metadata tracker by species to plot macaque/mouse/human as different distributions
-
-    Parameters
-    ----------
-    column : str
-        QC metric column of metadata tracker/pd.DataFrame to plot
-    value : float or int, optional
-        Value to plot. Default is None.
-    barcode : str
-        Experiment ID or barcode, used as label in plot. Default is ''.
-    qc_output_path : str, optional
-        Path to save plot image. Default is ''.
-    Raises
-    ------
-    ValueError
-        If column provided does not exist
-
-    Returns
-    -------
-    ax: matplotlib.axes.Axes
-        Modified axes object with plot
-    """
-    if barcode != '':
-        barcode = str(barcode)
-
-    metadata = MetadataTracking._read_metadata(metadata_path)
-
-    if column not in list(metadata):
-        raise ValueError('Column provided not in metadata columns. Check spelling')
-
-    # Set species specific metadata subsets
-    mouse_md, human_md, macaque_md, marmoset_md = MetadataTracking.get_species_metadata(metadata_path)
-
-    if ax is None:
-        fig, ax = plt.subplots(figsize=(8, 6))
-
-    sns.set_style('white')
-    sns.set_style('ticks')
-
-    config = load_config()  # load config to get title dictionary
-    title = config['TITLE_DICT'][column]
-
-    if species_label_bool:
-        mouse_label = "Mouse"
-        human_label = "Human"
-        macaque_label = "Macaque"
-        marmoset_label = "Marmoset"
-    else:
-        mouse_label = ""
-        human_label = ""
-        macaque_label = ""
-        marmoset_label = ""
-
-    # Plot mouse
-    sns.kdeplot(data=mouse_md, x=f'{column}', fill=True, cut=0, label=mouse_label, alpha=0.1, ax=ax, warn_singular=False)
-    # Plot human
-    sns.kdeplot(data=human_md, x=f'{column}', fill=True, cut=0, label=human_label, alpha=0.1, ax=ax, warn_singular=False)
-    # Plot macaque
-    sns.kdeplot(data=macaque_md, x=f'{column}', fill=True, cut=0, label=macaque_label, alpha=0.1, ax=ax, warn_singular=False)
-#        Plot marmoset
-    sns.kdeplot(data=marmoset_md, x=f'{column}', fill=True, cut=0, label=marmoset_label, alpha=0.1, ax=ax, warn_singular=False)
-
-    # Plot given value if exists
-    if value is not None:
-        if barcode != '':
-            ax.axvline(value, linestyle='dashed', color='k', label=barcode)
-        else:
-            ax.axvline(value, linestyle='dashed', color='k')
-
-    # Add title
-    ax.set(title=title, xlabel=column, ylabel='probability density')
-
-    if barcode != '':
-        if outfile != '':
-            plt.savefig(outfile, dpi=100)
-    ax.legend()
-    return ax
-
-
-def plot_damage_lifting_distributions(metadata_path: Union[str, Path], damage_value: float = None, lifting_value: float = None, 
-                                        barcode: str = '', outfile: str = '', ax=None, species_label_bool=False):
-    fig, (ax0, ax1) = plt.subplots(1,2,figsize=(15,4))
-    plot_distribution(metadata_path=metadata_path, column="damage_percent", value=damage_value, 
-                                        barcode=barcode, ax=ax0) 
-    plot_distribution(metadata_path=metadata_path, column="lifting_percent", value=lifting_value, 
-                                            barcode=barcode, ax=ax1)
-    plt.savefig(outfile, dpi=100)
+def plot_pixel_percentages(damage_percentage: Union[int, float], tissue_percentage: Union[int, float],
+                           lifting_percentage: Union[int, float], ventricles_percentage: Union[int, float],
+                           colormap_list: list = ["white", "orange", "green", "red", "blue"],
+                           colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
+                           ax = None, title: str = "", out_file: Union[str, Path]=None, dpi: int = 100):
     
+    # Plot pixel percentages
+    barlist = ax.bar([0, 1, 2, 3], [damage_percentage, tissue_percentage, lifting_percentage,
+                                                ventricles_percentage])
+    ax.set_title("Pixel Percentages of Ideal Tissue Area")
+    ax.set_xticks([0, 1, 2, 3])
+    ax.set_xticklabels(colormap_labels[1:])
+    barlist[0].set_color(colormap_list[1])
+    barlist[1].set_color(colormap_list[2])
+    barlist[2].set_color(colormap_list[3])
+    barlist[3].set_color(colormap_list[4])
+    for index, value in enumerate([damage_percentage, tissue_percentage, lifting_percentage,
+                                   ventricles_percentage]):
+        ax.text(index-0.15, value+0.5, f"{str(value)}%")
+    
+    if title != '':
+        ax.set_title(title)
+
+    if out_file != '':
+        plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
 
-def plot_pixel_classification(pixel_classification: np.ndarray,
-                              damage_percentage: Union[int, float],
-                              tissue_percentage: Union[int, float],
-                              lifting_percentage: Union[int, float],
-                              ventricles_percentage: Union[int, float],
-                              dapi_mask_path: Union[str, Path],
-                              transcript_mask_path: Union[str, Path],
-                              damage_mask_path: Union[str, Path],
-                              lifting_mask_path: Union[str, Path],
-                              ventricles_mask_path: Union[str, Path],
-                              outfile: Union[str, Path]):
+def plot_pixel_classification(pixel_classification: np.ndarray, ax=None, title: str = "", 
+                              colormap_list: list = ["white", "orange", "green", "red", "blue"],
+                              colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
+                              out_file: Union[str, Path] = None, dpi: int = 200):
     """
-    Plots pixel classification
+    Plots pixel classification of an experiment
+    """
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(5, 5))
+
+    # Create color map
+    cmap = ListedColormap(colormap_list)
+    bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 4.5]  # Define the boundaries for each color
+    norm = BoundaryNorm(bounds, cmap.N, clip=False)
+
+    # Plot pixel classification with specified color map
+    img = ax.imshow(pixel_classification, cmap=cmap, norm=norm, interpolation="none")
+    cbar = plt.colorbar(img, ticks=[0, 1, 2, 3, 4], ax=ax)
+    cbar.set_ticklabels(colormap_labels)
+
+    if title != '':
+        ax.set_title(title)
+
+    if out_file != '':
+        plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
+
+
+def plot_full_pixel_fig(pixel_classification: np.ndarray, damage_percentage: Union[int, float],
+                        tissue_percentage: Union[int, float], lifting_percentage: Union[int, float],
+                        ventricles_percentage: Union[int, float], dapi_mask_path: Union[str, Path],
+                        transcript_mask_path: Union[str, Path], damage_mask_path: Union[str, Path],
+                        lifting_mask_path: Union[str, Path], ventricles_mask_path: Union[str, Path],
+                        colormap_list: list = ["white", "orange", "green", "red", "blue"],
+                        colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
+                        out_file: Union[str, Path] = None, dpi: int = 200):
+    """
+    Plots full pixel classification figure with pixel classification, pixel 
+    percentages, and all masks used in classification
 
     Parameters
     ----------
@@ -399,13 +249,6 @@ def plot_pixel_classification(pixel_classification: np.ndarray,
     -------
     None
     """
-    # Create color map
-    colormap_list = ["white", "orange", "green", "red", "blue"]
-    colormap_labels = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"]
-    cmap = ListedColormap(colormap_list)
-    bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 4.5]  # Define the boundaries for each color
-    norm = BoundaryNorm(bounds, cmap.N, clip=False)
-
     # Create axes with gridspec
     gs = gridspec.GridSpec(6, 10)
     fig = plt.figure(figsize=(20, 12))
@@ -425,37 +268,31 @@ def plot_pixel_classification(pixel_classification: np.ndarray,
     ventricles_mask_ax.axis('off')
 
     # Plot pixel classification with specified color map
-    img = pixel_class_ax.imshow(pixel_classification, cmap=cmap, norm=norm, interpolation="none")
-    cbar = plt.colorbar(img, ticks=[0, 1, 2, 3, 4], ax=pixel_class_ax)
-    cbar.set_ticklabels(colormap_labels)
+    plot_pixel_classification(pixel_classification, ax=pixel_class_ax)
 
     # Plot pixel percentages
-    barlist = pixel_perc_ax.bar([0, 1, 2, 3], [damage_percentage, tissue_percentage, lifting_percentage,
-                                                ventricles_percentage])
-    pixel_perc_ax.set_title("Pixel Percentages of Ideal Tissue Area")
-    pixel_perc_ax.set_xticks([0, 1, 2, 3])
-    pixel_perc_ax.set_xticklabels(colormap_labels[1:])
-    barlist[0].set_color(colormap_list[1])
-    barlist[1].set_color(colormap_list[2])
-    barlist[2].set_color(colormap_list[3])
-    barlist[3].set_color(colormap_list[4])
-    for index, value in enumerate([damage_percentage, tissue_percentage, lifting_percentage,
-                                    ventricles_percentage]):
-        pixel_perc_ax.text(index-0.15, value+0.5, f"{str(value)}%")
-
+    plot_pixel_percentages(damage_percentage, tissue_percentage,lifting_percentage, 
+                           ventricles_percentage, ax = pixel_perc_ax)
+    
+    # Plot masks
     plot_masks(dapi_mask_ax, dapi_mask_path, transcript_mask_ax, transcript_mask_path,
-                                lifting_mask_ax, lifting_mask_path, damage_mask_ax, damage_mask_path,
-                                ventricles_mask_ax, ventricles_mask_path)
+               lifting_mask_ax, lifting_mask_path, damage_mask_ax, damage_mask_path,
+               ventricles_mask_ax, ventricles_mask_path)
 
     fig.subplots_adjust(hspace=0.7)
     plt.suptitle("Pixel Classification", fontsize=20)
-    plt.savefig(outfile, dpi=200, bbox_inches='tight', facecolor='white', transparent=False)
+
+    if out_file != None:
+        plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
+
     plt.show()
+    plt.close();
 
 
 def plot_masks(dapi_mask_ax=None, dapi_mask_path="", transcript_mask_ax=None, transcript_mask_path="",
                 lifting_mask_ax=None, lifting_mask_path="", damage_mask_ax=None, damage_mask_path="",
-                ventricles_mask_ax=None, ventricles_mask_path="", outfile: Union[str, Path] = ""):
+                ventricles_mask_ax=None, ventricles_mask_path="", out_file: Union[str, Path] = "",
+                dpi: int = 200):
 
     if dapi_mask_ax is not None and dapi_mask_path != "":
         dapi_mask = tiff.imread(dapi_mask_path)
@@ -487,4 +324,6 @@ def plot_masks(dapi_mask_ax=None, dapi_mask_path="", transcript_mask_ax=None, tr
         ventricles_mask_ax.set_title("Ventricles Mask")
         ventricles_mask_ax.axis('off')
 
-    plt.savefig(outfile, dpi=200, bbox_inches='tight', facecolor='white', transparent=False)
+    if out_file != None:
+        plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
+
