@@ -159,6 +159,54 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, a
     plt.show()
     plt.close();
 
+def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Union[str, Path] = '', ylim: bool = True):
+    """
+    Plot (and save) figure of extracted fluidics log file data
+
+    Flow rates for each time point in experiment plotted with median flow rate highlighted and
+    dotted low flow rate line plotted at 0.8 flow units
+
+    Parameters
+    ----------
+    flow_data : tuple
+        Tuple of arrays: hrs_after_start, flow_rates, median_flow_times, median_flow_rates
+    title : str, optional
+        Title for plot. Default is None.
+    out_path : str or Path, optional
+        Path to save flow figure. Default is ''
+    ylim : bool, optional
+        Whether to limit y axis on scale to (0, 2). Default is True.
+    Returns
+    -------
+    ax : matplotlib.Axes.axes
+        Modified axes with plot
+
+    Notes
+    -----
+    Ideal flow rates are between 1.0 and 1.5, and most common concerns are about low flow rates. Especially high
+    (> 2) flow rate data points indicate air bubbles in the fluidics lines causing flow sensor to detect transient
+    but extreme flow rates. Setting ylim to False unrestricts the y axis range to properly visualize these points
+    """
+
+    hrs_after_start, flow_rates, median_flow_times, median_flow_rates = flow_data
+
+    fig, ax = plt.subplots(figsize=(15, 5))
+    ax.plot(hrs_after_start, flow_rates, '.k')
+    ax.plot(median_flow_times, median_flow_rates, 'or')
+    if ylim:
+        ax.set_ylim(0, 2)
+    ax.set_xlim(0, hrs_after_start[-1]+1)
+    ax.set_xlabel('time (hr)')
+    ax.set_ylabel('flow')
+    ax.set_yticks([0, 2])
+    ax.axhline(0.8, ls=':', color='b')
+
+    if title != '':
+        ax.set_title(title)
+
+    if out_file != '':
+        fig.savefig(out_file)
+
 
 def plot_pixel_percentages(damage_percentage: Union[int, float], tissue_percentage: Union[int, float],
                            lifting_percentage: Union[int, float], ventricles_percentage: Union[int, float],
