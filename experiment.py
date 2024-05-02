@@ -2,10 +2,13 @@ from typing import Union
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import pixel_classification as pc
 
 class Experiment:
 
     def __init__(self, transcripts: pd.DataFrame = None, transcripts_path: Union[str, Path] = None):
+        ## CAN PROVIDE CODEBOOK AS OPTIONAL PARAMETER, IF EXISTS READ IT IN FROM DATA LOSS MODULE
+        ## CAN PROVIDE DAPI IMAGE PATH AS OPTIONAL PARAMETER, IF EXISTS READ IT IN FROM PIXEL CLASS MODULE? OR PATH?
         """
         Initialize an Experiment instance from transcripts dataframe 
         """
@@ -22,7 +25,7 @@ class Experiment:
         self.counts_per_gene = self.transcripts.groupby('gene').size().to_dict()
         # Remove 'Blank' codewords
         self.filtered_transcripts = self.remove_blanks(self.transcripts)
-        # self.n_genes = self.filtered_transcripts['gene'].nunique()
+        self.n_genes = self.filtered_transcripts['gene'].nunique()
         self.genes = [gene for gene in self.filtered_transcripts['gene'].unique()]
         # Total transcript counts, including 'Blank' codewords
         self.total_transcript_counts = len(self.transcripts)
@@ -31,8 +34,8 @@ class Experiment:
         # Number of z-planes imaged
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
-        self.fovs = self.get_fovs_dataframe(self.filtered_transcripts)
-
+        self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
+    
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
@@ -235,3 +238,25 @@ class Experiment:
         counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
         fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
         return fovs
+
+
+    @staticmethod
+    def get_transcript_density(transcripts_image_path: np.ndarray = None, transcripts_image: np.ndarray = None, 
+                               transcripts_mask_path: np.ndarray = None, transcripts_mask: np.ndarray = None):
+        """
+        Calculates transcript density per on-tissue micron
+        """
+        transcripts_image = pc.get_image(transcripts_image_path, transcripts_image)
+        transcripts_mask = pc.get_imgae(transcripts_mask_path, transcripts_mask)
+
+        on_tissue_filtered_transcript_count = np.sum(transcripts_image[transcripts_mask == 1])
+        transcript_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
+
+        # When issue with Ilastik mask or experiment such that transcript counts are way low
+        if transcript_mask_area > 0:
+            transcript_density_um2 = on_tissue_filtered_transcript_count / transcript_mask_area
+        else:
+            transcript_density_um2 = np.nan
+
+        return on_tissue_filtered_transcript_count, transcript_mask_area, transcript_density_um2
+    
