@@ -9,7 +9,7 @@ from matplotlib.colors import Normalize as color_normalize
 from matplotlib.patches import Rectangle
 import matplotlib.cm as cm
 from typing import Union
-import pixel_classification
+import pixel_classification as pc
 
 
 class FOVDropout:
@@ -23,7 +23,14 @@ class FOVDropout:
         pass
 
     @staticmethod
-    def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame, paths_dict: dict, force_mask: bool = False):
+    def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame, 
+                            transcripts_mask_path: Union[str, Path] = None,
+                            transcripts_mask: np.ndarray = None,
+                            transcripts_image_path: Union[str, Path] = None,
+                            ilastik_program_path: Union[str, Path] = None,
+                            pixel_model_path: Union[str, Path] = None,
+                            object_model_path: Union[str, Path] = None,
+                            force_mask: bool = False):
         """
         Use ilastik transcripts mask to detemine on- and off-tissue FOVs
         FOV is considered on-tissue if at least 50% of its area is on-tissue
@@ -35,7 +42,7 @@ class FOVDropout:
         fovs : pd.DataFrame
             FOVs dataframe
         paths_dict : dict
-            Dictionary containing trancsripts mask path
+            Dictionary containing transcripts mask path
         force_mask : bool, optional
             Whether to force the creation of a new transcripts mask
 
@@ -55,24 +62,30 @@ class FOVDropout:
         saves a transposed version of that image to match the remaining (i.e., DAPI, ventricles) masks. For this reason,
         the mask is transposed after being read in, to match the original transcripts dimensions.
         """
-        mask_path = paths_dict['transcript_mask_path']
-        image_path = paths_dict['transcript_image_path']
-        ilastik_program_path = paths_dict['ilastik_program_path']
-        pixel_class_path = paths_dict['transcript_mask_pixel_model']
-        object_class_path = paths_dict['transcript_mask_object_model']
 
-        mask_x_bins, mask_y_bins = pixel_classification.create_transcript_image(transcripts)
+        _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts)
 
-        if not force_mask and os.path.exists(mask_path):
-            mask = tiff.imread(mask_path)
-            mask = mask.T  # Transpose to match original transcripts dimensions
+        if not force_mask:
+            try:
+                transcripts_mask = pc.get_image(transcripts_mask_path, transcripts_mask)
+            except FileNotFoundError:
+                raise Exception(f"transcripts mask not found at {transcripts_mask_path}")
         else:
+            if transcripts_image_path is None:
+                raise Exception("transcripts_image_path must be provided")
+            if ilastik_program_path is None:
+                raise Exception("ilastik_program_path must be provided")
+            if pixel_model_path is None:
+                raise Exception("pixel_model_path must be provided")
+            if object_model_path is  None:
+                raise Exception("object_model_path must be provided")
+            
             # Create and save mask
-            mask_x_bins, mask_y_bins = pixel_classification.create_transcript_image(transcripts, image_path)
-            pixel_classification.generate_mask(ilastik_program_path, image_path, pixel_class_path, object_class_path)
-
-            mask = tiff.imread(mask_path)
-            mask = mask.T  # Transpose to match original transcripts dimensions
+            _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts, transcripts_image_path)
+            transcripts_mask = pc.generate_transcript_mask(transcripts_image_path, ilastik_program_path,
+                                                        pixel_model_path, object_model_path)
+            
+        transcripts_mask = transcripts_mask.T  # Transpose to match original transcripts dimensions
 
         on_tissue = []
         for fov in fovs.index:
