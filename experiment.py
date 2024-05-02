@@ -33,9 +33,6 @@ class Experiment:
         # DataFrame grouped by FOVs and storing FOV information
         self.fovs = self.get_fovs_dataframe(self.filtered_transcripts)
 
-        # TODO
-        # self.barcode = 
-
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
