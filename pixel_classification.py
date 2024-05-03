@@ -50,22 +50,6 @@ def generate_mask(ilastik_program_path: Union[str, Path], input_image_path: Unio
     ilastik_workflow.run_ilastik_workflow(object_workflow_args)
 
 
-# def get_image(image_path: Union[str,Path] = None, image: np.ndarray = None):
-#     """
-#     Helper function to return images from image path or image
-#     """    
-#     if image_path is None and image is None:
-#         raise Exception("image_path or image must be provided as arguments")
-
-#     if image_path is not None and image is None:
-#         try:
-#             image=tiff.imread(image_path)
-#         except FileNotFoundError:
-#             raise Exception(f"{image_path} file not found")
-        
-#     return image
-
-
 def rounddown_10(x: Union[int, float]) -> int:
     """
     Helper function rounds down given number to nearest multiple of 10
