@@ -2,23 +2,50 @@ from typing import Union
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import json
 import pixel_classification as pc
+import data_processing
+from data_loss import FOVDropout
 
 class Experiment:
 
-    def __init__(self, transcripts: pd.DataFrame = None, transcripts_path: Union[str, Path] = None):
-        ## CAN PROVIDE CODEBOOK AS OPTIONAL PARAMETER, IF EXISTS READ IT IN FROM DATA LOSS MODULE
-        ## CAN PROVIDE DAPI IMAGE PATH AS OPTIONAL PARAMETER, IF EXISTS READ IT IN FROM PIXEL CLASS MODULE? OR PATH?
+    def __init__(self, transcripts_input: Union[pd.DataFrame, str, Path],
+                 ilastik_paths_json_input: Union[dict, str, Path] = None,
+                 transcripts_image_path: Union[str, Path] = None,
+                 transcripts_mask_path: Union[str, Path] = None,
+                 dapi_high_res_image_path: Union[str, Path] = None,
+                 dapi_image_path: Union[str, Path] = None,
+                 dapi_mask_path: Union[str, Path] = None,
+                 detachment_mask_path: Union[str, Path] = None,
+                 ventricle_image_path: Union[str, Path] = None,
+                 ventricle_mask_path: Union[str, Path] = None,
+                 damage_mask_path: Union[str, Path] = None,
+                 pixel_classification_path: Union[str, Path] = None,
+                 codebook_input: Union[pd.DataFrame, str, Path] = None,
+                 output_dir: Union[str, Path] = None):
         """
         Initialize an Experiment instance from transcripts dataframe 
         """
-        if transcripts_path is None and transcripts is None:
-            raise Exception("Either transcripts_path or transcripts must be provided")
-        
-        if transcripts_path is not None and transcripts is None:
-            # Read transcripts
-            transcripts = self.read_transcripts(self.transcripts_path)
+        # Assign ilastik paths as attributes 
+        ilastik_paths = data_processing.process_input(ilastik_paths_json_input)
+        self.unpack_dictionary(ilastik_paths)
 
+        # Assign parameters as self attributes
+        self.transcripts_image_path = transcripts_image_path if transcripts_image_path is not None else None
+        self.transcripts_mask_path = transcripts_mask_path if transcripts_mask_path is not None else None
+        self.dapi_high_res_image_path = dapi_high_res_image_path if dapi_high_res_image_path is not None else None
+        self.dapi_image_path = dapi_image_path if dapi_image_path is not None else None
+        self.dapi_mask_path = dapi_mask_path if dapi_mask_path is not None else None
+        self.detachment_mask_path = detachment_mask_path if detachment_mask_path is not None else None
+        self.ventricle_image_path = ventricle_image_path if ventricle_image_path is not None else None
+        self.ventricle_mask_path = ventricle_mask_path if ventricle_mask_path is not None else None
+        self.damage_mask_path = damage_mask_path if damage_mask_path is not None else None
+        self.codebook = data_processing.process_input(codebook_input) if codebook_input is not None else None
+        self.output_dir = output_dir if output_dir is not None else None
+        self.pixel_classification_path = pixel_classification_path if pixel_classification_path is not None else None
+
+        # Transcripts dataframe
+        transcripts = data_processing.process_input(transcripts_input)
         # Adjust (x,y) locations
         self.transcripts = self.scale_transcripts_xy(transcripts)
         # Counts per gene (including blanks)
@@ -28,14 +55,37 @@ class Experiment:
         self.n_genes = self.filtered_transcripts['gene'].nunique()
         self.genes = [gene for gene in self.filtered_transcripts['gene'].unique()]
         # Total transcript counts, including 'Blank' codewords
-        self.total_transcript_counts = len(self.transcripts)
+        self.total_transcripts_counts = len(self.transcripts)
         # Total transcript counts, excluding 'Blank' codewords
         self.filtered_transcripts_count = len(self.filtered_transcripts)
         # Number of z-planes imaged
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
         self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
+
+        # Create transcripts mask if parameters are provided
+        if not data_processing.check_if_none(self.ilastik_program_path, self.transcripts_pixel_model_path, 
+                                             self.transcripts_object_model_path, self.transcripts_image_path, 
+                                             self.transcripts_mask_path):
+            self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path, 
+                                                                self.ilastik_program_path, 
+                                                                self.transcripts_pixel_model_path, 
+                                                                self.transcripts_object_model_path, 
+                                                                self.filtered_transcripts)
+            
+        
     
+    def unpack_dictionary(self, dictionary: dict):
+        """
+        Unpacks every key-value pair from the dictionary into a self attribute
+
+        Parameters
+        ----------
+        dictionary : dict
+            Dictionary to unpack into self attributes
+        """
+        for key, val in dictionary.items():
+            setattr(self, key, val)
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
@@ -139,7 +189,7 @@ class Experiment:
 
         # Add transcript counts per FOV
         num_planes = transcripts['global_z'].nunique()
-        fovs['transcript_count'] = transcripts.groupby('fov').size()
+        fovs['transcripts_count'] = transcripts.groupby('fov').size()
 
         # Add counts per z-plane per FOV
         for i in range(num_planes):
@@ -241,22 +291,131 @@ class Experiment:
 
 
     @staticmethod
-    def get_transcript_density(transcripts_image_path: np.ndarray = None, transcripts_image: np.ndarray = None, 
-                               transcripts_mask_path: np.ndarray = None, transcripts_mask: np.ndarray = None):
+    def get_transcripts_density(transcripts_image_input: Union[np.ndarray, str, Path], 
+                               transcripts_mask_input: Union[np.ndarray, str, Path]):
         """
         Calculates transcript density per on-tissue micron
         """
-        transcripts_image = pc.get_image(transcripts_image_path, transcripts_image)
-        transcripts_mask = pc.get_imgae(transcripts_mask_path, transcripts_mask)
+        transcripts_image = data_processing.process_input(transcripts_image_input)
+        transcripts_mask = data_processing.process_input(transcripts_mask_input)
 
-        on_tissue_filtered_transcript_count = np.sum(transcripts_image[transcripts_mask == 1])
-        transcript_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
+        on_tissue_filtered_transcripts_count = np.sum(transcripts_image[transcripts_mask == 1])
+        transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
-        if transcript_mask_area > 0:
-            transcript_density_um2 = on_tissue_filtered_transcript_count / transcript_mask_area
+        if transcripts_mask_area > 0:
+            transcripts_density_um2 = on_tissue_filtered_transcripts_count / transcripts_mask_area
         else:
-            transcript_density_um2 = np.nan
+            transcripts_density_um2 = np.nan
 
-        return on_tissue_filtered_transcript_count, transcript_mask_area, transcript_density_um2
+        return on_tissue_filtered_transcripts_count, transcripts_mask_area, transcripts_density_um2
     
+    def run_dropout_pipeline(self):
+        """
+        Runs entire dropout pipeline, including false positive correction
+
+        Attributes Set
+        --------------
+        fovs : pd.DataFrame
+            FOVs dataframe including all dropout information
+        """
+        self.fovs_df = FOVDropout.find_on_tissue_fovs(self.filtered_transcripts, self.fovs_df,
+                                                      self.transcripts_mask, self.transcripts_image_path,
+                                                      self.ilastik_program_path, 
+                                                      self.transcripts_pixel_classification_path,
+                                                      self.transcripts_object_classification_path)
+        self.fovs_df = FOVDropout.detect_dropouts(self.filtered_transcripts, self.fovs_df)
+        self.fovs_df = FOVDropout.compare_codebook_fov_genes(self.fovs_df, self.codebook)
+        self.fovs_df = FOVDropout.detect_false_positives(self.fovs_df, self.codebook)
+        
+        if self.output_dir is not None:
+            FOVDropout.save_fov_tsv(self.fovs, self.output_dir)
+
+    def run_pixel_classification(self):
+        """
+        Runs entire pixel classification workflow:
+            - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
+            - resizes and aligns masks
+            - calculates pixel percentages over "ideal" tissue area
+
+        Attributes Set
+        --------------
+        pixel_areas : np.ndarray
+            Array of pixel classification area designations in microns: [damage, tissue, gel lifting, ventricles]
+        pixel_percentages : np.ndarray
+            Array of pixel classification area designations as percentage of "ideal" tissue area
+            [damage, tissue, gel lifting, ventricles]
+        ideal_tissue_area : float
+            Sum of all non-off-tissue pixels
+        """
+        print("Generating transcript mask...")
+        pc.generate_transcripts_mask(self.transcripts_image_path,
+                                     self.ilastik_program_path,
+                                     self.transcripts_pixel_classification_path,
+                                     self.transcripts_object_classification_path,
+                                     self.transcripts_mask_path,
+                                     self.filtered_transcripts)
+
+        print("Generating DAPI mask...")
+        pc.generate_dapi_mask(self.dapi_image_path,
+                              self.ilastik_program_path,
+                              self.dapi_pixel_classification_path,
+                              self.dapi_object_classification_path,
+                              self.dapi_mask_path,
+                              self.dapi_high_res_image_path)
+
+        print("Generating lifting mask...")
+        pc.generate_detachment_mask(self.transcripts_mask_path,
+                                    self.dapi_mask_path,
+                                    self.detachment_mask_path)
+        
+        if any(np.isin(self.genes, self.ventricle_genes_list)): # if ventricle genes exist
+            print("Generating ventricle mask...")
+            pc.generate_ventricle_mask(self.ventricle_image_path,
+                                       self.ventricle_genes_list,
+                                       self.dapi_mask_path,
+                                       self.transcripts_mask_path,
+                                       self.ilastik_program_path,
+                                       self.ventricle_pixel_classification_path,
+                                       self.ventricle_object_classification_path,
+                                       self.filtered_transcripts)
+
+            print("Generating damage mask...")
+            pc.generate_damage_mask(self.damage_mask_path,
+                                    self.dapi_image_path,
+                                    self.dapi_mask_path,
+                                    self.transcripts_mask_path,
+                                    self.ventricle_mask_path)
+
+            pc.resize_all_masks(self.transcripts_mask_path,
+                                self.dapi_mask_path,
+                                self.detachment_mask_path,
+                                self.ventricle_mask_path,
+                                self.damage_mask_path)
+
+            # Classify each pixel
+            print("Classifying pixels...")
+            self.full_pixel_classification = pc.classify_pixels(self.transcripts_mask_path,
+                                                                self.detachment_mask_path,
+                                                                self.ventricle_mask_path,
+                                                                self.damage_mask_path,
+                                                                self.full_pixel_classification_path)
+
+            # Get pixel areas in microns and as percentage of "ideal" tissue area
+            self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area = pc.calculate_class_areas(self.full_pixel_classification)
+            self.damage_percent, self.tissue_percent, self.detachment_percent, self.ventricle_percent = pc.calculate_class_percentages(self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area)
+
+            pixel_stats_dict = {'damage_area': self.damage_area,
+                                'transcripts_area': self.transcripts_area,
+                                'detachment_area': self.detachment_area,
+                                'ventricle_area': self.ventricle_area,
+                                'damage_percent': self.damage_percent,
+                                'tissue_percent': self.tissue_percent,
+                                'detachment_percent': self.detachment_percent,
+                                'ventricle_percent': self.ventricle_percent,
+                                'total_area': self.total_area}
+
+        # Convert and write JSON object to file
+        if self.output_dir is not None:
+            with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
+                json.dump(pixel_stats_dict, outfile, indent=4)
