@@ -369,6 +369,10 @@ class Experiment:
                                     self.dapi_mask_path,
                                     self.detachment_mask_path)
         
+        
+        # TODO: set transcripts, dapi, detachment sizes as attributes -- need to calculate first !!! 
+
+        
         if any(np.isin(self.genes, self.ventricle_genes_list)): # if ventricle genes exist
             print("Generating ventricle mask...")
             pc.generate_ventricle_mask(self.ventricle_image_path,
