@@ -604,7 +604,7 @@ def resize_all_masks(transcripts_mask: np.ndarray,
 
     return transcripts_mask, dapi_mask, detachment_mask, ventricle_mask, damage_mask
 
-
+# TODO: Make classify_pixels able to classify in absence of ventricle genes
 def classify_pixels(transcripts_mask_input: Union[np.ndarray, str, Path],
                     detachment_mask_input: Union[np.ndarray, str, Path],
                     ventricle_mask_input: Union[np.ndarray, str, Path],
