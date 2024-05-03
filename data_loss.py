@@ -25,7 +25,7 @@ class FOVDropout:
 
     @staticmethod
     def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame, 
-                            transcripts_mask_input: Union[np.ndarray, str, Path] = None,
+                            transcripts_mask_path: Union[str, Path] = None,
                             transcripts_image_path: Union[str, Path] = None,
                             ilastik_program_path: Union[str, Path] = None,
                             pixel_model_path: Union[str, Path] = None,
@@ -41,16 +41,12 @@ class FOVDropout:
             Transcripts table dataframe
         fovs : pd.DataFrame
             FOVs dataframe 
-        transcripts_mask_path : str or Path
-            Path to transcripts mask for on-tissue determination. 
-            Can be used in place of transcripts_mask. Required if
-            force_mask is False
-        transcripts_mask : np.ndarray
-            Transcripts mask for on-tissue determination. Can be used 
-            in place of transcripts_mask. Required if force_mask is False
+        transcripts_mask_path : np.ndarray or str or Path
+            String or Path of path to transcripts mask. Optional,
+            required if force_mask is False
         transcripts_image_path : str or Path
-            Path to transcripts image for transcripts mask generation.
-            Required if force_mask is True
+            Path to transcripts image to save image for transcripts mask 
+            generation. Required if force_mask is True
         ilastik_program_path : str or Path
             Path to ilastik program for transcripts mask generation. 
             Required if force_mask is True
@@ -82,8 +78,8 @@ class FOVDropout:
 
         _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts)
 
-        if not force_mask:
-            transcripts_mask = data_processing.process_input(transcripts_mask_input)
+        if not force_mask and os.path.exists(transcripts_mask_path):
+            transcripts_mask = tiff.imread(transcripts_mask_path)
         else:
             if transcripts_image_path is None:
                 raise Exception("transcripts_image_path must be provided")
