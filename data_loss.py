@@ -40,9 +40,26 @@ class FOVDropout:
         transcripts : pd.DataFrame
             Transcripts table dataframe
         fovs : pd.DataFrame
-            FOVs dataframe
-        paths_dict : dict
-            Dictionary containing transcripts mask path
+            FOVs dataframe 
+        transcripts_mask_path : str or Path
+            Path to transcripts mask for on-tissue determination. 
+            Can be used in place of transcripts_mask. Required if
+            force_mask is False
+        transcripts_mask : np.ndarray
+            Transcripts mask for on-tissue determination. Can be used 
+            in place of transcripts_mask. Required if force_mask is False
+        transcripts_image_path : str or Path
+            Path to transcripts image for transcripts mask generation.
+            Required if force_mask is True
+        ilastik_program_path : str or Path
+            Path to ilastik program for transcripts mask generation. 
+            Required if force_mask is True
+        pixel_model_path : str or Path
+            Path to pixel classification model for transcripts mask
+            generation. Required if force_mask is True
+        object_model_path : 
+            Path to object classification model for transcripts mask
+            generation. Required if force_mask is True
         force_mask : bool, optional
             Whether to force the creation of a new transcripts mask
 
@@ -70,6 +87,8 @@ class FOVDropout:
                 transcripts_mask = pc.get_image(transcripts_mask_path, transcripts_mask)
             except FileNotFoundError:
                 raise Exception(f"transcripts mask not found at {transcripts_mask_path}")
+            except Exception:
+                raise Exception("transcripts_mask_path or transcripts_mask must be provided")
         else:
             if transcripts_image_path is None:
                 raise Exception("transcripts_image_path must be provided")
@@ -96,7 +115,7 @@ class FOVDropout:
             mask_max_y = np.digitize(fovs.loc[fov, 'y_max'], mask_y_bins)
 
             # If 50% of FOV is on tissue, consider it on-tissue
-            if np.sum(mask[mask_min_x:mask_max_x, mask_min_y:mask_max_y]) >= \
+            if np.sum(transcripts_mask[mask_min_x:mask_max_x, mask_min_y:mask_max_y]) >= \
                 0.5 * (mask_max_x - mask_min_x) * (mask_max_y - mask_min_y) and \
                     fovs.loc[fov, 'height'] > 0 and fovs.loc[fov, 'width'] > 0:
                 on_tissue.append(True)
