@@ -1,0 +1,10 @@
+{
+    "ilastik_program_path": "",
+    "transcripts_pixel_classification_path": "",
+    "transcripts_object_classification_path": "",
+    "dapi_pixel_classification_path": "",
+    "dapi_object_classiifcation_path": "",
+    "ventricle_pixel_classification_path": "",
+    "ventricle_object_classification_path": "",
+    "ventricle_genes_list": [""]
+}

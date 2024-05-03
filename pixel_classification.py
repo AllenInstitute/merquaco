@@ -239,39 +239,39 @@ def on_tissue_threshold(dapi_image: np.ndarray, bin_count: int) -> int:
 
     return threshold
 
-def create_transcript_image(transcripts: np.ndarray, transcript_image_path: Union[str, Path] = ''):
+def create_transcripts_image(transcripts: np.ndarray, transcripts_image_path: Union[str, Path] = ''):
     """
     Creates transcripts image from transcripts via 2D histogram
     """
     img, mask_x_bins, mask_y_bins = get_hist2d(transcripts)
         
-    if transcript_image_path != '':
-        tiff.imwrite(transcript_image_path, img.T)  # Transpose image to be the same orientation as DAPI mask
+    if transcripts_image_path != '':
+        tiff.imwrite(transcripts_image_path, img.T)  # Transpose image to be the same orientation as DAPI mask
 
     return img, mask_x_bins, mask_y_bins  # Returns bins for FOV drop out
 
-def generate_transcript_mask(transcript_image_path: Union[str, Path],
-                             ilastik_program_path: Union[str, Path],
-                             pixel_classification_model_path: Union[str, Path],
-                             object_classification_model_path: Union[str, Path],
-                             filtered_transcripts: pd.DataFrame = None):
+def generate_transcripts_mask(transcripts_image_path: Union[str, Path],
+                              ilastik_program_path: Union[str, Path],
+                              pixel_classification_model_path: Union[str, Path],
+                              object_classification_model_path: Union[str, Path],
+                              filtered_transcripts: pd.DataFrame = None):
     """
     Generate transcripts mask from transcripts table dataframe
     """
-    if not os.path.exists(transcript_image_path):  # If transcript_image does not exist
+    if not os.path.exists(transcripts_image_path):  # If transcripts_image does not exist
         if filtered_transcripts is not None:
             # Convert transcripts to image and save
-            _ = create_transcript_image(filtered_transcripts, transcript_image_path)
+            _ = create_transcripts_image(filtered_transcripts, transcripts_image_path)
         else:
             raise Exception("transcripts image does not exist, transcripts must be provided")
 
-    generate_mask(ilastik_program_path, transcript_image_path, 
+    generate_mask(ilastik_program_path, transcripts_image_path, 
                   pixel_classification_model_path, object_classification_model_path)
     
-    transcript_mask_path = Path(transcript_image_path).with_name(Path(transcript_image_path).name.replace('.tiff', '_mask.tiff'))
-    transcript_mask = tiff.imread(transcript_mask_path)
+    transcripts_mask_path = Path(transcripts_image_path).with_name(Path(transcripts_image_path).name.replace('.tiff', '_mask.tiff'))
+    transcripts_mask = tiff.imread(transcripts_mask_path)
     
-    return transcript_mask
+    return transcripts_mask
     
 
 def create_dapi_image(high_res_dapi_image_path: str, low_res_dapi_image_path: str) -> np.ndarray:
@@ -344,7 +344,7 @@ def generate_dapi_mask(dapi_image_path: Union[str, Path],
     return dapi_mask
 
 
-def generate_detachment_mask(transcript_mask_path: Union[str, Path],
+def generate_detachment_mask(transcripts_mask_path: Union[str, Path],
                              dapi_mask_path: Union[str, Path],
                              detachment_mask_path: Union[str, Path]):
     """
@@ -352,7 +352,7 @@ def generate_detachment_mask(transcript_mask_path: Union[str, Path],
 
     Parameters
     ----------
-    transcript_mask_path : str or Path
+    transcripts_mask_path : str or Path
         Path to binary transcript mask
     dapi_mask_path : str or Path
         Path to binary DAPI mask
@@ -369,12 +369,12 @@ def generate_detachment_mask(transcript_mask_path: Union[str, Path],
         If any of the input paths don't exist
     """
     # Read in masks
-    transcript_mask = tiff.imread(transcript_mask_path)
+    transcripts_mask = tiff.imread(transcripts_mask_path)
     dapi_mask = tiff.imread(dapi_mask_path)
     # Resize DAPI mask to same size as transcript mask
-    dapi_mask = resize_mask(dapi_mask, by=transcript_mask)
+    dapi_mask = resize_mask(dapi_mask, by=transcripts_mask)
     # Generate detachment mask by subtracting transcript mask from DAPI mask
-    detachment_mask = dapi_mask - transcript_mask
+    detachment_mask = dapi_mask - transcripts_mask
     # Not detachment: '-1's correspond to regions where there are transcripts but no DAPI
     detachment_mask[detachment_mask == -1] = 0
 
@@ -385,7 +385,7 @@ def generate_detachment_mask(transcript_mask_path: Union[str, Path],
 
 def create_ventricle_genes_image(ventricle_genes_image_path: Union[str, Path],
                                  dapi_mask_path: Union[str, Path],
-                                 transcript_mask_path: Union[str, Path],
+                                 transcripts_mask_path: Union[str, Path],
                                  filtered_transcripts: pd.DataFrame,
                                  ventricle_genes: list = ["Crb2","Glis3","Inhbb",
                                                           "Naaa","Cd24a","Dsg2","Hdc",
@@ -395,10 +395,10 @@ def create_ventricle_genes_image(ventricle_genes_image_path: Union[str, Path],
     Creates and saves image of ventricle genes superimposed on DAPI image
     """
     dapi_mask = tiff.imread(dapi_mask_path)
-    transcript_mask = tiff.imread(transcript_mask_path)
+    transcripts_mask = tiff.imread(transcripts_mask_path)
 
     # Resize DAPI to be same size as transcript mask so ventricle outline can be added
-    dapi_mask = resize_mask(dapi_mask, by=transcript_mask)
+    dapi_mask = resize_mask(dapi_mask, by=transcripts_mask)
                                         
     # Define empty list to append gene density maps
     gene_density_maps = []
@@ -427,7 +427,7 @@ def create_ventricle_genes_image(ventricle_genes_image_path: Union[str, Path],
 
 def generate_ventricle_mask(ventricle_genes_image_path: Union[str, Path],
                             dapi_mask_path: Union[str, Path],
-                            transcript_mask_path: Union[str, Path],
+                            transcripts_mask_path: Union[str, Path],
                             ilastik_program_path: Union[str, Path],
                             pixel_classification_model_path: Union[str, Path],
                             object_classification_model_path: Union[str, Path],
@@ -446,7 +446,7 @@ def generate_ventricle_mask(ventricle_genes_image_path: Union[str, Path],
         List of ventricle marker genes
     dapi_mask_path : str or Path
         Path to binary DAPI mask
-    transcript_mask_path : str or Path
+    transcripts_mask_path : str or Path
         Path to binary transcripts mask
     ilastik_program_path : str or Path
         Path to ilastik program
@@ -463,7 +463,7 @@ def generate_ventricle_mask(ventricle_genes_image_path: Union[str, Path],
     """
     if not os.path.exists(ventricle_genes_image_path):
         create_ventricle_genes_image(ventricle_genes, ventricle_genes_image_path, 
-                                     dapi_mask_path, transcript_mask_path,filtered_transcripts)
+                                     dapi_mask_path, transcripts_mask_path,filtered_transcripts)
 
     generate_mask(ilastik_program_path, ventricle_genes_image_path,
                   pixel_classification_model_path, object_classification_model_path,
@@ -477,7 +477,7 @@ def generate_ventricle_mask(ventricle_genes_image_path: Union[str, Path],
 def generate_damage_mask(damage_mask_path: Union[str, Path],
                          dapi_image_path: Union[str, Path],
                          dapi_mask_path: Union[str, Path],
-                         transcript_mask_path: Union[str, Path],
+                         transcripts_mask_path: Union[str, Path],
                          ventricle_mask_path: Union[str, Path]):
     """
     Generate and save binary tissue damage mask
@@ -490,7 +490,7 @@ def generate_damage_mask(damage_mask_path: Union[str, Path],
         Path to DAPI image
     dapi_mask_path : str or Path
         Path to binary DAPI mask
-    transcript_mask_path : str or Path
+    transcripts_mask_path : str or Path
         Path to binary transcript mask
     ventricle_mask_path : str or Path
         Path to binary ventricles mask
@@ -502,7 +502,7 @@ def generate_damage_mask(damage_mask_path: Union[str, Path],
     # Read in masks
     dapi_image = tiff.imread(dapi_image_path)
     dapi_mask = tiff.imread(dapi_mask_path)
-    transcript_mask = tiff.imread(transcript_mask_path)
+    transcripts_mask = tiff.imread(transcripts_mask_path)
     ventricle_mask = tiff.imread(ventricle_mask_path)
 
     # Dilate and erode DAPI image
@@ -525,15 +525,15 @@ def generate_damage_mask(damage_mask_path: Union[str, Path],
     # Flood fill exterior with 0s, leaving only on-tissue damage and ventricles. This method flood fills edge damage
     damage_ventricles2 = flood_fill(inverted_dapi_mask, (0, 0), 0)
     # Make same size as transcript mask again since padding the DAPI mask increased its size
-    damage_ventricles1 = resize_mask(damage_ventricles1, by=transcript_mask)
-    damage_ventricles2 = resize_mask(damage_ventricles2, by=transcript_mask)
+    damage_ventricles1 = resize_mask(damage_ventricles1, by=transcripts_mask)
+    damage_ventricles2 = resize_mask(damage_ventricles2, by=transcripts_mask)
     # Add both methods of damage and ventricle detection
     damage_ventricles = damage_ventricles1 + damage_ventricles2
     # Make binary
     damage_ventricles[damage_ventricles > 1] = 1
 
     # Get damage only by subtracting ventricle mask
-    ventricle_mask = resize_mask(ventricle_mask, by=transcript_mask)
+    ventricle_mask = resize_mask(ventricle_mask, by=transcripts_mask)
     damage = damage_ventricles - ventricle_mask
     damage[damage == -1] = 0
 
@@ -552,30 +552,30 @@ def resize_all_masks(transcripts_mask_input: Union[np.ndarray, str, Path],
     Resize all masks to be same dimensions as transcripts mask
     """
     # Get masks
-    transcript_mask = data_processing.process_input(transcripts_mask_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
     dapi_mask = data_processing.process_input(dapi_mask_input)
     detachment_mask = data_processing.process_input(detachment_mask_input)
     ventricle_mask = data_processing.process_input(ventricle_mask_input)
     damage_mask = data_processing.process_input(damage_mask_input)
 
     # Resize all masks to be the same size as transcript mask
-    dapi_mask = resize_mask(dapi_mask, by=transcript_mask)
-    detachment_mask = resize_mask(detachment_mask, by=transcript_mask)
-    ventricle_mask = resize_mask(ventricle_mask, by=transcript_mask)
-    damage_mask = resize_mask(damage_mask, by=transcript_mask)
+    dapi_mask = resize_mask(dapi_mask, by=transcripts_mask)
+    detachment_mask = resize_mask(detachment_mask, by=transcripts_mask)
+    ventricle_mask = resize_mask(ventricle_mask, by=transcripts_mask)
+    damage_mask = resize_mask(damage_mask, by=transcripts_mask)
 
     return dapi_mask, detachment_mask, ventricle_mask, damage_mask
 
 
 
 
-def resize_all_masks(transcript_mask: np.ndarray,
+def resize_all_masks(transcripts_mask: np.ndarray,
                      dapi_mask: np.ndarray,
                      detachment_mask: np.nadarray,
                      ventricle_mask: np.nadarray,
                      damage_mask: np.ndarray,
                      save: bool = False,
-                     transcript_mask_path: Union[str, Path] = None,
+                     transcripts_mask_path: Union[str, Path] = None,
                      dapi_mask_path: Union[str, Path] = None,
                      detachment_mask_path: Union[str, Path] = None,
                      ventricle_mask_path: Union[str, Path] = None,
@@ -584,15 +584,15 @@ def resize_all_masks(transcript_mask: np.ndarray,
     Resize all masks to be same dimensions as transcripts mask
     """
     # Resize all masks to be the same size as transcript mask
-    dapi_mask = resize_mask(dapi_mask, by=transcript_mask)
-    detachment_mask = resize_mask(detachment_mask, by=transcript_mask)
-    ventricle_mask = resize_mask(ventricle_mask, by=transcript_mask)
-    damage_mask = resize_mask(damage_mask, by=transcript_mask)
+    dapi_mask = resize_mask(dapi_mask, by=transcripts_mask)
+    detachment_mask = resize_mask(detachment_mask, by=transcripts_mask)
+    ventricle_mask = resize_mask(ventricle_mask, by=transcripts_mask)
+    damage_mask = resize_mask(damage_mask, by=transcripts_mask)
 
     if save:
         try:
             # Save all masks with equal sizes
-            tiff.imwrite(transcript_mask_path, transcript_mask)
+            tiff.imwrite(transcripts_mask_path, transcripts_mask)
             tiff.imwrite(dapi_mask_path, dapi_mask)
             tiff.imwrite(detachment_mask_path, detachment_mask)
             tiff.imwrite(ventricle_mask_path, ventricle_mask)
@@ -602,10 +602,10 @@ def resize_all_masks(transcript_mask: np.ndarray,
         except Exception:
             raise Exception("Ensure paths to all masks are provided.")
 
-    return transcript_mask, dapi_mask, detachment_mask, ventricle_mask, damage_mask
+    return transcripts_mask, dapi_mask, detachment_mask, ventricle_mask, damage_mask
 
 
-def classify_pixels(transcript_mask_input: Union[np.ndarray, str, Path],
+def classify_pixels(transcripts_mask_input: Union[np.ndarray, str, Path],
                     detachment_mask_input: Union[np.ndarray, str, Path],
                     ventricle_mask_input: Union[np.ndarray, str, Path],
                     damage_mask_input: Union[np.ndarray, str, Path],
@@ -614,7 +614,7 @@ def classify_pixels(transcript_mask_input: Union[np.ndarray, str, Path],
     Combine all masks and classify each pixel as either damage, tissue, detachment, ventricle, or off-tissue
     """
     # Get masks
-    transcript_mask = data_processing.process_input(transcript_mask_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
     detachment_mask = data_processing.process_input(detachment_mask_input)
     ventricle_mask = data_processing.process_input(ventricle_mask_input)
     damage_mask = data_processing.process_input(damage_mask_input)
@@ -622,9 +622,9 @@ def classify_pixels(transcript_mask_input: Union[np.ndarray, str, Path],
     try:
         # Calculate pixel classification image with priority: damage > tissue > detachment > ventricle
         pixel_classification = (1 * damage_mask +
-                                2 * (transcript_mask & ~damage_mask) +
-                                3 * (detachment_mask & ~(damage_mask | transcript_mask)) +
-                                4 * (ventricle_mask & ~(damage_mask | transcript_mask | detachment_mask)))
+                                2 * (transcripts_mask & ~damage_mask) +
+                                3 * (detachment_mask & ~(damage_mask | transcripts_mask)) +
+                                4 * (ventricle_mask & ~(damage_mask | transcripts_mask | detachment_mask)))
     except:
         raise Exception("Cannot perform pixel classification on masks of unequal size.\
                         Call resize_all_masks function to make them equal in size.")
@@ -651,21 +651,23 @@ def calculate_class_areas(pixel_classification: np.ndarray):
         tuple of micron values for each pixel: [damage, tissue, gel detachment, ventricles]
     """
     damage_pixels = pixel_classification == 1
-    transcript_pixels = pixel_classification == 2
+    transcripts_pixels = pixel_classification == 2
     detachment_pixels = pixel_classification == 3
     ventricle_pixels = pixel_classification == 4
 
     # Calculate class areas in microns. Multiply by 100 since mask generation bins by 10 micron pixels
     damage_area = np.sum(damage_pixels) * 100
-    transcript_area = np.sum(transcript_pixels) * 100
+    transcripts_area = np.sum(transcripts_pixels) * 100
     detachment_area = np.sum(detachment_pixels) * 100
     ventricle_area = np.sum(ventricle_pixels) * 100
-    total_area = np.sum(damage_area, transcript_area, detachment_area, ventricle_area)
+    total_area = np.sum(damage_area, transcripts_area, detachment_area, ventricle_area)
 
-    return float(damage_area), float(transcript_area), float(detachment_area), float(ventricle_area), float(total_area)
+    return float(damage_area), float(transcripts_area), float(detachment_area), float(ventricle_area), float(total_area)
 
 
-def calculate_class_percentages(class_areas: np.ndarray = None):
+def calculate_class_percentages(damage_area: float, transcripts_area: float, 
+                                detachment_area: float, ventricle_area: float, 
+                                total_area: float):
     """
     Computes and uses "ideal" tissue area as denominator for pixel percentage calculations
 
@@ -686,9 +688,9 @@ def calculate_class_percentages(class_areas: np.ndarray = None):
     "Ideal" tissue is computed by summing all pixels that are not off-tissue.
     """
 
-    damage_percentage = np.round((class_areas[0] / class_areas[4]) * 100, 4)
-    transcript_percentage = np.round((class_areas[1] / class_areas[4]) * 100, 4)
-    detachment_percentage = np.round((class_areas[2] / class_areas[4]) * 100, 4)
-    ventricle_percentage = np.round((class_areas[3] / class_areas[4]) * 100, 4)
+    damage_percentage = np.round((damage_area / total_area) * 100, 4)
+    transcripts_percentage = np.round((transcripts_area / total_area) * 100, 4)
+    detachment_percentage = np.round((detachment_area / total_area) * 100, 4)
+    ventricle_percentage = np.round((ventricle_area / total_area) * 100, 4)
 
-    return float(damage_percentage), float(transcript_percentage), float(detachment_percentage), float(ventricle_percentage)
+    return float(damage_percentage), float(transcripts_percentage), float(detachment_percentage), float(ventricle_percentage)
