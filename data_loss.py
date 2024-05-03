@@ -10,6 +10,7 @@ from matplotlib.patches import Rectangle
 import matplotlib.cm as cm
 from typing import Union
 import pixel_classification as pc
+import data_processing
 
 
 class FOVDropout:
@@ -24,8 +25,7 @@ class FOVDropout:
 
     @staticmethod
     def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame, 
-                            transcripts_mask_path: Union[str, Path] = None,
-                            transcripts_mask: np.ndarray = None,
+                            transcripts_mask_input: Union[np.ndarray, str, Path] = None,
                             transcripts_image_path: Union[str, Path] = None,
                             ilastik_program_path: Union[str, Path] = None,
                             pixel_model_path: Union[str, Path] = None,
@@ -83,12 +83,7 @@ class FOVDropout:
         _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts)
 
         if not force_mask:
-            try:
-                transcripts_mask = pc.get_image(transcripts_mask_path, transcripts_mask)
-            except FileNotFoundError:
-                raise Exception(f"transcripts mask not found at {transcripts_mask_path}")
-            except Exception:
-                raise Exception("transcripts_mask_path or transcripts_mask must be provided")
+            transcripts_mask = data_processing.process_input(transcripts_mask_input)
         else:
             if transcripts_image_path is None:
                 raise Exception("transcripts_image_path must be provided")
