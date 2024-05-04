@@ -604,11 +604,10 @@ def resize_all_masks(transcripts_mask: np.ndarray,
 
     return transcripts_mask, dapi_mask, detachment_mask, ventricle_mask, damage_mask
 
-# TODO: Make classify_pixels able to classify in absence of ventricle genes
 def classify_pixels(transcripts_mask_input: Union[np.ndarray, str, Path],
                     detachment_mask_input: Union[np.ndarray, str, Path],
-                    ventricle_mask_input: Union[np.ndarray, str, Path],
-                    damage_mask_input: Union[np.ndarray, str, Path],
+                    ventricle_mask_input: Union[np.ndarray, str, Path] = None,
+                    damage_mask_input: Union[np.ndarray, str, Path] = None,
                     full_classification_out_file: Union[ str, Path] = None):
     """
     Combine all masks and classify each pixel as either damage, tissue, detachment, ventricle, or off-tissue
@@ -616,18 +615,26 @@ def classify_pixels(transcripts_mask_input: Union[np.ndarray, str, Path],
     # Get masks
     transcripts_mask = data_processing.process_input(transcripts_mask_input)
     detachment_mask = data_processing.process_input(detachment_mask_input)
-    ventricle_mask = data_processing.process_input(ventricle_mask_input)
-    damage_mask = data_processing.process_input(damage_mask_input)
+    ventricle_mask = data_processing.process_input(ventricle_mask_input) if ventricle_mask_input is not None else None
+    damage_mask = data_processing.process_input(damage_mask_input) if damage_mask_input is not None else None
 
-    try:
-        # Calculate pixel classification image with priority: damage > tissue > detachment > ventricle
-        pixel_classification = (1 * damage_mask +
-                                2 * (transcripts_mask & ~damage_mask) +
-                                3 * (detachment_mask & ~(damage_mask | transcripts_mask)) +
-                                4 * (ventricle_mask & ~(damage_mask | transcripts_mask | detachment_mask)))
-    except:
-        raise Exception("Cannot perform pixel classification on masks of unequal size.\
-                        Call resize_all_masks function to make them equal in size.")
+    if ventricle_mask is not None and damage_mask is not None:
+        try:
+            # Calculate pixel classification image with priority: damage > tissue > detachment > ventricle
+            pixel_classification = (1 * damage_mask +
+                                    2 * (transcripts_mask & ~damage_mask) +
+                                    3 * (detachment_mask & ~(damage_mask | transcripts_mask)) +
+                                    4 * (ventricle_mask & ~(damage_mask | transcripts_mask | detachment_mask)))
+        except:
+            raise Exception("Cannot perform pixel classification on masks of unequal size.\
+                            Call resize_all_masks function to make them equal in size.")
+        
+    elif ventricle_mask is None and damage_mask is None:
+        pixel_classification = (2 * transcripts_mask + 
+                                3 * detachment_mask & ~(transcripts_mask))
+    
+    else:
+        raise Exception("Both of or none of ventricle_mask_input and damage_mask_input must be provided.")
 
     if full_classification_out_file is not None:
         # Save full pixel classification
@@ -656,10 +663,10 @@ def calculate_class_areas(pixel_classification: np.ndarray):
     ventricle_pixels = pixel_classification == 4
 
     # Calculate class areas in microns. Multiply by 100 since mask generation bins by 10 micron pixels
-    damage_area = np.sum(damage_pixels) * 100
+    damage_area = np.sum(damage_pixels) * 100 if np.any(damage_pixels) else np.nan
     transcripts_area = np.sum(transcripts_pixels) * 100
     detachment_area = np.sum(detachment_pixels) * 100
-    ventricle_area = np.sum(ventricle_pixels) * 100
+    ventricle_area = np.sum(ventricle_pixels) * 100 if np.any(ventricle_pixels) else np.nan
     total_area = np.sum(damage_area, transcripts_area, detachment_area, ventricle_area)
 
     return float(damage_area), float(transcripts_area), float(detachment_area), float(ventricle_area), float(total_area)
@@ -688,7 +695,7 @@ def calculate_class_percentages(damage_area: float, transcripts_area: float,
     "Ideal" tissue is computed by summing all pixels that are not off-tissue.
     """
 
-    damage_percentage = np.round((damage_area / total_area) * 100, 4)
+    damage_percent = np.round((damage_area / total_area) * 100, 4)
     transcripts_percentage = np.round((transcripts_area / total_area) * 100, 4)
     detachment_percentage = np.round((detachment_area / total_area) * 100, 4)
     ventricle_percentage = np.round((ventricle_area / total_area) * 100, 4)
