@@ -696,8 +696,8 @@ def calculate_class_percentages(damage_area: float, transcripts_area: float,
     """
 
     damage_percent = np.round((damage_area / total_area) * 100, 4)
-    transcripts_percentage = np.round((transcripts_area / total_area) * 100, 4)
-    detachment_percentage = np.round((detachment_area / total_area) * 100, 4)
-    ventricle_percentage = np.round((ventricle_area / total_area) * 100, 4)
+    transcripts_percent = np.round((transcripts_area / total_area) * 100, 4)
+    detachment_percent = np.round((detachment_area / total_area) * 100, 4)
+    ventricle_percent = np.round((ventricle_area / total_area) * 100, 4)
 
-    return float(damage_percentage), float(transcripts_percentage), float(detachment_percentage), float(ventricle_percentage)
+    return float(damage_percent), float(transcripts_percent), float(detachment_percent), float(ventricle_percent)
