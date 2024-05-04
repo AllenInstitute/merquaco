@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def get_cb_list(transcripts: pd.DataFrame, num_planes: int = 7):
+def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7):
     """
     Performs checkerboard analysis across z-planes
     """
@@ -55,7 +55,7 @@ def get_image_dimensions(transcripts: pd.DataFrame):
 
     return np.round(max(max_x, max_y)) + 1000
 
-def get_cb_vals_all_z(transcripts: pd.DataFrame):
+def get_periodicity_vals_all_z(transcripts: pd.DataFrame):
     """
     Performs checkerboard analysis in all z-planes collapsed
     """
