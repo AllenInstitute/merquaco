@@ -3,9 +3,14 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import json
+import matplotlib.pyplot as plt
 import pixel_classification as pc
 import data_processing
-from data_loss import FOVDropout
+from data_loss import FOVDropout, DropoutResult
+import figures
+import z_plane_detection as zp
+import perfusion
+import periodicity
 
 class Experiment:
 
@@ -22,6 +27,7 @@ class Experiment:
                  damage_mask_path: Union[str, Path] = None,
                  pixel_classification_path: Union[str, Path] = None,
                  codebook_input: Union[pd.DataFrame, str, Path] = None,
+                 perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None):
         """
         Initialize an Experiment instance from transcripts dataframe 
@@ -41,6 +47,7 @@ class Experiment:
         self.ventricle_mask_path = ventricle_mask_path if ventricle_mask_path is not None else None
         self.damage_mask_path = damage_mask_path if damage_mask_path is not None else None
         self.codebook = data_processing.process_input(codebook_input) if codebook_input is not None else None
+        self.perfusion_path = perfusion_path if perfusion_path is not None else None
         self.output_dir = output_dir if output_dir is not None else None
         self.pixel_classification_path = pixel_classification_path if pixel_classification_path is not None else None
 
@@ -291,7 +298,7 @@ class Experiment:
 
 
     @staticmethod
-    def get_transcripts_density(transcripts_image_input: Union[np.ndarray, str, Path], 
+    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path], 
                                transcripts_mask_input: Union[np.ndarray, str, Path]):
         """
         Calculates transcript density per on-tissue micron
@@ -308,7 +315,7 @@ class Experiment:
         else:
             transcripts_density_um2 = np.nan
 
-        return on_tissue_filtered_transcripts_count, transcripts_mask_area, transcripts_density_um2
+        return on_tissue_filtered_transcripts_count, transcripts_density_um2
     
     def run_dropout_pipeline(self):
         """
@@ -331,7 +338,7 @@ class Experiment:
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs, self.output_dir)
 
-    def run_pixel_classification(self):
+    def run_full_pixel_classification(self):
         """
         Runs entire pixel classification workflow:
             - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
@@ -348,16 +355,21 @@ class Experiment:
         ideal_tissue_area : float
             Sum of all non-off-tissue pixels
         """
-        print("Generating transcript mask...")
-        pc.generate_transcripts_mask(self.transcripts_image_path,
-                                     self.ilastik_program_path,
-                                     self.transcripts_pixel_classification_path,
-                                     self.transcripts_object_classification_path,
-                                     self.transcripts_mask_path,
-                                     self.filtered_transcripts)
+        # Set attributes as None in case there are no ventricle genes
+        self.ventricle_mask = None
+        self.damage_mask = None 
+
+        if self.transcripts_mask is None:
+            print("Generating transcript mask...")
+            self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
+                                        self.ilastik_program_path,
+                                        self.transcripts_pixel_classification_path,
+                                        self.transcripts_object_classification_path,
+                                        self.transcripts_mask_path,
+                                        self.filtered_transcripts)
 
         print("Generating DAPI mask...")
-        pc.generate_dapi_mask(self.dapi_image_path,
+        self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
                               self.ilastik_program_path,
                               self.dapi_pixel_classification_path,
                               self.dapi_object_classification_path,
@@ -365,17 +377,13 @@ class Experiment:
                               self.dapi_high_res_image_path)
 
         print("Generating lifting mask...")
-        pc.generate_detachment_mask(self.transcripts_mask_path,
+        self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
                                     self.dapi_mask_path,
                                     self.detachment_mask_path)
         
-        
-        # TODO: set transcripts, dapi, detachment sizes as attributes -- need to calculate first !!! 
-
-        
         if any(np.isin(self.genes, self.ventricle_genes_list)): # if ventricle genes exist
             print("Generating ventricle mask...")
-            pc.generate_ventricle_mask(self.ventricle_image_path,
+            self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
                                        self.ventricle_genes_list,
                                        self.dapi_mask_path,
                                        self.transcripts_mask_path,
@@ -385,41 +393,108 @@ class Experiment:
                                        self.filtered_transcripts)
 
             print("Generating damage mask...")
-            pc.generate_damage_mask(self.damage_mask_path,
+            self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
                                     self.dapi_image_path,
                                     self.dapi_mask_path,
                                     self.transcripts_mask_path,
                                     self.ventricle_mask_path)
 
-            pc.resize_all_masks(self.transcripts_mask_path,
-                                self.dapi_mask_path,
-                                self.detachment_mask_path,
-                                self.ventricle_mask_path,
-                                self.damage_mask_path)
+            # resize all masks by transcripts mask 
+            self.dapi_mask, self.detachment_mask, self.ventricle_mask, self.damage_mask = pc.resize_all_masks(self.transcripts_mask,
+                                                                                                              self.dapi_mask,
+                                                                                                              self.detachment_mask,
+                                                                                                              self.ventricle_mask,
+                                                                                                              self.damage_mask)
 
-            # Classify each pixel
-            print("Classifying pixels...")
-            self.full_pixel_classification = pc.classify_pixels(self.transcripts_mask_path,
-                                                                self.detachment_mask_path,
-                                                                self.ventricle_mask_path,
-                                                                self.damage_mask_path,
-                                                                self.full_pixel_classification_path)
+        # Classify each pixel
+        print("Classifying pixels...")
+        self.pixel_classification = pc.classify_pixels(self.transcripts_mask,
+                                                       self.detachment_mask,
+                                                       self.ventricle_mask,
+                                                       self.damage_mask,
+                                                       self.pixel_classification_path)
 
-            # Get pixel areas in microns and as percentage of "ideal" tissue area
-            self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area = pc.calculate_class_areas(self.full_pixel_classification)
-            self.damage_percent, self.tissue_percent, self.detachment_percent, self.ventricle_percent = pc.calculate_class_percentages(self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area)
+        # Get pixel areas in microns and as percentage of "ideal" tissue area
+        self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area = pc.calculate_class_areas(self.pixel_classification)
+        self.damage_percent, self.transcripts_percent, self.detachment_percent, self.ventricle_percent = pc.calculate_class_percentages(self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area)
 
-            pixel_stats_dict = {'damage_area': self.damage_area,
-                                'transcripts_area': self.transcripts_area,
-                                'detachment_area': self.detachment_area,
-                                'ventricle_area': self.ventricle_area,
-                                'damage_percent': self.damage_percent,
-                                'tissue_percent': self.tissue_percent,
-                                'detachment_percent': self.detachment_percent,
-                                'ventricle_percent': self.ventricle_percent,
-                                'total_area': self.total_area}
+        pixel_stats_dict = {'damage_area': self.damage_area,
+                            'transcripts_area': self.transcripts_area,
+                            'detachment_area': self.detachment_area,
+                            'ventricle_area': self.ventricle_area,
+                            'damage_percent': self.damage_percent,
+                            'transcripts_percent': self.transcripts_percent,
+                            'detachment_percent': self.detachment_percent,
+                            'ventricle_percent': self.ventricle_percent,
+                            'total_area': self.total_area}
 
         # Convert and write JSON object to file
         if self.output_dir is not None:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
+
+    # TODO: if plot_figures, plot each figure 
+    def run_all_qc(self, run_pixel_classification: bool = True,
+                    run_dropout: bool = True, run_perfusion: bool = False,
+                    plot_figures: bool = True):
+        """
+        Runs all standard QC functions and prints results
+        """
+        # 1. Run  pixel classification workflow
+        if run_pixel_classification:
+            
+            self.run_full_pixel_classification()
+            if plot_figures:
+                figures.plot_full_pixel_fig(self.pixel_classification, self.dapi_mask, self.transcripts_mask, self.detachment_mask,
+                                            self.transcripts_percent, self.detachment_percent, self.damage_mask, self.ventricle_mask,
+                                            self.damage_percent, self.ventricle_percent, Path(self.output_dir, "pixel_classification_plot.png"))
+                plt.show()
+
+        # 2. Dropout detection
+        self.n_dropped_fovs = np.nan  # Initialize empty for plotting later if dropout is not run
+        if run_dropout:
+            print('Beginning FOV Dropout Detection')
+            self.run_dropout_pipeline()
+            dropout = DropoutResult(self.fovs)
+            # Get raw number of dropped FOVs, genes
+            self.n_dropped_fovs = int(dropout.get_dropped_fov_counts())
+            self.n_dropped_genes = int(dropout.get_dropped_gene_counts())
+            # Get dictionary of dropped genes per FOV
+            self.dropped_fovs_dict = dropout.get_dropped_gene_counts(dic=True)
+            # Draw and save dropout
+            if self.n_dropped_fovs > 0:
+                dropout.draw_genes_dropped_per_fov(out_path=Path(self.qc_output_path, 'fov_dropout.png'))
+
+        # 3. On-tissue metrics
+        print('Get on-tissue transcript density')
+        self.on_tissue_filtered_transcripts_count, self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path, self.transcripts_mask) 
+        self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
+
+        # 4. Periodicity
+        print('Calculating periodicity')
+        self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts, num_planes=self.num_planes)
+        self.periodicity = np.round(np.nanmin(self.periodicity_list), 3)
+        # TODO: Plot cb hist
+
+        # 5. z-plane transcript ratio
+        print('Computing z-plane metrics')
+        self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
+        self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
+        # TODO: Plot z-plane drop off
+
+        # 7. Perfusion
+        if run_perfusion and self.perfusion_path is not None:
+            perfusion_data = perfusion.analyze_flow(self.perfusion_path)
+            perfusion_out_file = Path(self.output_dir, "perfusion.png")
+            figures.plot_perfusion_figure(perfusion_data, out_file = perfusion_out_file)
+
+        # 7. Plot figures
+        if plot_figures:
+            rounded_ts_density = "{:.3g}".format(self.transcript_density_um2_per_gene)
+            wdr_data = [len(self.experiment.filtered_transcripts), rounded_ts_density, self.n_dropped_fovs,
+                        self.most_checkerboard, self.z_ratio]
+            figures.plot_wdr_dists(self.qc_metadata_tracker, self.z_ratio, self.most_checkerboard,
+                                        self.transcript_density_um2_per_gene,
+                                        self.experiment.barcode, wdr_data, self.experiment.qc_output_path)
+            # TODO: Remove plot_wdr_dists
+    
