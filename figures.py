@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import seaborn as sns
+from matplotlib.axes import Axes
 from IPython.display import display
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import tifffile as tiff
 from pathlib import Path
 from typing import Union
+import data_processing
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
@@ -159,7 +160,7 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, a
     plt.show()
     plt.close();
 
-def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Union[str, Path] = '', ylim: bool = True):
+def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Union[str, Path] = None, ylim: bool = True):
     """
     Plot (and save) figure of extracted fluidics log file data
 
@@ -208,26 +209,41 @@ def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Unio
         fig.savefig(out_file)
 
 
-def plot_pixel_percentages(damage_percentage: Union[int, float], tissue_percentage: Union[int, float],
-                           lifting_percentage: Union[int, float], ventricles_percentage: Union[int, float],
+def plot_pixel_percentages(transcripts_percent: float, detachment_percent: float, 
+                           damage_percent: float = np.nan, ventricle_percent: float = np.nan,
                            colormap_list: list = ["white", "orange", "green", "red", "blue"],
                            colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
-                           ax = None, title: str = "", out_file: Union[str, Path]=None, dpi: int = 100):
+                           ax: Axes = None, title: str = "", out_file: Union[str, Path]=None, dpi: int = 100):
     
-    # Plot pixel percentages
-    barlist = ax.bar([0, 1, 2, 3], [damage_percentage, tissue_percentage, lifting_percentage,
-                                                ventricles_percentage])
-    ax.set_title("Pixel Percentages of Ideal Tissue Area")
-    ax.set_xticks([0, 1, 2, 3])
-    ax.set_xticklabels(colormap_labels[1:])
-    barlist[0].set_color(colormap_list[1])
-    barlist[1].set_color(colormap_list[2])
-    barlist[2].set_color(colormap_list[3])
-    barlist[3].set_color(colormap_list[4])
-    for index, value in enumerate([damage_percentage, tissue_percentage, lifting_percentage,
-                                   ventricles_percentage]):
-        ax.text(index-0.15, value+0.5, f"{str(value)}%")
-    
+    if damage_percent != np.nan and ventricle_percent != np.nan:
+        # Plot pixel percentages
+        barlist = ax.bar([0, 1, 2, 3], [damage_percent, transcripts_percent, detachment_percent,
+                                                    ventricle_percent])
+        ax.set_title("Pixel Percentages of Ideal Tissue Area")
+        ax.set_xticks([0, 1, 2, 3])
+        ax.set_xticklabels(colormap_labels[1:])
+        barlist[0].set_color(colormap_list[1])
+        barlist[1].set_color(colormap_list[2])
+        barlist[2].set_color(colormap_list[3])
+        barlist[3].set_color(colormap_list[4])
+        for index, value in enumerate([damage_percent, transcripts_percent, detachment_percent,
+                                    ventricle_percent]):
+            ax.text(index-0.15, value+0.5, f"{str(value)}%")
+
+    elif damage_percent == np.nan and ventricle_percent == np.nan:
+        # Plot pixel percentages
+        barlist = ax.bar([0, 1, 2, 3], [transcripts_percent, detachment_percent])
+        ax.set_title("Pixel Percentages of Ideal Tissue Area")
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(colormap_labels[1:])
+        barlist[0].set_color(colormap_list[2])
+        barlist[1].set_color(colormap_list[3])
+        for index, value in enumerate([transcripts_percent, detachment_percent]):
+            ax.text(index-0.15, value+0.5, f"{str(value)}%")
+
+    else:
+        raise Exception("Both of or none of damage_percent and ventricle_percents must be provided.")
+
     if title != '':
         ax.set_title(title)
 
@@ -235,7 +251,7 @@ def plot_pixel_percentages(damage_percentage: Union[int, float], tissue_percenta
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
 
-def plot_pixel_classification(pixel_classification: np.ndarray, ax=None, title: str = "", 
+def plot_pixel_classification(pixel_classification: np.ndarray, ax: Axes = None, title: str = "", 
                               colormap_list: list = ["white", "orange", "green", "red", "blue"],
                               colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
                               out_file: Union[str, Path] = None, dpi: int = 200):
@@ -261,42 +277,26 @@ def plot_pixel_classification(pixel_classification: np.ndarray, ax=None, title: 
     if out_file != '':
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
-
-def plot_full_pixel_fig(pixel_classification: np.ndarray, damage_percentage: Union[int, float],
-                        tissue_percentage: Union[int, float], lifting_percentage: Union[int, float],
-                        ventricles_percentage: Union[int, float], dapi_mask_path: Union[str, Path],
-                        transcript_mask_path: Union[str, Path], damage_mask_path: Union[str, Path],
-                        lifting_mask_path: Union[str, Path], ventricles_mask_path: Union[str, Path],
-                        colormap_list: list = ["white", "orange", "green", "red", "blue"],
-                        colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
+# TODO: Fix plot_full_pixel_fig function to display only the masks that exist.
+def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union[np.ndarray, str, Path],
+                        transcripts_mask_input: Union[np.ndarray, str, Path], 
+                        detachment_mask_input: Union[np.ndarray, str, Path], 
+                        transcripts_percent: Union[int, float], detachment_percent: Union[int, float], 
+                        damage_mask_input: Union[np.ndarray, str, Path] = None,
+                        ventricle_mask_input: Union[np.ndarray, str, Path] = None ,
+                        damage_percent: float = np.nan, ventricle_percent: float = np.nan,
                         out_file: Union[str, Path] = None, dpi: int = 200):
     """
     Plots full pixel classification figure with pixel classification, pixel 
     percentages, and all masks used in classification
-
-    Parameters
-    ----------
-    pixel_classification : np.ndarray
-        Image array with each pixel classified with a value in [0, 1, 2, 3, 4]
-    pixel_percentages : list or np.ndarray
-        List or array of pixel percentages of "ideal" tissue area
-    dapi_mask_path : str or Path
-        Path to binary DAPI mask
-    transcript_mask_path : str or Path
-        Path to binary transcript mask
-    damage_mask_path : str or Path
-        Path to binary damage mask
-    lifting_mask_path : str or Path
-        Path to binary gel lifting mask
-    ventricles_mask_path : str or Path
-        Path to binary ventricles mask
-    outfile : str or Path
-        Path at which to save figure
-
-    Returns
-    -------
-    None
     """
+    # Load in masks
+    dapi_mask = data_processing.process_input(dapi_mask_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
+    detachment_mask = data_processing.process_input(detachment_mask_input)
+    damage_mask = data_processing.process_input(damage_mask_input) if damage_mask_input is not None else None
+    ventricle_mask = data_processing.process_input(ventricle_mask_input) if ventricle_mask_input is not None else None
+
     # Create axes with gridspec
     gs = gridspec.GridSpec(6, 10)
     fig = plt.figure(figsize=(20, 12))
@@ -306,26 +306,26 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, damage_percentage: Uni
     pixel_perc_ax = fig.add_subplot(gs[0:4, 5:])
     dapi_mask_ax = fig.add_subplot(gs[4:, 0:2])
     dapi_mask_ax.axis('off')
-    transcript_mask_ax = fig.add_subplot(gs[4:, 2:4])
-    transcript_mask_ax.axis('off')
+    transcripts_mask_ax = fig.add_subplot(gs[4:, 2:4])
+    transcripts_mask_ax.axis('off')
     damage_mask_ax = fig.add_subplot(gs[4:, 4:6])
     damage_mask_ax.axis('off')
-    lifting_mask_ax = fig.add_subplot(gs[4:, 6:8])
-    lifting_mask_ax.axis('off')
-    ventricles_mask_ax = fig.add_subplot(gs[4:, 8:10])
-    ventricles_mask_ax.axis('off')
+    detachment_mask_ax = fig.add_subplot(gs[4:, 6:8])
+    detachment_mask_ax.axis('off')
+    ventricle_mask_ax = fig.add_subplot(gs[4:, 8:10])
+    ventricle_mask_ax.axis('off')
 
     # Plot pixel classification with specified color map
     plot_pixel_classification(pixel_classification, ax=pixel_class_ax)
 
     # Plot pixel percentages
-    plot_pixel_percentages(damage_percentage, tissue_percentage,lifting_percentage, 
-                           ventricles_percentage, ax = pixel_perc_ax)
+    plot_pixel_percentages(transcripts_percent, detachment_percent, damage_percent,
+                           ventricle_percent, ax=pixel_perc_ax)
     
     # Plot masks
-    plot_masks(dapi_mask_ax, dapi_mask_path, transcript_mask_ax, transcript_mask_path,
-               lifting_mask_ax, lifting_mask_path, damage_mask_ax, damage_mask_path,
-               ventricles_mask_ax, ventricles_mask_path)
+    plot_masks(dapi_mask, dapi_mask_ax, transcripts_mask, transcripts_mask_ax, detachment_mask,
+               detachment_mask_ax, damage_mask, damage_mask_ax, ventricle_mask, ventricle_mask_ax, 
+               out_file)
 
     fig.subplots_adjust(hspace=0.7)
     plt.suptitle("Pixel Classification", fontsize=20)
@@ -337,41 +337,52 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, damage_percentage: Uni
     plt.close();
 
 
-def plot_masks(dapi_mask_ax=None, dapi_mask_path="", transcript_mask_ax=None, transcript_mask_path="",
-                lifting_mask_ax=None, lifting_mask_path="", damage_mask_ax=None, damage_mask_path="",
-                ventricles_mask_ax=None, ventricles_mask_path="", out_file: Union[str, Path] = "",
-                dpi: int = 200):
+def plot_masks(dapi_mask_input: Union[np.ndarray, str, Path],
+               dapi_mask_ax: Axes,
+               transcripts_mask_input: Union[np.ndarray, str, Path], 
+               transcripts_mask_ax: Axes,
+               detachment_mask_input: Union[np.ndarray, str, Path], 
+               detachment_mask_ax: Axes,
+               damage_mask_input: Union[np.ndarray, str, Path] = None,
+               damage_mask_ax: Axes = None,
+               ventricle_mask_input: Union[np.ndarray, str, Path] = None,
+               ventricle_mask_ax: Axes = None,
+               out_file: Union[str, Path] = None,
+               dpi: int = 200):
 
-    if dapi_mask_ax is not None and dapi_mask_path != "":
-        dapi_mask = tiff.imread(dapi_mask_path)
+    # Load in masks
+    dapi_mask = data_processing.process_input(dapi_mask_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
+    detachment_mask = data_processing.process_input(detachment_mask_input)
+    damage_mask = data_processing.process_input(damage_mask_input) if damage_mask_input is not None else None
+    ventricle_mask = data_processing.process_input(ventricle_mask_input) if ventricle_mask_input is not None else None
+
+
+    if dapi_mask_ax is not None:
         dapi_mask_ax.imshow(dapi_mask)
         dapi_mask_ax.set_title("DAPI Mask")
         dapi_mask_ax.axis('off')
 
-    if transcript_mask_ax is not None and transcript_mask_path != "":
-        transcript_mask = tiff.imread(transcript_mask_path)
-        transcript_mask_ax.imshow(transcript_mask)
-        transcript_mask_ax.set_title("Transcript Mask")
-        transcript_mask_ax.axis('off')
+    if transcripts_mask_ax is not None :
+        transcripts_mask_ax.imshow(transcripts_mask)
+        transcripts_mask_ax.set_title("Transcript Mask")
+        transcripts_mask_ax.axis('off')
 
-    if lifting_mask_ax is not None and lifting_mask_path != "":
-        lifting_mask = tiff.imread(lifting_mask_path)
-        lifting_mask_ax.imshow(lifting_mask)
-        lifting_mask_ax.set_title("Lifting Mask")
-        lifting_mask_ax.axis('off')
+    if detachment_mask_ax is not None:
+        detachment_mask_ax.imshow(detachment_mask)
+        detachment_mask_ax.set_title("Lifting Mask")
+        detachment_mask_ax.axis('off')
 
-    if damage_mask_ax is not None and damage_mask_path != "":
-        damage_mask = tiff.imread(damage_mask_path)
+    if damage_mask_ax is not None and damage_mask is not None:
         damage_mask_ax.imshow(damage_mask)
         damage_mask_ax.set_title("Damage Mask")
         damage_mask_ax.axis('off')
 
-    if ventricles_mask_ax is not None and ventricles_mask_path != "":
-        ventricles_mask = tiff.imread(ventricles_mask_path)
-        ventricles_mask_ax.imshow(ventricles_mask)
-        ventricles_mask_ax.set_title("Ventricles Mask")
-        ventricles_mask_ax.axis('off')
+    if ventricle_mask_ax is not None and ventricle_mask is not None:
+        ventricle_mask_ax.imshow(ventricle_mask)
+        ventricle_mask_ax.set_title("Ventricles Mask")
+        ventricle_mask_ax.axis('off')
 
-    if out_file != None:
+    if out_file is not None:
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
