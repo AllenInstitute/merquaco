@@ -277,7 +277,6 @@ def plot_pixel_classification(pixel_classification: np.ndarray, ax: Axes = None,
     if out_file != '':
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
-# TODO: Fix plot_full_pixel_fig function to display only the masks that exist.
 def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union[np.ndarray, str, Path],
                         transcripts_mask_input: Union[np.ndarray, str, Path], 
                         detachment_mask_input: Union[np.ndarray, str, Path], 
@@ -297,23 +296,43 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
     damage_mask = data_processing.process_input(damage_mask_input) if damage_mask_input is not None else None
     ventricle_mask = data_processing.process_input(ventricle_mask_input) if ventricle_mask_input is not None else None
 
-    # Create axes with gridspec
-    gs = gridspec.GridSpec(6, 10)
-    fig = plt.figure(figsize=(20, 12))
+    if damage_mask is not None and ventricle_mask is not None:
+        # Create axes with gridspec
+        gs = gridspec.GridSpec(6, 10)
+        fig = plt.figure(figsize=(20, 12))
 
-    pixel_class_ax = fig.add_subplot(gs[0:4, 0:5])
-    pixel_class_ax.axis('off')
-    pixel_perc_ax = fig.add_subplot(gs[0:4, 5:])
-    dapi_mask_ax = fig.add_subplot(gs[4:, 0:2])
-    dapi_mask_ax.axis('off')
-    transcripts_mask_ax = fig.add_subplot(gs[4:, 2:4])
-    transcripts_mask_ax.axis('off')
-    damage_mask_ax = fig.add_subplot(gs[4:, 4:6])
-    damage_mask_ax.axis('off')
-    detachment_mask_ax = fig.add_subplot(gs[4:, 6:8])
-    detachment_mask_ax.axis('off')
-    ventricle_mask_ax = fig.add_subplot(gs[4:, 8:10])
-    ventricle_mask_ax.axis('off')
+        pixel_class_ax = fig.add_subplot(gs[0:4, 0:5])
+        pixel_class_ax.axis('off')
+        pixel_perc_ax = fig.add_subplot(gs[0:4, 5:])
+        dapi_mask_ax = fig.add_subplot(gs[4:, 0:2])
+        dapi_mask_ax.axis('off')
+        transcripts_mask_ax = fig.add_subplot(gs[4:, 2:4])
+        transcripts_mask_ax.axis('off')
+        damage_mask_ax = fig.add_subplot(gs[4:, 4:6])
+        damage_mask_ax.axis('off')
+        detachment_mask_ax = fig.add_subplot(gs[4:, 6:8])
+        detachment_mask_ax.axis('off')
+        ventricle_mask_ax = fig.add_subplot(gs[4:, 8:10])
+        ventricle_mask_ax.axis('off')
+
+    elif damage_mask is None and ventricle_mask is None:
+        # Create axes with gridspec
+        gs = gridspec.GridSpec(4,6)
+        fig = plt.figure(figsize=(16, 12))
+
+        pixel_class_ax = fig.add_subplot(gs[0:2, 0:3])
+        pixel_class_ax.axis('off')
+        pixel_perc_ax = fig.add_subplot(gs[0:2, 3:])
+        dapi_mask_ax = fig.add_subplot(gs[2:, 0:2])
+        dapi_mask_ax.axis('off')
+        transcripts_mask_ax = fig.add_subplot(gs[2:, 2:4])
+        transcripts_mask_ax.axis('off')
+        detachment_mask_ax = fig.add_subplot(gs[2:, 4:6])
+        detachment_mask_ax.axis('off')
+
+    else:
+        raise Exception("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
+
 
     # Plot pixel classification with specified color map
     plot_pixel_classification(pixel_classification, ax=pixel_class_ax)
