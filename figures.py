@@ -9,6 +9,7 @@ import tifffile as tiff
 from pathlib import Path
 from typing import Union
 import data_processing
+import periodicity
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
@@ -64,6 +65,58 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     plt.close();
 
 
+def plot_periodicity_hist(transcripts: pd.DataFrame, 
+                          n_transcripts: int = None,
+                          scale: Union[int, float] = None,
+                          fov_width: Union[int, float] = 202,
+                          fov_height: Union[int, float] = 202,
+                          alpha: Union[int, float] = 0.25, ms: Union[int, float] = 0.1,
+                          ts_color: str = "black", hist_color: str = "red",
+                          out_file: Union[str, Path] = None, dpi: int = 200):
+
+    _, ax = plt.subplots(figsize=(8, 6))
+
+    x = np.asarray(transcripts['global_x'])
+    y = np.asarray(transcripts['global_y'])
+
+    # Scale axes
+    xmax = np.max(x) + 200
+    ymax = np.max(y) + 200
+    xmin = np.min(x) - 200
+    ymin = np.min(y) - 200
+
+    # Subsample transcripts
+    if n_transcripts is None:
+        n_transcripts = int(len(transcripts) / 90)
+    samples = np.random.choice(transcripts.shape[0], n_transcripts, replace=False)
+
+    # Plot subsamples
+    ax.plot(x[samples], y[samples], '.', ms=ms, alpha=alpha, color=ts_color)
+
+    # Get pixel dimensions
+    dimensions = periodicity.get_image_dimensions(transcripts)
+
+    # Create line density plots for x and y
+    hist_x, _ = periodicity.get_chunk_values(x, dimensions, fov_width)
+    hist_y, _ = periodicity.get_chunk_values(y, dimensions, fov_height)
+    indices = np.arange(len(hist_y))
+
+    # Plot em
+    if scale is None:
+        scale = int(xmax * ymax) / 15
+    ax.plot(hist_x*scale, alpha=alpha, linewidth=0.5, color=hist_color)
+    ax.plot(hist_y*scale, indices, alpha=alpha, linewidth=0.5, color=hist_color)
+
+    # Axis scaling
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+
+    # Aesthetics
+    plt.axis('off')
+
+    plt.savefig(out_file, dpi=dpi)
+    plt.show()
+    plt.close();
 
 def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotation_degrees: int = -90,
                        num_planes: int = 7, ms: float = 1, alpha: float = 0.5, color: str = "black",
