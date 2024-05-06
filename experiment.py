@@ -444,6 +444,7 @@ class Experiment:
         if run_pixel_classification:
             
             self.run_full_pixel_classification()
+
             if plot_figures:
                 figures.plot_full_pixel_fig(self.pixel_classification, self.dapi_mask, self.transcripts_mask, self.detachment_mask,
                                             self.transcripts_percent, self.detachment_percent, self.damage_mask, self.ventricle_mask,
@@ -461,9 +462,10 @@ class Experiment:
             self.n_dropped_genes = int(dropout.get_dropped_gene_counts())
             # Get dictionary of dropped genes per FOV
             self.dropped_fovs_dict = dropout.get_dropped_gene_counts(dic=True)
-            # Draw and save dropout
-            if self.n_dropped_fovs > 0:
-                dropout.draw_genes_dropped_per_fov(out_path=Path(self.qc_output_path, 'fov_dropout.png'))
+            if plot_figures:
+                # Draw and save dropout
+                if self.n_dropped_fovs > 0:
+                    dropout.draw_genes_dropped_per_fov(out_path=Path(self.qc_output_path, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
         print('Get on-tissue transcript density')
