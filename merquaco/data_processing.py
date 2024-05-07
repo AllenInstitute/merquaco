@@ -8,26 +8,17 @@ import json
 
 def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
     if isinstance(input_data, pd.DataFrame):
-        return process_dataframe(input_data)
+        return input_data
     elif isinstance(input_data, np.ndarray):
-        return process_image_array(input_data)
+        return input_data
     elif isinstance(input_data, dict):
-        return process_dictionary(input_data)
+        return input_data
     elif isinstance(input_data, str):
         return process_path(input_data)
     elif isinstance(input_data, Path):
         return process_path(str(input_data))
     else:
         raise TypeError("Unsupported input type. Must be a DataFrame, numpy array, dictionary, file path, or JSON.")
-
-def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    return df
-
-def process_image_array(image_array: np.ndarray) -> np.ndarray:
-    return image_array
-
-def process_dictionary(data_dict: dict) -> dict:
-    return data_dict
 
 def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray]:
     # Determine the type of file based on its extension

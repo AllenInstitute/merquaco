@@ -8,8 +8,8 @@ from matplotlib.colors import ListedColormap, BoundaryNorm
 import tifffile as tiff
 from pathlib import Path
 from typing import Union
-import data_processing
-import periodicity
+import merquaco.data_processing as data_processing
+import merquaco.periodicity as periodicity
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,

@@ -4,13 +4,13 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
-import pixel_classification as pc
-import data_processing
-from data_loss import FOVDropout, DropoutResult
-import figures
-import z_plane_detection as zp
-import perfusion
-import periodicity
+import merquaco.pixel_classification as pc
+import merquaco.data_processing as data_processing
+from merquaco.data_loss import FOVDropout, DropoutResult
+import merquaco.figures as figures
+import merquaco.z_plane_detection as zp
+import merquaco.perfusion as perfusion
+import merquaco.periodicity as periodicity
 
 class Experiment:
 
@@ -433,7 +433,6 @@ class Experiment:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
-    # TODO: if plot_figures, plot each figure 
     def run_all_qc(self, run_pixel_classification: bool = True,
                     run_dropout: bool = True, run_perfusion: bool = False,
                     plot_figures: bool = True):
