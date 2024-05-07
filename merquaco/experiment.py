@@ -15,7 +15,7 @@ import merquaco.periodicity as periodicity
 class Experiment:
 
     def __init__(self, transcripts_input: Union[pd.DataFrame, str, Path],
-                 ilastik_paths_dict: Union[dict, str, Path] = None,
+                 ilastik_paths_input: Union[dict, str, Path] = None,
                  transcripts_image_path: Union[str, Path] = None,
                  transcripts_mask_path: Union[str, Path] = None,
                  dapi_high_res_image_path: Union[str, Path] = None,
@@ -33,8 +33,10 @@ class Experiment:
         Initialize an Experiment instance from transcripts dataframe 
         """
         # Assign ilastik paths as attributes 
-        ilastik_paths = data_processing.process_input(ilastik_paths_dict)
-        self.unpack_dictionary(ilastik_paths)
+        ilastik_paths_dict = data_processing.process_input(ilastik_paths_input)
+        # Unpack dictionary as self attributes
+        for key, val in ilastik_paths_dict.items():
+            setattr(self, key, val)
 
         # Assign parameters as self attributes
         self.transcripts_image_path = transcripts_image_path if transcripts_image_path is not None else None
@@ -79,20 +81,6 @@ class Experiment:
                                                                 self.transcripts_pixel_model_path, 
                                                                 self.transcripts_object_model_path, 
                                                                 self.filtered_transcripts)
-            
-        
-    
-    def unpack_dictionary(self, dictionary: dict):
-        """
-        Unpacks every key-value pair from the dictionary into a self attribute
-
-        Parameters
-        ----------
-        dictionary : dict
-            Dictionary to unpack into self attributes
-        """
-        for key, val in dictionary.items():
-            setattr(self, key, val)
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
@@ -434,8 +422,8 @@ class Experiment:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
     def run_all_qc(self, run_pixel_classification: bool = True,
-                    run_dropout: bool = True, run_perfusion: bool = False,
-                    plot_figures: bool = True):
+                   run_dropout: bool = True, run_perfusion: bool = False,
+                   plot_figures: bool = True):
         """
         Runs all standard QC functions and prints results
         """
