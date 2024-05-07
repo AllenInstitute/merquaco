@@ -118,6 +118,8 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     plt.show()
     plt.close();
 
+
+
 def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotation_degrees: int = -90,
                        num_planes: int = 7, ms: float = 1, alpha: float = 0.5, color: str = "black",
                        title: str = '', out_file: str = '', label_planes=False):
