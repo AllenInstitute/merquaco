@@ -465,7 +465,7 @@ class Experiment:
             if plot_figures:
                 # Draw and save dropout
                 if self.n_dropped_fovs > 0:
-                    dropout.draw_genes_dropped_per_fov(out_path=Path(self.qc_output_path, 'fov_dropout.png'))
+                    dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
         print('Get on-tissue transcript density')
@@ -476,27 +476,19 @@ class Experiment:
         print('Calculating periodicity')
         self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts, num_planes=self.num_planes)
         self.periodicity = np.round(np.nanmin(self.periodicity_list), 3)
-        # TODO: Plot cb hist
+        if plot_figures:
+            figures.plot_periodicity_hist(self.transcripts, out_file = Path(self.output_dir, "periodicity_hist.png"))
 
         # 5. z-plane transcript ratio
         print('Computing z-plane metrics')
         self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
         self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
-        # TODO: Plot z-plane drop off
+        if plot_figures:
+            figures.plot_transcripts_per_z(self.transcripts_per_z, out_file = Path(self.output_dir, "transcripts_per_z.png"))
 
         # 7. Perfusion
         if run_perfusion and self.perfusion_path is not None:
             perfusion_data = perfusion.analyze_flow(self.perfusion_path)
-            perfusion_out_file = Path(self.output_dir, "perfusion.png")
-            figures.plot_perfusion_figure(perfusion_data, out_file = perfusion_out_file)
-
-        # 7. Plot figures
-        if plot_figures:
-            rounded_ts_density = "{:.3g}".format(self.transcript_density_um2_per_gene)
-            wdr_data = [len(self.experiment.filtered_transcripts), rounded_ts_density, self.n_dropped_fovs,
-                        self.most_checkerboard, self.z_ratio]
-            figures.plot_wdr_dists(self.qc_metadata_tracker, self.z_ratio, self.most_checkerboard,
-                                        self.transcript_density_um2_per_gene,
-                                        self.experiment.barcode, wdr_data, self.experiment.qc_output_path)
-            # TODO: Remove plot_wdr_dists
+            if plot_figures:
+                figures.plot_perfusion_figure(perfusion_data, out_file = Path(self.output_dir, "perfusion.png"))
     
