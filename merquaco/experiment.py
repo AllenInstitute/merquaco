@@ -15,7 +15,7 @@ import merquaco.periodicity as periodicity
 class Experiment:
 
     def __init__(self, transcripts_input: Union[pd.DataFrame, str, Path],
-                 ilastik_paths_json_input: Union[dict, str, Path] = None,
+                 ilastik_paths_json: Union[dict, str, Path] = None,
                  transcripts_image_path: Union[str, Path] = None,
                  transcripts_mask_path: Union[str, Path] = None,
                  dapi_high_res_image_path: Union[str, Path] = None,
@@ -33,7 +33,7 @@ class Experiment:
         Initialize an Experiment instance from transcripts dataframe 
         """
         # Assign ilastik paths as attributes 
-        ilastik_paths = data_processing.process_input(ilastik_paths_json_input)
+        ilastik_paths = data_processing.process_input(ilastik_paths_json)
         self.unpack_dictionary(ilastik_paths)
 
         # Assign parameters as self attributes
