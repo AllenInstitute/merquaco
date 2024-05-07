@@ -3,9 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.axes import Axes
-from IPython.display import display
 from matplotlib.colors import ListedColormap, BoundaryNorm
-import tifffile as tiff
 from pathlib import Path
 from typing import Union
 import merquaco.data_processing as data_processing
