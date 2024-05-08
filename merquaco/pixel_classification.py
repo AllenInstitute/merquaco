@@ -664,7 +664,8 @@ def resize_all_masks(transcripts_mask_input: Union[np.ndarray, str, Path],
                      dapi_mask_input: Union[np.ndarray, str, Path],
                      detachment_mask_input: Union[np.ndarray, str, Path],
                      ventricle_mask_input: Union[np.ndarray, str, Path],
-                     damage_mask_input: Union[np.ndarray, str, Path]) -> tuple:
+                     damage_mask_input: Union[np.ndarray, str, Path],
+                     save: bool = False) -> tuple:
     """
     Resize all masks to be same dimensions as transcripts mask
 
@@ -680,18 +681,22 @@ def resize_all_masks(transcripts_mask_input: Union[np.ndarray, str, Path],
         Ventricle mask
     damage_mask_input : np.ndarray or str or Path
         Damage mask
+    save : bool, optional
+        Whether to save new masks. Default is False.
 
     Returns
     -------
     tuple of arrays
-    dapi_mask : np.ndarray
-        Resized DAPI mask array
-    detachment_mask : np.ndarray
-        Resized detachment mask
-    ventricle_mask : np.ndarray
-        Resized ventricle mask
-    damage_mask : np.ndarray
-        Resized damage mask
+        transcripts_mask : np.ndarray
+            Resized transcripts mask
+        dapi_mask : np.ndarray
+            Resized DAPI mask array
+        detachment_mask : np.ndarray
+            Resized detachment mask
+        ventricle_mask : np.ndarray
+            Resized ventricle mask
+        damage_mask : np.ndarray
+            Resized damage mask
     """
     # Get masks
     transcripts_mask = data_processing.process_input(transcripts_mask_input)
@@ -706,39 +711,16 @@ def resize_all_masks(transcripts_mask_input: Union[np.ndarray, str, Path],
     ventricle_mask = resize_mask(ventricle_mask, by=transcripts_mask)
     damage_mask = resize_mask(damage_mask, by=transcripts_mask)
 
-    return dapi_mask, detachment_mask, ventricle_mask, damage_mask
-
-# TODO: combine resize_all_masks
-def resize_all_masks(transcripts_mask: np.ndarray,
-                     dapi_mask: np.ndarray,
-                     detachment_mask: np.nadarray,
-                     ventricle_mask: np.nadarray,
-                     damage_mask: np.ndarray,
-                     save: bool = False,
-                     transcripts_mask_path: Union[str, Path] = None,
-                     dapi_mask_path: Union[str, Path] = None,
-                     detachment_mask_path: Union[str, Path] = None,
-                     ventricle_mask_path: Union[str, Path] = None,
-                     damage_mask_path: Union[str, Path] = None):
-    """
-    Resize all masks to be same dimensions as transcripts mask
-    """
-    # Resize all masks to be the same size as transcript mask
-    dapi_mask = resize_mask(dapi_mask, by=transcripts_mask)
-    detachment_mask = resize_mask(detachment_mask, by=transcripts_mask)
-    ventricle_mask = resize_mask(ventricle_mask, by=transcripts_mask)
-    damage_mask = resize_mask(damage_mask, by=transcripts_mask)
-
     if save:
         try:
             # Save all masks with equal sizes
-            tiff.imwrite(transcripts_mask_path, transcripts_mask)
-            tiff.imwrite(dapi_mask_path, dapi_mask)
-            tiff.imwrite(detachment_mask_path, detachment_mask)
-            tiff.imwrite(ventricle_mask_path, ventricle_mask)
-            tiff.imwrite(damage_mask_path, damage_mask)
+            tiff.imwrite(transcripts_mask_input, transcripts_mask)
+            tiff.imwrite(dapi_mask_input, dapi_mask)
+            tiff.imwrite(detachment_mask_input, detachment_mask)
+            tiff.imwrite(ventricle_mask_input, ventricle_mask)
+            tiff.imwrite(damage_mask_input, damage_mask)
         except FileNotFoundError:
-            print(f"File not found. Ensure proper path is provided.")
+            print("File not found. Ensure proper path is provided.")
         except Exception:
             raise Exception("Ensure paths to all masks are provided.")
 
