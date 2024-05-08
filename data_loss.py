@@ -10,7 +10,6 @@ from matplotlib.patches import Rectangle
 import matplotlib.cm as cm
 from typing import Union
 import pixel_classification as pc
-import data_processing
 
 
 class FOVDropout:
@@ -24,13 +23,13 @@ class FOVDropout:
         pass
 
     @staticmethod
-    def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame, 
+    def find_on_tissue_fovs(transcripts: pd.DataFrame, fovs: pd.DataFrame,
                             transcripts_mask_path: Union[str, Path] = None,
                             transcripts_image_path: Union[str, Path] = None,
                             ilastik_program_path: Union[str, Path] = None,
                             pixel_model_path: Union[str, Path] = None,
                             object_model_path: Union[str, Path] = None,
-                            force_mask: bool = False):
+                            force_mask: bool = False) -> pd.DataFrame:
         """
         Use ilastik transcripts mask to detemine on- and off-tissue FOVs
         FOV is considered on-tissue if at least 50% of its area is on-tissue
@@ -40,20 +39,20 @@ class FOVDropout:
         transcripts : pd.DataFrame
             Transcripts table dataframe
         fovs : pd.DataFrame
-            FOVs dataframe 
+            FOVs dataframe
         transcripts_mask_path : np.ndarray or str or Path
             String or Path of path to transcripts mask. Optional,
             required if force_mask is False
         transcripts_image_path : str or Path
-            Path to transcripts image to save image for transcripts mask 
+            Path to transcripts image to save image for transcripts mask
             generation. Required if force_mask is True
         ilastik_program_path : str or Path
-            Path to ilastik program for transcripts mask generation. 
+            Path to ilastik program for transcripts mask generation.
             Required if force_mask is True
         pixel_model_path : str or Path
             Path to pixel classification model for transcripts mask
             generation. Required if force_mask is True
-        object_model_path : 
+        object_model_path : str or Path
             Path to object classification model for transcripts mask
             generation. Required if force_mask is True
         force_mask : bool, optional
@@ -66,35 +65,37 @@ class FOVDropout:
 
         Raises
         ------
+        ValueError
+            If image path is not provided
         RuntimeError
             If no on-tissue FOVs are found
 
         Notes
         -----
-        `pixel_classification.create_transcript_image()` returns the original dimensions of the transcripts image, but
+        `pixel_classification.create_transcripts_image()` returns the original dimensions of the transcripts image, but
         saves a transposed version of that image to match the remaining (i.e., DAPI, ventricles) masks. For this reason,
         the mask is transposed after being read in, to match the original transcripts dimensions.
         """
 
-        _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts)
+        _, mask_x_bins, mask_y_bins = pc.create_transcripts_image(transcripts)
 
         if not force_mask and os.path.exists(transcripts_mask_path):
             transcripts_mask = tiff.imread(transcripts_mask_path)
         else:
             if transcripts_image_path is None:
-                raise Exception("transcripts_image_path must be provided")
+                raise ValueError("transcripts_image_path must be provided")
             if ilastik_program_path is None:
-                raise Exception("ilastik_program_path must be provided")
+                raise ValueError("ilastik_program_path must be provided")
             if pixel_model_path is None:
-                raise Exception("pixel_model_path must be provided")
-            if object_model_path is  None:
-                raise Exception("object_model_path must be provided")
-            
+                raise ValueError("pixel_model_path must be provided")
+            if object_model_path is None:
+                raise ValueError("object_model_path must be provided")
+
             # Create and save mask
             _, mask_x_bins, mask_y_bins = pc.create_transcript_image(transcripts, transcripts_image_path)
             transcripts_mask = pc.generate_transcript_mask(transcripts_image_path, ilastik_program_path,
-                                                        pixel_model_path, object_model_path)
-            
+                                                           pixel_model_path, object_model_path)
+
         transcripts_mask = transcripts_mask.T  # Transpose to match original transcripts dimensions
 
         on_tissue = []
@@ -121,7 +122,7 @@ class FOVDropout:
         return fovs
 
     @staticmethod
-    def detect_dropouts(transcripts: pd.DataFrame, fovs: pd.DataFrame, thresh: float = 0.15):
+    def detect_dropouts(transcripts: pd.DataFrame, fovs: pd.DataFrame, thresh: float = 0.15) -> pd.DataFrame:
         """
         Compares cardinal neighbors for each FOV to detect dropout
         FOVs are considered dropped if:
@@ -230,7 +231,7 @@ class FOVDropout:
         return fovs
 
     @staticmethod
-    def read_codebook(codebook_path: Union[str, Path]):
+    def read_codebook(codebook_path: Union[str, Path]) -> pd.DataFrame:
         """
         Reads merscope codebook into dataframe
 
@@ -251,7 +252,7 @@ class FOVDropout:
         return codebook
 
     @staticmethod
-    def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame):
+    def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
         """
         Compares genes in FOVs and codebook dataframes and removes mismatched genes from consideration.
 
@@ -302,7 +303,7 @@ class FOVDropout:
         return fovs
 
     @staticmethod
-    def detect_false_positives(fovs: pd.DataFrame, codebook: pd.DataFrame):
+    def detect_false_positives(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
         """
         Detects false positive FOV dropouts by evaluating codebook rounds in which the genes dropped for a target FOV
 
@@ -375,7 +376,7 @@ class FOVDropout:
         return fovs
 
     @staticmethod
-    def save_fov_pkl(fovs: pd.DataFrame, output_dir: Union[str, Path]):
+    def save_fov_pkl(fovs: pd.DataFrame, output_dir: Union[str, Path]) -> None:
         """
         Save FOVs dataframe as .pkl file
 
@@ -398,7 +399,7 @@ class FOVDropout:
         fovs.to_pickle(Path(output_dir, 'fovs.pkl'))
 
     @staticmethod
-    def save_fov_tsv(fovs: pd.DataFrame, output_dir: Union[str, Path]):
+    def save_fov_tsv(fovs: pd.DataFrame, output_dir: Union[str, Path]) -> None:
         """
         Save FOVs dataframe as .txt.gz file
 

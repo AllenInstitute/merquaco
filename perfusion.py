@@ -10,7 +10,7 @@ def analyze_flow(log_file_path: Union[str, Path]):
 
     Parameters
     ----------
-    log_file_path : str
+    log_file_path : str or Path
         Path to log file
 
     Returns
