@@ -112,7 +112,7 @@ class Experiment:
         num_planes : int
             Number of z-planes imaged
         fovs_df : pd.DataFrame
-            DataFrame of FOV coordinates, transcript counts, neighbors 
+            DataFrame of FOV coordinates, transcript counts, neighbors
         """
         # Assign ilastik paths as attributes
         ilastik_paths_dict = data_processing.process_input(ilastik_paths_input)
@@ -369,7 +369,7 @@ class Experiment:
         return fovs
 
     @staticmethod
-    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path], 
+    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path],
                                transcripts_mask_input: Union[np.ndarray, str, Path]):
         """
         Calculates transcript density per on-tissue micron
@@ -570,7 +570,7 @@ class Experiment:
         print('Get on-tissue transcript density')
         self.on_tissue_filtered_transcripts_count, \
             self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
-                                                                             self.transcripts_mask) 
+                                                                             self.transcripts_mask)
         self.transcript_density_um2_per_gene = self.transcripts_density_um2 / self.n_genes
 
         # 4. Periodicity
