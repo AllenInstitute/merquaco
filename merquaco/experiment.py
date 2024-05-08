@@ -12,9 +12,11 @@ import merquaco.z_plane_detection as zp
 import merquaco.perfusion as perfusion
 import merquaco.periodicity as periodicity
 
+
 class Experiment:
 
-    def __init__(self, transcripts_input: Union[pd.DataFrame, str, Path],
+    def __init__(self,
+                 transcripts_input: Union[pd.DataFrame, str, Path],
                  ilastik_paths_input: Union[dict, str, Path] = None,
                  transcripts_image_path: Union[str, Path] = None,
                  transcripts_mask_path: Union[str, Path] = None,
@@ -30,28 +32,108 @@ class Experiment:
                  perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None):
         """
-        Initialize an Experiment instance from transcripts dataframe 
+        Initialize an Experiment instance from transcripts table dataframe
+
+        Parameters
+        ----------
+        transcripts_input : pd.DataFrame, str, or Path
+            DataFrame of or path to transcripts table
+        ilastik_path_input : dict, str, or Path, optional
+            Dictionary of or path to ilastik paths. Default is None.
+        transcripts_image_path : str or Path, optional
+            Path at which to save transcripts image. Default is None.
+        transcripts_mask_path : str or Path, optional
+            Path at which to save binary transcripts mask. Default is None.
+        dapi_high_res_image_path : str or Path, optional
+            Path to high resolution DAPI tiff image. Default is None.
+        dapi_image_path : str or Path, optional
+            Path at which to save low-res, modified DAPI image. Default is None.
+        dapi_mask_path : str or Path, optional
+            Path at which to save binary DAPI mask.
+        detachment_mask_path : str or Path, optional
+            Path at which to save detachment binary mask. Default is None.
+        ventricle_image_path : str or Path, optional
+            Path at which to save ventricle image. Default is None.
+        ventricle_mask_path : str or Path, optional
+            Path at which to save binary ventricle mask. Default is None.
+        damage_mask_path : str or Path, optional
+            Path at which to save binary damage mask. Default is None.
+        pixel_classification_path : str or Path, optional
+            Path at which to save final pixel classification results. Default is None.
+        codebook_input : pd.DataFrame, str, or Path, optional
+            DataFrame of or path to codebook table. Default is None.
+        perfusion_path : str or Path, optional
+            Path to perfusion log file. Default is None.
+        output_dir : str or Path, optional
+            Directory at which to save QC outputs
+
+        Attributes Set
+        --------------
+        transcripts_image_path : str or Path
+            Path at which to save transcripts image.
+        transcripts_mask_path : str or Path
+            Path at which to save binary transcripts mask.
+        dapi_high_res_image_path : str or Path
+            Path to high resolution DAPI tiff image.
+        dapi_image_path : str or Path
+            Path at which to save low-res, modified DAPI image.
+        dapi_mask_path : str or Path
+            Path at which to save binary DAPI mask.
+        detachment_mask_path : str or Path
+            Path at which to save detachment binary mask.
+        ventricle_image_path : str or Path
+            Path at which to save ventricle image.
+        ventricle_mask_path : str or Path
+            Path at which to save binary ventricle mask.
+        damage_mask_path : str or Path
+            Path at which to save binary damage mask.
+        pixel_classification_path : str or Path
+            Path at which to save final pixel classification results.
+        codebook : pd.DataFrame
+            Codebook table.
+        perfusion_path : str or Path
+            Path to perfusion log file.
+        output_dir : str or Path
+            Directory at which to save QC outputs.
+        transcripts : pd.DataFrame
+            Transcripts table
+        counts_per_gene : dict
+            Dictionary of transcript counts pergene
+        filtered_transcripts : pd.DataFrame
+            Transcripts table excluding blanks
+        n_genes : int
+            Number of genes imaged
+        genes : list
+            List of genes
+        total_transcripts_count : int
+            Total detected transcripts
+        filtered_transcripts_count : int
+            Total detected transcripts, excluding blanks
+        num_planes : int
+            Number of z-planes imaged
+        fovs_df : pd.DataFrame
+            DataFrame of FOV coordinates, transcript counts, neighbors 
         """
-        # Assign ilastik paths as attributes 
+        # Assign ilastik paths as attributes
         ilastik_paths_dict = data_processing.process_input(ilastik_paths_input)
         # Unpack dictionary as self attributes
         for key, val in ilastik_paths_dict.items():
             setattr(self, key, val)
 
         # Assign parameters as self attributes
-        self.transcripts_image_path = transcripts_image_path if transcripts_image_path is not None else None
-        self.transcripts_mask_path = transcripts_mask_path if transcripts_mask_path is not None else None
-        self.dapi_high_res_image_path = dapi_high_res_image_path if dapi_high_res_image_path is not None else None
-        self.dapi_image_path = dapi_image_path if dapi_image_path is not None else None
-        self.dapi_mask_path = dapi_mask_path if dapi_mask_path is not None else None
-        self.detachment_mask_path = detachment_mask_path if detachment_mask_path is not None else None
-        self.ventricle_image_path = ventricle_image_path if ventricle_image_path is not None else None
-        self.ventricle_mask_path = ventricle_mask_path if ventricle_mask_path is not None else None
-        self.damage_mask_path = damage_mask_path if damage_mask_path is not None else None
+        self.transcripts_image_path = transcripts_image_path
+        self.transcripts_mask_path = transcripts_mask_path
+        self.dapi_high_res_image_path = dapi_high_res_image_path
+        self.dapi_image_path = dapi_image_path
+        self.dapi_mask_path = dapi_mask_path
+        self.detachment_mask_path = detachment_mask_path
+        self.ventricle_image_path = ventricle_image_path
+        self.ventricle_mask_path = ventricle_mask_path
+        self.damage_mask_path = damage_mask_path
+        self.pixel_classification_path = pixel_classification_path
         self.codebook = data_processing.process_input(codebook_input) if codebook_input is not None else None
-        self.perfusion_path = perfusion_path if perfusion_path is not None else None
-        self.output_dir = output_dir if output_dir is not None else None
-        self.pixel_classification_path = pixel_classification_path if pixel_classification_path is not None else None
+        self.perfusion_path = perfusion_path
+        self.output_dir = output_dir
 
         # Transcripts dataframe
         transcripts = data_processing.process_input(transcripts_input)
@@ -73,29 +155,32 @@ class Experiment:
         self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
 
         # Create transcripts mask if parameters are provided
-        if not data_processing.check_if_none(self.ilastik_program_path, self.transcripts_pixel_model_path, 
-                                             self.transcripts_object_model_path, self.transcripts_image_path, 
+        if not data_processing.check_if_none(self.ilastik_program_path,
+                                             self.transcripts_pixel_model_path,
+                                             self.transcripts_object_model_path,
+                                             self.transcripts_image_path,
                                              self.transcripts_mask_path):
-            self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path, 
-                                                                self.ilastik_program_path, 
-                                                                self.transcripts_pixel_model_path, 
-                                                                self.transcripts_object_model_path, 
-                                                                self.filtered_transcripts)
+
+            self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
+                                                                 self.ilastik_program_path,
+                                                                 self.transcripts_pixel_model_path,
+                                                                 self.transcripts_object_model_path,
+                                                                 self.filtered_transcripts)
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
         """
-        Reads transcripts csv and returns DataFrame for given `detected_transcripts.csv`
+        Reads and returns transcripts table dataframe
 
         Parameters
         ----------
-        path : str or Path
+        transcripts_path : str or Path
             Path to detected_transcripts.csv file
 
         Returns
         -------
-        all_transcripts : pd.DataFrame
-            Detected transcripts CSV
+        transcripts : pd.DataFrame
+            Transcripts table
 
         Raises
         ------
@@ -108,7 +193,7 @@ class Experiment:
         except FileNotFoundError as e:
             raise FileNotFoundError(f'detected_transcripts.csv not found at {transcripts_path}'
                                     f'Error: {e}')
-        
+
     @staticmethod
     def remove_blanks(transcripts: pd.DataFrame) -> pd.DataFrame:
         """
@@ -117,12 +202,12 @@ class Experiment:
         Parameters
         ----------
         transcripts : pd.DataFrame
-            Transcripts DataFrame
+            Transcripts table
 
         Returns
         -------
         filtered_transcripts : pd.DataFrame
-            Transcripts DataFrame excluding 'Blank' codewords
+            Transcripts table excluding 'Blank' codewords
         """
         return transcripts[~transcripts['gene'].str.startswith('Blank')]
 
@@ -194,7 +279,6 @@ class Experiment:
         fovs['z_ratio'] = fovs[f'z{num_planes - 1}_count'] / fovs['z0_count']
 
         return fovs
-    
 
     @staticmethod
     def get_fov_neighbors(fovs: pd.DataFrame) -> pd.DataFrame:
@@ -284,12 +368,26 @@ class Experiment:
         fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
         return fovs
 
-
     @staticmethod
     def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path], 
                                transcripts_mask_input: Union[np.ndarray, str, Path]):
         """
         Calculates transcript density per on-tissue micron
+
+        Parameters
+        ----------
+        transcripts_image_input : np.ndarray, str, or Path
+            Array of or path to transcripts image.
+        transcripts_mask_input : np.ndarray, str, or Path
+            Array of or path to binary transcripts mask.
+
+        Returns
+        -------
+        tuple
+            on_tissue_filtered_transcripts_count : float
+                Number of on-tissue transcripts
+            transcripts_density_um2 : float
+                Number of transcripts per on-tissue micron
         """
         transcripts_image = data_processing.process_input(transcripts_image_input)
         transcripts_mask = data_processing.process_input(transcripts_mask_input)
@@ -304,7 +402,7 @@ class Experiment:
             transcripts_density_um2 = np.nan
 
         return on_tissue_filtered_transcripts_count, transcripts_density_um2
-    
+
     def run_dropout_pipeline(self):
         """
         Runs entire dropout pipeline, including false positive correction
@@ -316,13 +414,13 @@ class Experiment:
         """
         self.fovs_df = FOVDropout.find_on_tissue_fovs(self.filtered_transcripts, self.fovs_df,
                                                       self.transcripts_mask, self.transcripts_image_path,
-                                                      self.ilastik_program_path, 
+                                                      self.ilastik_program_path,
                                                       self.transcripts_pixel_classification_path,
                                                       self.transcripts_object_classification_path)
         self.fovs_df = FOVDropout.detect_dropouts(self.filtered_transcripts, self.fovs_df)
         self.fovs_df = FOVDropout.compare_codebook_fov_genes(self.fovs_df, self.codebook)
         self.fovs_df = FOVDropout.detect_false_positives(self.fovs_df, self.codebook)
-        
+
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs, self.output_dir)
 
@@ -345,54 +443,55 @@ class Experiment:
         """
         # Set attributes as None in case there are no ventricle genes
         self.ventricle_mask = None
-        self.damage_mask = None 
+        self.damage_mask = None
 
         if self.transcripts_mask is None:
             print("Generating transcript mask...")
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
-                                        self.ilastik_program_path,
-                                        self.transcripts_pixel_classification_path,
-                                        self.transcripts_object_classification_path,
-                                        self.transcripts_mask_path,
-                                        self.filtered_transcripts)
+                                                                 self.ilastik_program_path,
+                                                                 self.transcripts_pixel_classification_path,
+                                                                 self.transcripts_object_classification_path,
+                                                                 self.transcripts_mask_path,
+                                                                 self.filtered_transcripts)
 
         print("Generating DAPI mask...")
         self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
-                              self.ilastik_program_path,
-                              self.dapi_pixel_classification_path,
-                              self.dapi_object_classification_path,
-                              self.dapi_mask_path,
-                              self.dapi_high_res_image_path)
+                                               self.ilastik_program_path,
+                                               self.dapi_pixel_classification_path,
+                                               self.dapi_object_classification_path,
+                                               self.dapi_mask_path,
+                                               self.dapi_high_res_image_path)
 
         print("Generating lifting mask...")
         self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
-                                    self.dapi_mask_path,
-                                    self.detachment_mask_path)
-        
-        if any(np.isin(self.genes, self.ventricle_genes_list)): # if ventricle genes exist
+                                                           self.dapi_mask_path,
+                                                           self.detachment_mask_path)
+
+        if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
             print("Generating ventricle mask...")
             self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
-                                       self.ventricle_genes_list,
-                                       self.dapi_mask_path,
-                                       self.transcripts_mask_path,
-                                       self.ilastik_program_path,
-                                       self.ventricle_pixel_classification_path,
-                                       self.ventricle_object_classification_path,
-                                       self.filtered_transcripts)
+                                                             self.ventricle_genes_list,
+                                                             self.dapi_mask_path,
+                                                             self.transcripts_mask_path,
+                                                             self.ilastik_program_path,
+                                                             self.ventricle_pixel_classification_path,
+                                                             self.ventricle_object_classification_path,
+                                                             self.filtered_transcripts)
 
             print("Generating damage mask...")
             self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
-                                    self.dapi_image_path,
-                                    self.dapi_mask_path,
-                                    self.transcripts_mask_path,
-                                    self.ventricle_mask_path)
+                                                       self.dapi_image_path,
+                                                       self.dapi_mask_path,
+                                                       self.transcripts_mask_path,
+                                                       self.ventricle_mask_path)
 
-            # resize all masks by transcripts mask 
-            self.dapi_mask, self.detachment_mask, self.ventricle_mask, self.damage_mask = pc.resize_all_masks(self.transcripts_mask,
-                                                                                                              self.dapi_mask,
-                                                                                                              self.detachment_mask,
-                                                                                                              self.ventricle_mask,
-                                                                                                              self.damage_mask)
+            # Resize all masks by transcripts mask
+            self.transcripts_mask, self.dapi_mask, self.detachment_mask, \
+                self.ventricle_mask, self.damage_mask = pc.resize_all_masks(self.transcripts_mask,
+                                                                            self.dapi_mask,
+                                                                            self.detachment_mask,
+                                                                            self.ventricle_mask,
+                                                                            self.damage_mask)
 
         # Classify each pixel
         print("Classifying pixels...")
@@ -403,8 +502,14 @@ class Experiment:
                                                        self.pixel_classification_path)
 
         # Get pixel areas in microns and as percentage of "ideal" tissue area
-        self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area = pc.calculate_class_areas(self.pixel_classification)
-        self.damage_percent, self.transcripts_percent, self.detachment_percent, self.ventricle_percent = pc.calculate_class_percentages(self.damage_area, self.transcripts_area, self.detachment_area, self.ventricle_area, self.total_area)
+        self.damage_area, self.transcripts_area, self.detachment_area, \
+            self.ventricle_area, self.total_area = pc.calculate_class_areas(self.pixel_classification)
+        self.damage_percent, self.transcripts_percent, self.detachment_percent, \
+            self.ventricle_percent = pc.calculate_class_percentages(self.damage_area,
+                                                                    self.transcripts_area,
+                                                                    self.detachment_area,
+                                                                    self.ventricle_area,
+                                                                    self.total_area)
 
         pixel_stats_dict = {'damage_area': self.damage_area,
                             'transcripts_area': self.transcripts_area,
@@ -429,13 +534,20 @@ class Experiment:
         """
         # 1. Run  pixel classification workflow
         if run_pixel_classification:
-            
             self.run_full_pixel_classification()
 
             if plot_figures:
-                figures.plot_full_pixel_fig(self.pixel_classification, self.dapi_mask, self.transcripts_mask, self.detachment_mask,
-                                            self.transcripts_percent, self.detachment_percent, self.damage_mask, self.ventricle_mask,
-                                            self.damage_percent, self.ventricle_percent, Path(self.output_dir, "pixel_classification_plot.png"))
+                figures.plot_full_pixel_fig(self.pixel_classification,
+                                            self.dapi_mask,
+                                            self.transcripts_mask,
+                                            self.detachment_mask,
+                                            self.transcripts_percent,
+                                            self.detachment_percent,
+                                            self.damage_mask,
+                                            self.ventricle_mask,
+                                            self.damage_percent,
+                                            self.ventricle_percent,
+                                            Path(self.output_dir, "pixel_classification_plot.png"))
                 plt.show()
 
         # 2. Dropout detection
@@ -456,26 +568,29 @@ class Experiment:
 
         # 3. On-tissue metrics
         print('Get on-tissue transcript density')
-        self.on_tissue_filtered_transcripts_count, self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path, self.transcripts_mask) 
-        self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
+        self.on_tissue_filtered_transcripts_count, \
+            self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
+                                                                             self.transcripts_mask) 
+        self.transcript_density_um2_per_gene = self.transcripts_density_um2 / self.n_genes
 
         # 4. Periodicity
         print('Calculating periodicity')
         self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts, num_planes=self.num_planes)
         self.periodicity = np.round(np.nanmin(self.periodicity_list), 3)
         if plot_figures:
-            figures.plot_periodicity_hist(self.transcripts, out_file = Path(self.output_dir, "periodicity_hist.png"))
+            figures.plot_periodicity_hist(self.transcripts, out_file=Path(self.output_dir, "periodicity_hist.png"))
 
         # 5. z-plane transcript ratio
         print('Computing z-plane metrics')
         self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
         self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
         if plot_figures:
-            figures.plot_transcripts_per_z(self.transcripts_per_z, out_file = Path(self.output_dir, "transcripts_per_z.png"))
+            figures.plot_transcripts_per_z(self.transcripts_per_z,
+                                           out_file=Path(self.output_dir, "transcripts_per_z.png"))
 
         # 7. Perfusion
         if run_perfusion and self.perfusion_path is not None:
             perfusion_data = perfusion.analyze_flow(self.perfusion_path)
             if plot_figures:
-                figures.plot_perfusion_figure(perfusion_data, out_file = Path(self.output_dir, "perfusion.png"))
-    
+                figures.plot_perfusion_figure(perfusion_data,
+                                              out_file=Path(self.output_dir, "perfusion.png"))

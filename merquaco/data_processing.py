@@ -7,10 +7,15 @@ import json
 
 
 def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
+    """
+    Helper function processes and returns relevant format for input data
+    """
     if isinstance(input_data, pd.DataFrame):
-        return input_data
+        if not check_if_none(input_data):
+            return input_data
     elif isinstance(input_data, np.ndarray):
-        return input_data
+        if not check_if_none(input_data):
+            return input_data
     elif isinstance(input_data, dict):
         return input_data
     elif isinstance(input_data, str):
@@ -38,10 +43,13 @@ def check_if_none(*args):
     """
     Check if all provided arguments are None.
 
-    Parameters:
+    Parameters
+    ----------
     *args: Variable number of arguments that can be of any type.
 
-    Returns:
-    bool: True if all arguments are None, False otherwise.
+    Returns
+    -------
+    bool
+        True if all arguments are None, False otherwise.
     """
     return all(arg is None for arg in args)
