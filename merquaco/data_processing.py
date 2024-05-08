@@ -8,11 +8,11 @@ import json
 
 def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
     if isinstance(input_data, pd.DataFrame):
-        return input_data
+        return process_dataframe(input_data)
     elif isinstance(input_data, np.ndarray):
-        return input_data
+        return process_image_array(input_data)
     elif isinstance(input_data, dict):
-        return input_data
+        return process_dictionary(input_data)
     elif isinstance(input_data, str):
         return process_path(input_data)
     elif isinstance(input_data, Path):
@@ -20,6 +20,14 @@ def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
     else:
         raise TypeError("Unsupported input type. Must be a DataFrame, numpy array, dictionary, file path, or JSON.")
 
+def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    return df
+
+def process_image_array(image_array: np.ndarray) -> np.ndarray:
+    return image_array
+
+def process_dictionary(data_dict: dict) -> dict:
+    return data_dict
 
 def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray]:
     # Determine the type of file based on its extension
@@ -33,7 +41,6 @@ def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray]:
     else:
         raise ValueError("File type not supported or file not found.")
 
-
 def check_if_none(*args):
     """
     Check if all provided arguments are None.
@@ -45,3 +52,4 @@ def check_if_none(*args):
     bool: True if all arguments are None, False otherwise.
     """
     return all(arg is None for arg in args)
+

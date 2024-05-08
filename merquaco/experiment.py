@@ -4,18 +4,18 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
-import pixel_classification as pc
-import data_processing
-from data_loss import FOVDropout, DropoutResult
-import figures
-import z_plane_detection as zp
-import perfusion
-import periodicity
+import merquaco.pixel_classification as pc
+import merquaco.data_processing as data_processing
+from merquaco.data_loss import FOVDropout, DropoutResult
+import merquaco.figures as figures
+import merquaco.z_plane_detection as zp
+import merquaco.perfusion as perfusion
+import merquaco.periodicity as periodicity
 
 class Experiment:
 
     def __init__(self, transcripts_input: Union[pd.DataFrame, str, Path],
-                 ilastik_paths_json_input: Union[dict, str, Path] = None,
+                 ilastik_paths_input: Union[dict, str, Path] = None,
                  transcripts_image_path: Union[str, Path] = None,
                  transcripts_mask_path: Union[str, Path] = None,
                  dapi_high_res_image_path: Union[str, Path] = None,
@@ -33,8 +33,10 @@ class Experiment:
         Initialize an Experiment instance from transcripts dataframe 
         """
         # Assign ilastik paths as attributes 
-        ilastik_paths = data_processing.process_input(ilastik_paths_json_input)
-        self.unpack_dictionary(ilastik_paths)
+        ilastik_paths_dict = data_processing.process_input(ilastik_paths_input)
+        # Unpack dictionary as self attributes
+        for key, val in ilastik_paths_dict.items():
+            setattr(self, key, val)
 
         # Assign parameters as self attributes
         self.transcripts_image_path = transcripts_image_path if transcripts_image_path is not None else None
@@ -79,20 +81,6 @@ class Experiment:
                                                                 self.transcripts_pixel_model_path, 
                                                                 self.transcripts_object_model_path, 
                                                                 self.filtered_transcripts)
-            
-        
-    
-    def unpack_dictionary(self, dictionary: dict):
-        """
-        Unpacks every key-value pair from the dictionary into a self attribute
-
-        Parameters
-        ----------
-        dictionary : dict
-            Dictionary to unpack into self attributes
-        """
-        for key, val in dictionary.items():
-            setattr(self, key, val)
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
@@ -433,10 +421,9 @@ class Experiment:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
-    # TODO: if plot_figures, plot each figure 
     def run_all_qc(self, run_pixel_classification: bool = True,
-                    run_dropout: bool = True, run_perfusion: bool = False,
-                    plot_figures: bool = True):
+                   run_dropout: bool = True, run_perfusion: bool = False,
+                   plot_figures: bool = True):
         """
         Runs all standard QC functions and prints results
         """
@@ -465,7 +452,7 @@ class Experiment:
             if plot_figures:
                 # Draw and save dropout
                 if self.n_dropped_fovs > 0:
-                    dropout.draw_genes_dropped_per_fov(out_path=Path(self.qc_output_path, 'fov_dropout.png'))
+                    dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
         print('Get on-tissue transcript density')
@@ -476,27 +463,19 @@ class Experiment:
         print('Calculating periodicity')
         self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts, num_planes=self.num_planes)
         self.periodicity = np.round(np.nanmin(self.periodicity_list), 3)
-        # TODO: Plot cb hist
+        if plot_figures:
+            figures.plot_periodicity_hist(self.transcripts, out_file = Path(self.output_dir, "periodicity_hist.png"))
 
         # 5. z-plane transcript ratio
         print('Computing z-plane metrics')
         self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
         self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
-        # TODO: Plot z-plane drop off
+        if plot_figures:
+            figures.plot_transcripts_per_z(self.transcripts_per_z, out_file = Path(self.output_dir, "transcripts_per_z.png"))
 
         # 7. Perfusion
         if run_perfusion and self.perfusion_path is not None:
             perfusion_data = perfusion.analyze_flow(self.perfusion_path)
-            perfusion_out_file = Path(self.output_dir, "perfusion.png")
-            figures.plot_perfusion_figure(perfusion_data, out_file = perfusion_out_file)
-
-        # 7. Plot figures
-        if plot_figures:
-            rounded_ts_density = "{:.3g}".format(self.transcript_density_um2_per_gene)
-            wdr_data = [len(self.experiment.filtered_transcripts), rounded_ts_density, self.n_dropped_fovs,
-                        self.most_checkerboard, self.z_ratio]
-            figures.plot_wdr_dists(self.qc_metadata_tracker, self.z_ratio, self.most_checkerboard,
-                                        self.transcript_density_um2_per_gene,
-                                        self.experiment.barcode, wdr_data, self.experiment.qc_output_path)
-            # TODO: Remove plot_wdr_dists
+            if plot_figures:
+                figures.plot_perfusion_figure(perfusion_data, out_file = Path(self.output_dir, "perfusion.png"))
     

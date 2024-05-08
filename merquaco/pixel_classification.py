@@ -9,8 +9,8 @@ from skimage.segmentation import flood_fill
 import tifffile as tiff
 import cv2
 from typing import Union
-import ilastik_workflow
-import data_processing
+import merquaco.ilastik_workflow as ilastik_workflow
+import merquaco.data_processing as data_processing
 
 
 def generate_mask(ilastik_program_path: Union[str, Path],

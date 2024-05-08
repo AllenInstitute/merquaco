@@ -1,0 +1,8 @@
+numpy
+pandas
+tifffile
+matplotlib
+seaborn
+scikit-image
+opencv-python
+imagecodecs

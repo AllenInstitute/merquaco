@@ -35,14 +35,14 @@ def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7):
     return periodicity_list
 
 
-def get_chunk_values(transcripts: pd.DataFrame, image_dimensions: int, fov_dimensions: int = 202):
+def get_chunk_values(transcripts: np.ndarray, image_dimensions: int, fov_dimensions: int = 202):
     """
     Calculates histogram and periodicity chunk values for transcripts DataFrame
 
     Parameters
     ----------
-    transcripts : pd.DataFrame
-        Transcripts table
+    transcripts : np.ndarray
+        Array of transcript x or y coordinates
     image_dimensions : int
         Size of image
     fov_dimensions : int, optional
