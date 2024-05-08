@@ -2,6 +2,7 @@ from typing import Union
 from pathlib import Path
 import subprocess
 
+
 def get_pixel_workflow_args(ilastik_program_path: Union[str, Path],
                             pixel_classification_model_path: Union[str, Path],
                             input_image_path: Union[str, Path],
@@ -40,6 +41,7 @@ def get_pixel_workflow_args(ilastik_program_path: Union[str, Path],
         '--output_filename_format',
         probability_map_path,
     ]
+
 
 def get_object_workflow_args(ilastik_program_path: Union[str, Path], 
                              object_classification_model_path: Union[str, Path],
@@ -84,6 +86,7 @@ def get_object_workflow_args(ilastik_program_path: Union[str, Path],
         mask_path,
     ]
 
+
 def run_ilastik_workflow(workflow_args: list):
     """
     Run Ilastik workflow through subprocess
@@ -104,7 +107,8 @@ def run_ilastik_workflow(workflow_args: list):
     """
 
     try:
-        result = subprocess.run(workflow_args, stdout=open('ilastik_logs.txt', 'w+'), stderr=open('ilastik_logs.txt', 'w+'))
+        result = subprocess.run(workflow_args, stdout=open('ilastik_logs.txt', 'w+'), stderr=open('ilastik_logs.txt',
+                                                                                                  'w+'))
         if result.returncode != 0:
             """print('STDOUT: ', result.stdout)
             print('STDERR: ', result.stderr)"""
