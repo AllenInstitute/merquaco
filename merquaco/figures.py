@@ -11,11 +11,36 @@ import merquaco.periodicity as periodicity
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
-                         rotation_degrees: int = -90, ax=None, out_file: Union[str,Path] = None,
+                         rotation_degrees: int = -90, ax: plt.Axes = None, out_file: Union[str, Path] = '',
                          ms: float = 1, alpha: float = 0.5, color: str = "black",
                          title: str = ''):
     """
     Plots transcripts overview, subsampling 0.1% by default.
+
+    Parameters
+    ----------
+    transcripts : pd.DataFrame
+        Transcripts table
+    subsample : int, optional
+        Denominator for subsampling transcripts. Default is 1000.
+    rotation_degrees : int, optional
+        Degrees to rotate section image by. Default is -90 to match Vizualizer orientation.
+    ax : plt.Axes, optional
+        Axes on which to plot image. Default is None.
+    out_file : str or Path, optional
+        Path at which to save the image. Default is ''.
+    ms : float, optional
+        Marker size for plotting. Default is 1.
+    alpha : float, optional
+        Alpha parameter. Default is 0.5.
+    color : str, optional
+        Color for plotting transcripts. Default is 'black'.
+    title : str, optional
+        Title for plot. Default is ''.
+
+    Returns
+    -------
+    None
     """
     if ax is None:
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -56,24 +81,59 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     if title != '':
         ax.set_title(title)
 
-    if out_file != None:
+    if out_file != '':
         plt.savefig(out_file)
 
     plt.show()
-    plt.close();
+    plt.close()
 
 
-def plot_periodicity_hist(transcripts: pd.DataFrame, 
+def plot_periodicity_hist(transcripts: pd.DataFrame,
                           n_transcripts: int = None,
+                          subsample: int = 100,
                           scale: Union[int, float] = None,
+                          ax: plt.Axes = None,
                           fov_width: Union[int, float] = 202,
                           fov_height: Union[int, float] = 202,
                           alpha: Union[int, float] = 0.25, ms: Union[int, float] = 0.1,
                           ts_color: str = "black", hist_color: str = "red",
-                          out_file: Union[str, Path] = None, dpi: int = 200):
+                          out_file: Union[str, Path] = '', dpi: int = 200):
+    """
+    Plot transcripts overview with histogram of counts along each axis.
 
-    _, ax = plt.subplots(figsize=(8, 6))
+    Parameters
+    ----------
+    transcripts : pd.DataFrame
+        Transcripts table
+    n_transcripts : int, optional
+        Number of transcripts to plot. Default is None.
+    subsample : int, optional
+        Denominator for subsampling transcripts. Default is 100.
+    scale : int or float, optional
+        Value to multiply histogram values by. Default is None.
+    ax : plt.Axes, optional
+        Axes on which to plot. Default is None.
+    fov_width : int or float, optional
+        FOV width in microns. Default is 202.
+    fov_height : int or float, optional
+        FOV height in microns. Default is 202.
+    alpha : int or float, optional
+        Alpha parameter for plotting. Default is 0.25.
+    ms : int or float, optional
+        Marker size for plotting transcripts. Default is 0.1.
+    ts_color : str, optional
+        Color for plotting transcripts. Default is 'black'.
+    hist_color : str, optional
+        Color for plotting histogram. Default is 'red'.
+    out_file : str or Path, optional
+        Path at which to save file. Default is ''.
+    dpi : int, optional
+        DPI value. Default is 200.
+    """
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8, 8))
 
+    # Define transcript arrays in x, y
     x = np.asarray(transcripts['global_x'])
     y = np.asarray(transcripts['global_y'])
 
@@ -85,7 +145,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
 
     # Subsample transcripts
     if n_transcripts is None:
-        n_transcripts = int(len(transcripts) / 90)
+        n_transcripts = int(len(transcripts) / subsample)
     samples = np.random.choice(transcripts.shape[0], n_transcripts, replace=False)
 
     # Plot subsamples
@@ -99,7 +159,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     hist_y, _ = periodicity.get_chunk_values(y, dimensions, fov_height)
     indices = np.arange(len(hist_y))
 
-    # Plot em
+    # Plot histograms
     if scale is None:
         scale = int(xmax * ymax) / 15
     ax.plot(hist_x*scale, alpha=alpha, linewidth=0.5, color=hist_color)
@@ -112,22 +172,29 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     # Aesthetics
     plt.axis('off')
 
-    plt.savefig(out_file, dpi=dpi)
+    if out_file != '':
+        plt.savefig(out_file, dpi=dpi)
     plt.show()
-    plt.close();
+    plt.close()
 
 
-
-def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotation_degrees: int = -90,
-                       num_planes: int = 7, ms: float = 1, alpha: float = 0.5, color: str = "black",
-                       title: str = '', out_file: str = '', label_planes=False):
+def plot_every_z_plane(transcripts: pd.DataFrame,
+                       subsample: int = 1000,
+                       rotation_degrees: int = -90,
+                       ms: float = 1,
+                       num_planes: int = 7,
+                       alpha: float = 0.5,
+                       color: str = "black",
+                       title: str = '',
+                       out_file: Union[str, Path] = '',
+                       label_planes: bool = False):
     """
     Plots transcripts overview for each z plane in a row
 
     Parameters
     ----------
     transcripts : pd.DataFrame
-        Detected transcripts DataFrame
+        Transcripts table
     subsample : int, optional
         Number to subsample transcripts by. Default is 1000
     rotation_degrees: int, optional
@@ -135,7 +202,15 @@ def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotatio
     ms : float, optional
         Marker size for each transcript spot. Default is 1
     num_planes : int, optional
-        Number of z planes to plot. Default is 7
+        Number of z planes to plot. Default is 7.
+    alpha : float, optional
+        Alpha parameter for plotting. Default is 0.5.
+    color : str, optional
+        Color for plotting transcript spots. Default is 'black'.
+    title : str, optional
+        Title for plot. Default is ''.
+    out_file : str or Path, optional
+        Path at which to save plot. Default is ''.
     label_planes : bool, optional
         Whether to label z planes on figure. Default is False.
 
@@ -165,11 +240,13 @@ def plot_every_z_plane(transcripts: pd.DataFrame, subsample: int = 1000, rotatio
         plt.savefig(out_file)
 
     plt.show()
-    plt.close();
+    plt.close()
 
 
-def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, ax=None, 
-                           title: str = "", out_file: str = ''):
+def plot_transcripts_per_z(transcripts_per_z: np.ndarray,
+                           ax: plt.Axes = None,
+                           title: str = '',
+                           out_file: str = ''):
     """
     Plot transcript counts for each z plane
 
@@ -179,27 +256,23 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, a
         Number of transcripts per z-plane
     num_planes : int, optional
         Number of planes to plot. Default is 7.
-    ax : matplotlib.Axes.axes, optional
-        Axes object on which to plot. Default is None
-
+    ax : plt.Axes, optional
+        Axes on which to plot. Default is None.
+    title : str, optional
+        Title for plot. Default is ''.
     out_file : str, optional
         Path at which to save figure. Default is ''
 
-    Returns
-    -------
-    ax : matplotlib.Axes.axes
-        Modified axes object with plot
-
-    Notes
-    -----
-    num_planes and len(transcripts_per_z) should match
+    Raises
+    ------
+    ValueError
     """
     if ax is None:
         _, ax = plt.subplots(figsize=(5, 5))
 
     ax.plot(transcripts_per_z, 'ok')
     ax.set_ylim(bottom=0)
-    ax.set_xticks(np.arange(0, num_planes, 1).tolist())
+    ax.set_xticks(np.arange(0, len(transcripts_per_z), 1).tolist())
     ax.set_xlabel('Z-Plane')
     ax.set_ylabel('Transcript Counts')
     ax.set_title('Transcript Counts per Z-Plane')
@@ -211,14 +284,18 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray, num_planes: int = 7, a
         plt.savefig(out_file)
 
     plt.show()
-    plt.close();
+    plt.close()
 
-def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Union[str, Path] = None, ylim: bool = True):
+
+def plot_perfusion_figure(flow_data: np.ndarray,
+                          title: str = '',
+                          out_file: Union[str, Path] = None,
+                          ylim: bool = True):
     """
     Plot (and save) figure of extracted fluidics log file data
 
     Flow rates for each time point in experiment plotted with median flow rate highlighted and
-    dotted low flow rate line plotted at 0.8 flow units
+    dotted low flow rate line plotted at 0.5 flow units (ml/min)
 
     Parameters
     ----------
@@ -230,10 +307,6 @@ def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Unio
         Path to save flow figure. Default is ''
     ylim : bool, optional
         Whether to limit y axis on scale to (0, 2). Default is True.
-    Returns
-    -------
-    ax : matplotlib.Axes.axes
-        Modified axes with plot
 
     Notes
     -----
@@ -253,7 +326,7 @@ def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Unio
     ax.set_xlabel('time (hr)')
     ax.set_ylabel('flow')
     ax.set_yticks([0, 2])
-    ax.axhline(0.8, ls=':', color='b')
+    ax.axhline(0.5, ls=':', color='b')
 
     if title != '':
         ax.set_title(title)
@@ -262,16 +335,55 @@ def plot_perfusion_figure(flow_data: np.ndarray, title: str = '', out_file: Unio
         fig.savefig(out_file)
 
 
-def plot_pixel_percentages(transcripts_percent: float, detachment_percent: float, 
-                           damage_percent: float = np.nan, ventricle_percent: float = np.nan,
+def plot_pixel_percentages(transcripts_percent: float,
+                           detachment_percent: float,
+                           damage_percent: float = np.nan,
+                           ventricle_percent: float = np.nan,
                            colormap_list: list = ["white", "orange", "green", "red", "blue"],
                            colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
-                           ax: Axes = None, title: str = "", out_file: Union[str, Path]=None, dpi: int = 100):
-    
+                           ax: Axes = None,
+                           title: str = '',
+                           out_file: Union[str, Path] = '',
+                           dpi: int = 100):
+    """
+    Plots proportion of 'ideal tissue area' for each classified category
+
+    Parameters
+    ----------
+    transcripts_percent : float
+        Percent of ideal tissue area classified as transcripts.
+    detachment_percent : float
+        Percent of ideal tissue area classified as detachment.
+    damage_percent : float, optional
+        Percent of ideal tissue area classified as damage.
+    ventricle_percent : flot, optional
+        Percent of ideal tissue area classified as ventricles.
+    colormap_list : list, optional
+        List of colors for plotting. Default is ["white", "orange", "green", "red", "blue"].
+    colormap_labels : list, optional
+        Labels for colormap. Default is ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"].
+    ax : plt.Axes, optional
+        Axes on which to plot. Default is None.
+    title : str, optional
+        Title for plot. Default is ''.
+    out_file : str or Path, optional
+        Path at which to save plot. Default is ''.
+    dpi : int, optional
+        DPI value for plot. Default is 100.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If only one of ['damage_percent', 'ventricle_percent'] are passed.
+    """
+
     if damage_percent != np.nan and ventricle_percent != np.nan:
         # Plot pixel percentages
-        barlist = ax.bar([0, 1, 2, 3], [damage_percent, transcripts_percent, detachment_percent,
-                                                    ventricle_percent])
+        barlist = ax.bar([0, 1, 2, 3], [damage_percent, transcripts_percent, detachment_percent, ventricle_percent])
         ax.set_title("Pixel Percentages of Ideal Tissue Area")
         ax.set_xticks([0, 1, 2, 3])
         ax.set_xticklabels(colormap_labels[1:])
@@ -279,8 +391,7 @@ def plot_pixel_percentages(transcripts_percent: float, detachment_percent: float
         barlist[1].set_color(colormap_list[2])
         barlist[2].set_color(colormap_list[3])
         barlist[3].set_color(colormap_list[4])
-        for index, value in enumerate([damage_percent, transcripts_percent, detachment_percent,
-                                    ventricle_percent]):
+        for index, value in enumerate([damage_percent, transcripts_percent, detachment_percent, ventricle_percent]):
             ax.text(index-0.15, value+0.5, f"{str(value)}%")
 
     elif damage_percent == np.nan and ventricle_percent == np.nan:
@@ -295,7 +406,7 @@ def plot_pixel_percentages(transcripts_percent: float, detachment_percent: float
             ax.text(index-0.15, value+0.5, f"{str(value)}%")
 
     else:
-        raise Exception("Both of or none of damage_percent and ventricle_percents must be provided.")
+        raise ValueError("Both of or neither of damage_percent and ventricle_percents must be provided.")
 
     if title != '':
         ax.set_title(title)
@@ -304,12 +415,34 @@ def plot_pixel_percentages(transcripts_percent: float, detachment_percent: float
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
 
-def plot_pixel_classification(pixel_classification: np.ndarray, ax: Axes = None, title: str = "", 
+def plot_pixel_classification(pixel_classification: np.ndarray,
+                              ax: Axes = None,
+                              title: str = '',
                               colormap_list: list = ["white", "orange", "green", "red", "blue"],
                               colormap_labels: list = ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"],
-                              out_file: Union[str, Path] = None, dpi: int = 200):
+                              out_file: Union[str, Path] = '',
+                              dpi: int = 200):
     """
     Plots pixel classification of an experiment
+
+    Parameters
+    ----------
+    pixel_classification : np.ndarray
+        Array of pixel classification results
+    ax : plt.Axes, optional
+        Axes on which to plot. Default is None.
+    colormap_list : list, optional
+        List of colors for plotting. Default is ["white", "orange", "green", "red", "blue"].
+    colormap_labels : list, optional
+        Labels for colormap. Default is ["Off-tissue", "Damage", "Tissue", "Lifting", "Ventricles"].
+    out_file : str or Path, optional
+        Path at which to save plot. Default is ''.
+    dpi : int, optional
+        DPI value for plot. Default is 200.
+
+    Returns
+    -------
+    None
     """
     if ax is None:
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -330,17 +463,54 @@ def plot_pixel_classification(pixel_classification: np.ndarray, ax: Axes = None,
     if out_file != '':
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
+
 def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union[np.ndarray, str, Path],
-                        transcripts_mask_input: Union[np.ndarray, str, Path], 
-                        detachment_mask_input: Union[np.ndarray, str, Path], 
-                        transcripts_percent: Union[int, float], detachment_percent: Union[int, float], 
+                        transcripts_mask_input: Union[np.ndarray, str, Path],
+                        detachment_mask_input: Union[np.ndarray, str, Path],
+                        transcripts_percent: Union[int, float],
+                        detachment_percent: Union[int, float],
                         damage_mask_input: Union[np.ndarray, str, Path] = None,
-                        ventricle_mask_input: Union[np.ndarray, str, Path] = None ,
-                        damage_percent: float = np.nan, ventricle_percent: float = np.nan,
-                        out_file: Union[str, Path] = None, dpi: int = 200):
+                        ventricle_mask_input: Union[np.ndarray, str, Path] = None,
+                        damage_percent: float = np.nan,
+                        ventricle_percent: float = np.nan,
+                        out_file: Union[str, Path] = '',
+                        dpi: int = 200):
     """
-    Plots full pixel classification figure with pixel classification, pixel 
-    percentages, and all masks used in classification
+    Plots full pixel classification figure with pixel classification, pixel percentages, and all binary masks.
+
+    Parameters
+    ----------
+    pixel_classification : np.ndarray
+        Array of pixel classification results
+    transcripts_mask_input : np.ndarray, str, or Path
+        Array of or path to transcripts mask
+    detachment_mask_input : np.ndarray, str, or Path
+        Array of or path to detachment mask
+    transcripts_percent : int or float
+        Percent of ideal tissue area classified as transcripts
+    detachment_percent : int or float
+        Percent of ideal tissue area classified as detachment
+    damage_mask_input : np.ndarray, str, or Path, optional
+        Array of or path to damage mask. Default is None.
+    ventricle_mask_input : np.ndarray, str, or Path, optional
+        Array of or path to ventricle mask. Default is None.
+    damage_percent : int or float, optoinal
+        Percent of ideal tissue area classified as damage. Default is np.nan.
+    ventricle_percent : int or float, optoinal
+        Percent of ideal tissue area classified as ventricles. Default is np.nan.
+    out_file : str or Path, optional
+        Path at which to save plot. Default is ''.
+    dpi : int, optional
+        DPI value for plotting. Default is 200.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If only one of ['damage_mask', 'ventricle_mask'] is passed.
     """
     # Load in masks
     dapi_mask = data_processing.process_input(dapi_mask_input)
@@ -384,8 +554,7 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
         detachment_mask_ax.axis('off')
 
     else:
-        raise Exception("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
-
+        raise ValueError("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
 
     # Plot pixel classification with specified color map
     plot_pixel_classification(pixel_classification, ax=pixel_class_ax)
@@ -393,7 +562,7 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
     # Plot pixel percentages
     plot_pixel_percentages(transcripts_percent, detachment_percent, damage_percent,
                            ventricle_percent, ax=pixel_perc_ax)
-    
+
     # Plot masks
     plot_masks(dapi_mask, dapi_mask_ax, transcripts_mask, transcripts_mask_ax, detachment_mask,
                detachment_mask_ax, damage_mask, damage_mask_ax, ventricle_mask, ventricle_mask_ax, 
@@ -402,26 +571,63 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
     fig.subplots_adjust(hspace=0.7)
     plt.suptitle("Pixel Classification", fontsize=20)
 
-    if out_file != None:
+    if out_file != '':
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
     plt.show()
-    plt.close();
+    plt.close()
+
+
+def plot_mask(mask_input: Union[np.ndarray, str, Path],
+              ax: plt.Axes = None,
+              title: str = '',
+              out_file: Union[str, Path] = '',
+              dpi: int = 200):
+    """
+    Processes and plots binary msk
+
+    Parameters
+    ----------
+    mask_input : np.ndarray, str, Path
+        Array of or path to binary mask.
+    ax : plt.Axes, optional
+        Axes on which to plot mask. Default is None.
+    title : str, optional
+        Title for plot. Default is ''.
+    out_file : str or Path, optional
+        Path at which to save mask. Default is ''.
+    dpi : int, optional
+        DPI value for saving plot. Default is 200.
+
+    Returns
+    -------
+    None
+    """
+    mask = data_processing.process_input(mask_input)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(5, 5))
+
+    ax.imshow(mask)
+    if title != '':
+        ax.set_title(title)
+    ax.axis('off')
+
+    if out_file != '':
+        plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
 
 
 def plot_masks(dapi_mask_input: Union[np.ndarray, str, Path],
                dapi_mask_ax: Axes,
-               transcripts_mask_input: Union[np.ndarray, str, Path], 
+               transcripts_mask_input: Union[np.ndarray, str, Path],
                transcripts_mask_ax: Axes,
-               detachment_mask_input: Union[np.ndarray, str, Path], 
+               detachment_mask_input: Union[np.ndarray, str, Path],
                detachment_mask_ax: Axes,
                damage_mask_input: Union[np.ndarray, str, Path] = None,
                damage_mask_ax: Axes = None,
                ventricle_mask_input: Union[np.ndarray, str, Path] = None,
                ventricle_mask_ax: Axes = None,
-               out_file: Union[str, Path] = None,
+               out_file: Union[str, Path] = '',
                dpi: int = 200):
-
     # Load in masks
     dapi_mask = data_processing.process_input(dapi_mask_input)
     transcripts_mask = data_processing.process_input(transcripts_mask_input)
@@ -429,14 +635,13 @@ def plot_masks(dapi_mask_input: Union[np.ndarray, str, Path],
     damage_mask = data_processing.process_input(damage_mask_input) if damage_mask_input is not None else None
     ventricle_mask = data_processing.process_input(ventricle_mask_input) if ventricle_mask_input is not None else None
 
-
     if dapi_mask_ax is not None:
         dapi_mask_ax.imshow(dapi_mask)
         dapi_mask_ax.set_title("DAPI Mask")
         dapi_mask_ax.axis('off')
 
-    if transcripts_mask_ax is not None :
-        transcripts_mask_ax.imshow(transcripts_mask)
+    if transcripts_mask_ax is not None:
+        transcripts_mask_ax.imshow( transcripts_mask)
         transcripts_mask_ax.set_title("Transcript Mask")
         transcripts_mask_ax.axis('off')
 
@@ -455,6 +660,5 @@ def plot_masks(dapi_mask_input: Union[np.ndarray, str, Path],
         ventricle_mask_ax.set_title("Ventricles Mask")
         ventricle_mask_ax.axis('off')
 
-    if out_file is not None:
+    if out_file != '':
         plt.savefig(out_file, dpi=dpi, bbox_inches='tight', facecolor='white', transparent=False)
-
