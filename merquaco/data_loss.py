@@ -9,7 +9,7 @@ from matplotlib.colors import Normalize as color_normalize
 from matplotlib.patches import Rectangle
 import matplotlib.cm as cm
 from typing import Union
-import pixel_classification as pc
+import merquaco.pixel_classification as pc
 
 
 class FOVDropout:
