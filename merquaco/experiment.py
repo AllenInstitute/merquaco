@@ -156,15 +156,15 @@ class Experiment:
 
         # Create transcripts mask if parameters are provided
         if not data_processing.check_if_none(self.ilastik_program_path,
-                                             self.transcripts_pixel_model_path,
-                                             self.transcripts_object_model_path,
+                                             self.transcripts_pixel_classification_path,
+                                             self.transcripts_object_classification_path,
                                              self.transcripts_image_path,
                                              self.transcripts_mask_path):
 
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                  self.ilastik_program_path,
-                                                                 self.transcripts_pixel_model_path,
-                                                                 self.transcripts_object_model_path,
+                                                                 self.transcripts_pixel_classification_path,
+                                                                 self.transcripts_object_classification_path,
                                                                  self.filtered_transcripts)
 
     @staticmethod
