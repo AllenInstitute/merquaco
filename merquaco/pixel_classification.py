@@ -809,11 +809,11 @@ def calculate_class_areas(pixel_classification: np.ndarray):
     ventricle_pixels = pixel_classification == 4
 
     # Calculate class areas in microns. Multiply by 100 since mask generation bins by 10 micron pixels
-    damage_area = np.sum(damage_pixels) * 100 if np.any(damage_pixels) else np.nan
+    damage_area = np.sum(damage_pixels) * 100
     transcripts_area = np.sum(transcripts_pixels) * 100
     detachment_area = np.sum(detachment_pixels) * 100
-    ventricle_area = np.sum(ventricle_pixels) * 100 if np.any(ventricle_pixels) else np.nan
-    total_area = np.sum(damage_area, transcripts_area, detachment_area, ventricle_area)
+    ventricle_area = np.sum(ventricle_pixels) * 100
+    total_area = damage_area + transcripts_area + detachment_area + ventricle_area
 
     return float(damage_area), float(transcripts_area), float(detachment_area), float(ventricle_area), float(total_area)
 
