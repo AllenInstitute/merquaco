@@ -578,8 +578,8 @@ def generate_ventricle_mask(ventricle_genes_image_path: Union[str, Path],
         Ventricle mask
     """
     if not os.path.exists(ventricle_genes_image_path):
-        create_ventricle_genes_image(ventricle_genes, ventricle_genes_image_path,
-                                     dapi_mask_path, transcripts_mask_path, transcripts)
+        create_ventricle_genes_image(ventricle_genes_image_path, dapi_mask_path, 
+                                     transcripts_mask_path, transcripts, ventricle_genes)
 
     generate_mask(ilastik_program_path, ventricle_genes_image_path,
                   pixel_classification_model_path, object_classification_model_path,
