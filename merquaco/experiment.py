@@ -469,13 +469,13 @@ class Experiment:
         if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
             print("Generating ventricle mask...")
             self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
-                                                             self.ventricle_genes_list,
                                                              self.dapi_mask_path,
                                                              self.transcripts_mask_path,
                                                              self.ilastik_program_path,
                                                              self.ventricle_pixel_classification_path,
                                                              self.ventricle_object_classification_path,
-                                                             self.filtered_transcripts)
+                                                             self.filtered_transcripts,
+                                                             self.ventricle_genes_list)
 
             print("Generating damage mask...")
             self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
