@@ -459,7 +459,6 @@ class Experiment:
                                                self.ilastik_program_path,
                                                self.dapi_pixel_classification_path,
                                                self.dapi_object_classification_path,
-                                               self.dapi_mask_path,
                                                self.dapi_high_res_image_path)
 
         print("Generating lifting mask...")
