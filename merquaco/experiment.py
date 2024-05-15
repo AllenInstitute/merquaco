@@ -131,8 +131,7 @@ class Experiment:
         self.ventricle_mask_path = ventricle_mask_path
         self.damage_mask_path = damage_mask_path
         self.pixel_classification_path = pixel_classification_path
-        self.codebook = data_processing.process_input(codebook_input) if codebook_input is not None else None
-        self.codebook = self.codebook[~self.codebook.index.str.startswith('Blank')]
+        self.codebook = Experiment.read_codebook(codebook_input)
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
 
@@ -211,6 +210,27 @@ class Experiment:
             Transcripts table excluding 'Blank' codewords
         """
         return transcripts[~transcripts['gene'].str.startswith('Blank')]
+    
+    @staticmethod
+    def read_codebook(codebook_input: Union[str, Path, pd.DataFrame]) -> pd.DataFrame:
+        """
+        Reads codebook for use with data loss module 
+        
+        Parameters
+        ----------
+        codebook_path : str or Path
+            Path at which to read codebook csv
+        Returns
+        -------
+        codebook : pd.DataFrame
+            Codebook dataframe, excluding blanks
+        """
+        codebook = data_processing.process_input(codebook_input)
+        codebook = codebook.drop(columns=['id', 'barcodeType'], errors='ignore').set_index('name')
+        codebook = codebook[~codebook.index.str.startswith('Blank')]
+
+        return codebook
+
 
     @staticmethod
     def scale_transcripts_xy(transcripts: pd.DataFrame) -> pd.DataFrame:
