@@ -85,8 +85,8 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     if out_file != '':
         plt.savefig(out_file)
 
-    plt.show()
-    #plt.close()
+    # plt.show()
+    # plt.close()
 
 
 def plot_periodicity_hist(transcripts: pd.DataFrame,
