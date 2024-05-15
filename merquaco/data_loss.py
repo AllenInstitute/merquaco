@@ -261,7 +261,7 @@ class FOVDropout:
         missing_transcripts_genes = []
         missing_codebook_genes = []
         transcripts_genes = list(fovs.filter(regex='dropout').columns.str.replace('dropout_', ''))
-        codebook_genes = list(codebook['name'])
+        codebook_genes = list(codebook.index)
 
         for transcripts_gene in transcripts_genes:
             if transcripts_gene not in codebook_genes:
