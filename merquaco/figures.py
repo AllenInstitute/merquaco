@@ -235,7 +235,7 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, alpha=alpha, color=color, ax=ax)
             
-    plt.set_title("Transcripts per z plane")
+    plt.title("Transcripts per z plane")
 
     if title != '':
         ax.set_title(title)
