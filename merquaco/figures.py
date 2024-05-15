@@ -11,7 +11,8 @@ import merquaco.periodicity as periodicity
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
-                         rotation_degrees: int = -90, ax: plt.Axes = None, out_file: Union[str, Path] = '',
+                         rotation_degrees: int = -90, ax: plt.Axes = None, 
+                         out_file: Union[str, Path] = '',
                          ms: float = 1, alpha: float = 0.5, color: str = "black",
                          title: str = ''):
     """
@@ -85,9 +86,7 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
         plt.savefig(out_file)
 
     plt.show()
-    plt.close()
-
-    return ax
+    #plt.close()
 
 
 def plot_periodicity_hist(transcripts: pd.DataFrame,
