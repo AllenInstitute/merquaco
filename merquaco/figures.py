@@ -97,7 +97,8 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
                           fov_height: Union[int, float] = 202,
                           alpha: Union[int, float] = 0.25, ms: Union[int, float] = 0.1,
                           ts_color: str = "black", hist_color: str = "red",
-                          out_file: Union[str, Path] = '', dpi: int = 200):
+                          title: str = "", out_file: Union[str, Path] = '', 
+                          dpi: int = 200):
     """
     Plot transcripts overview with histogram of counts along each axis.
 
@@ -131,7 +132,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
         DPI value. Default is 200.
     """
     if ax is None:
-        _, ax = plt.subplots(figsize=(8, 8))
+        _, ax = plt.subplots(figsize=(7,7))
 
     # Define transcript arrays in x, y
     x = np.asarray(transcripts['global_x'])
@@ -171,9 +172,14 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
 
     # Aesthetics
     plt.axis('off')
+    ax.title("Periodicity")
+
+    if title != '':
+        ax.set_title(title)
 
     if out_file != '':
         plt.savefig(out_file, dpi=dpi)
+
     plt.show()
     plt.close()
 
@@ -232,6 +238,8 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
         else:
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, lpha=alpha, color=color, ax=ax)
+            
+    ax.set_title("Transcripts per z plane")
 
     if title != '':
         ax.set_title(title)
