@@ -172,7 +172,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
 
     # Aesthetics
     plt.axis('off')
-    ax.title("Periodicity")
+    ax.set_title("Periodicity")
 
     if title != '':
         ax.set_title(title)
