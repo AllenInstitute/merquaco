@@ -85,12 +85,8 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     if out_file != '':
         plt.savefig(out_file)
 
-    # plt.show()
-    # plt.close()
-
 
 def plot_periodicity_hist(transcripts: pd.DataFrame,
-                          n_transcripts: int = None,
                           subsample: int = 100,
                           scale: Union[int, float] = None,
                           ax: plt.Axes = None,
@@ -146,9 +142,8 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     ymin = np.min(y) - 200
 
     # Subsample transcripts
-    if n_transcripts is None:
-        n_transcripts = int(len(transcripts) / subsample)
-    samples = np.random.choice(transcripts.shape[0], n_transcripts, replace=False)
+    sample_number = int(len(transcripts) / subsample)
+    samples = np.random.choice(transcripts.shape[0], sample_number, replace=False)
 
     # Plot subsamples
     ax.plot(x[samples], y[samples], '.', ms=ms, alpha=alpha, color=ts_color)
@@ -194,7 +189,7 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
                        color: str = "black",
                        title: str = '',
                        out_file: Union[str, Path] = '',
-                       label_planes: bool = False):
+                       label_planes: bool = True):
     """
     Plots transcripts overview for each z plane in a row
 
