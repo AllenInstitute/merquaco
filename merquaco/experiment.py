@@ -443,7 +443,7 @@ class Experiment:
         self.fovs_df = FOVDropout.detect_false_positives(self.fovs_df, self.codebook)
 
         if self.output_dir is not None:
-            FOVDropout.save_fov_tsv(self.fovs, self.output_dir)
+            FOVDropout.save_fov_tsv(self.fovs_df, self.output_dir)
 
     def run_full_pixel_classification(self):
         """
