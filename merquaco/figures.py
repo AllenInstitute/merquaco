@@ -87,6 +87,8 @@ def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
     plt.show()
     plt.close()
 
+    return ax
+
 
 def plot_periodicity_hist(transcripts: pd.DataFrame,
                           n_transcripts: int = None,
@@ -132,7 +134,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
         DPI value. Default is 200.
     """
     if ax is None:
-        _, ax = plt.subplots(figsize=(7,7))
+        _, ax = plt.subplots(figsize=(6,6))
 
     # Define transcript arrays in x, y
     x = np.asarray(transcripts['global_x'])
@@ -239,7 +241,7 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, alpha=alpha, color=color, ax=ax)
             
-    ax.set_title("Transcripts per z plane")
+    plt.set_title("Transcripts per z plane")
 
     if title != '':
         ax.set_title(title)
