@@ -575,7 +575,7 @@ class Experiment:
         if run_dropout:
             print('Beginning FOV Dropout Detection')
             self.run_dropout_pipeline()
-            dropout = DropoutResult(self.fovs)
+            dropout = DropoutResult(self.fovs_df)
             # Get raw number of dropped FOVs, genes
             self.n_dropped_fovs = int(dropout.get_dropped_fov_counts())
             self.n_dropped_genes = int(dropout.get_dropped_gene_counts())
