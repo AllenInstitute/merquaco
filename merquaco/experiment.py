@@ -596,7 +596,6 @@ class Experiment:
                     dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
-        print('Get on-tissue transcript density')
         self.on_tissue_filtered_transcripts_count, \
             self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
                                                                              self.transcripts_mask)
