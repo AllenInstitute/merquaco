@@ -230,26 +230,6 @@ class FOVDropout:
 
         return fovs
 
-    @staticmethod
-    def read_codebook(codebook_path: Union[str, Path]) -> pd.DataFrame:
-        """
-        Reads merscope codebook into dataframe
-
-        Parameters
-        ----------
-        codebook_path : str or Path
-            Path at which to read codebook csv
-
-        Returns
-        -------
-        codebook : pd.DataFrame
-            Codebook dataframe, excluding blanks
-        """
-        codebook = pd.read_table(codebook_path, header=0, sep=',').drop(columns=['id', 'barcodeType'],
-                                                                        errors='ignore').set_index('name')
-        codebook = codebook[~codebook.index.str.startswith('Blank')]
-
-        return codebook
 
     @staticmethod
     def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
@@ -281,7 +261,7 @@ class FOVDropout:
         missing_transcripts_genes = []
         missing_codebook_genes = []
         transcripts_genes = list(fovs.filter(regex='dropout').columns.str.replace('dropout_', ''))
-        codebook_genes = list(codebook.index)
+        codebook_genes = list(codebook['name'])
 
         for transcripts_gene in transcripts_genes:
             if transcripts_gene not in codebook_genes:
