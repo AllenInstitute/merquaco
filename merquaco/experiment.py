@@ -12,6 +12,15 @@ import merquaco.z_plane_detection as zp
 import merquaco.perfusion as perfusion
 import merquaco.periodicity as periodicity
 
+# dictionary keys for output metadata
+qc_dict_keys = ["filtered_transcripts_count","transcript_density_um2","transcript_density_um2_per_gene", 
+                "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity", 
+                "periodicity_list", "counts_per_gene", "n_dropped_fovs","n_dropped_genes", "dropped_fovs_dict",
+                "damage_area","tissue_area","lifting_area","ventricles_area","total_area","damage_percent",
+                "tissue_percent","lifting_percent","ventricles_percent","transcript_mask_pixel_model",
+                "transcript_mask_object_model","dapi_mask_pixel_model","dapi_mask_object_model",
+                "ventricle_mask_pixel_model","ventricle_mask_object_model"]
+
 
 class Experiment:
 
@@ -605,8 +614,9 @@ class Experiment:
         self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
         self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
         if plot_figures:
+            figures.plot_every_z_plane(self.transcripts, out_file=Path(self.output_dir, "transcripts_per_z.png"))
             figures.plot_transcripts_per_z(self.transcripts_per_z,
-                                           out_file=Path(self.output_dir, "transcripts_per_z.png"))
+                                           out_file=Path(self.output_dir, "transcript_counts_per_z.png"))
 
         # 7. Perfusion
         if run_perfusion and self.perfusion_path is not None:
@@ -614,3 +624,12 @@ class Experiment:
             if plot_figures:
                 figures.plot_perfusion_figure(perfusion_data,
                                               out_file=Path(self.output_dir, "perfusion.png"))
+                
+        # 8. Save metrics
+        metrics_dict = {}
+        for key in qc_dict_keys:
+            metrics_dict[key] = getattr(self, key, np.nan)
+
+        with open(Path(self.output_dir, "qc_summary.json"), 'w') as outfile:
+            json.dump(metrics_dict, outfile, indent=4)
+
