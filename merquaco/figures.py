@@ -237,7 +237,7 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
                                  ms=ms, alpha=alpha, color=color, ax=ax, title=f'z{i}')
         else:
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
-                                 ms=ms, lpha=alpha, color=color, ax=ax)
+                                 ms=ms, alpha=alpha, color=color, ax=ax)
             
     ax.set_title("Transcripts per z plane")
 
