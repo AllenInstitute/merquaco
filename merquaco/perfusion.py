@@ -32,7 +32,7 @@ def analyze_flow(log_file_path: Union[str, Path]):
     with open(log_file_path, 'r') as f:
         log = f.read()
 
-        print('Beginning fluidics log file analysis')
+        print('Beginning perfusion analysis')
 
         # Find locations of timestamps, cartridge positions, flow rates
         cartridge_locations = [i for i in range(len(log)) if log.startswith('cartridge_position=', i)]
