@@ -132,6 +132,7 @@ class Experiment:
         self.damage_mask_path = damage_mask_path
         self.pixel_classification_path = pixel_classification_path
         self.codebook = data_processing.process_input(codebook_input) if codebook_input is not None else None
+        self.codebook = self.codebook[~self.codebook.index.str.startswith('Blank')]
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
 
