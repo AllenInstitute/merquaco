@@ -413,7 +413,7 @@ class Experiment:
             FOVs dataframe including all dropout information
         """
         self.fovs_df = FOVDropout.find_on_tissue_fovs(self.filtered_transcripts, self.fovs_df,
-                                                      self.transcripts_mask, self.transcripts_image_path,
+                                                      self.transcripts_mask_path, self.transcripts_image_path,
                                                       self.ilastik_program_path,
                                                       self.transcripts_pixel_classification_path,
                                                       self.transcripts_object_classification_path)
