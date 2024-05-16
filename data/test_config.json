@@ -1,10 +1,10 @@
 {
     "ilastik_program_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/ilastik_program/ilastik-1.4.0-Linux/run_ilastik.sh",
-    "transcripts_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/TissueMaskPixelClassification_v1.0.ilp",
-    "transcripts_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/TissueMaskObjects_v1.1.ilp",
-    "dapi_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/DapiMaskPixelClassification_Mouse.ilp",
-    "dapi_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/DapiMaskObjectClassification_Mouse.ilp",
-    "ventricle_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/VentriclesPixelClassification.ilp",
-    "ventricle_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/VentriclesObjectClassification.ilp",
+    "transcripts_mask_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/TissueMaskPixelClassification_v1.0.ilp",
+    "transcripts_mask_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/TissueMaskObjects_v1.1.ilp",
+    "dapi_mask_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/DapiMaskPixelClassification_Mouse.ilp",
+    "dapi_mask_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/DapiMaskObjectClassification_Mouse.ilp",
+    "ventricle_mask_pixel_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/VentriclesPixelClassification.ilp",
+    "ventricle_mask_object_path": "/allen/programs/celltypes/workgroups/rnaseqanalysis/mFISH/merfish_qc/tissue_mask/models/VentriclesObjectClassification.ilp",
     "ventricle_genes_list": ["Crb2","Glis3","Inhbb","Naaa","Cd24a","Dsg2","Hdc","Shroom3","Vit","Rgs12","Trp73"]
 }
