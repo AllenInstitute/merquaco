@@ -26,7 +26,7 @@ class Experiment:
 
     def __init__(self,
                  transcripts_input: Union[pd.DataFrame, str, Path],
-                 ilastik_paths_input: Union[dict, str, Path] = None,
+                 ilastik_config_input: Union[dict, str, Path] = None,
                  transcripts_image_path: Union[str, Path] = None,
                  transcripts_mask_path: Union[str, Path] = None,
                  dapi_high_res_image_path: Union[str, Path] = None,
@@ -124,9 +124,9 @@ class Experiment:
             DataFrame of FOV coordinates, transcript counts, neighbors
         """
         # Assign ilastik paths as attributes
-        ilastik_paths_dict = data_processing.process_input(ilastik_paths_input)
+        ilastik_config_dict = data_processing.process_input(ilastik_config_input)
         # Unpack dictionary as self attributes
-        for key, val in ilastik_paths_dict.items():
+        for key, val in ilastik_config_dict.items():
             setattr(self, key, val)
 
         # Assign parameters as self attributes
