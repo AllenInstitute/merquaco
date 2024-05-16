@@ -165,15 +165,15 @@ class Experiment:
 
         # Create transcripts mask if parameters are provided
         if not data_processing.check_if_none(self.ilastik_program_path,
-                                             self.transcripts_pixel_classification_path,
-                                             self.transcripts_object_classification_path,
+                                             self.transcripts_mask_pixel_path,
+                                             self.transcripts_mask_object_path,
                                              self.transcripts_image_path,
                                              self.transcripts_mask_path):
 
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                  self.ilastik_program_path,
-                                                                 self.transcripts_pixel_classification_path,
-                                                                 self.transcripts_object_classification_path,
+                                                                 self.transcripts_mask_pixel_path,
+                                                                 self.transcripts_mask_object_path,
                                                                  self.filtered_transcripts)
 
     @staticmethod
@@ -445,8 +445,8 @@ class Experiment:
         self.fovs_df = FOVDropout.find_on_tissue_fovs(self.filtered_transcripts, self.fovs_df,
                                                       self.transcripts_mask_path, self.transcripts_image_path,
                                                       self.ilastik_program_path,
-                                                      self.transcripts_pixel_classification_path,
-                                                      self.transcripts_object_classification_path)
+                                                      self.transcripts_mask_pixel_path,
+                                                      self.transcripts_mask_object_path)
         self.fovs_df = FOVDropout.detect_dropouts(self.filtered_transcripts, self.fovs_df)
         self.fovs_df = FOVDropout.compare_codebook_fov_genes(self.fovs_df, self.codebook)
         self.fovs_df = FOVDropout.detect_false_positives(self.fovs_df, self.codebook)
@@ -479,16 +479,16 @@ class Experiment:
             print("Generating transcript mask...")
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                  self.ilastik_program_path,
-                                                                 self.transcripts_pixel_classification_path,
-                                                                 self.transcripts_object_classification_path,
+                                                                 self.transcripts_mask_pixel_path,
+                                                                 self.transcripts_mask_object_path,
                                                                  self.transcripts_mask_path,
                                                                  self.filtered_transcripts)
 
         print("Generating DAPI mask...")
         self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
                                                self.ilastik_program_path,
-                                               self.dapi_pixel_classification_path,
-                                               self.dapi_object_classification_path,
+                                               self.dapi_mask_pixel_path,
+                                               self.dapi_mask_object_path,
                                                self.dapi_high_res_image_path)
 
         print("Generating lifting mask...")
@@ -502,8 +502,8 @@ class Experiment:
                                                              self.dapi_mask_path,
                                                              self.transcripts_mask_path,
                                                              self.ilastik_program_path,
-                                                             self.ventricle_pixel_classification_path,
-                                                             self.ventricle_object_classification_path,
+                                                             self.ventricle_mask_pixel_path,
+                                                             self.ventricle_mask_object_path,
                                                              self.filtered_transcripts,
                                                              self.ventricle_genes_list)
 
