@@ -20,9 +20,9 @@ setup(
     packages=find_packages(where="."),
     include_package_data=True,
     install_requires=requirements,
-    entry_points={
-        "console_scripts": [
-            "merquaco = merquaco.quaco:run",
-        ],
-    }
+    # entry_points={
+    #     "console_scripts": [
+    #         "merquaco = merquaco.quaco:run",
+    #     ],
+    # }
 )
