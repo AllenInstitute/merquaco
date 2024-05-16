@@ -60,6 +60,9 @@ def generate_mask(ilastik_program_path: Union[str, Path],
                                                                      mask_path)
     ilastik_workflow.run_ilastik_workflow(object_workflow_args)
 
+    # Delete probability map as it is no longer needed
+    os.remove(probability_map_path)
+
 
 def rounddown_10(x: Union[int, float]) -> int:
     """
