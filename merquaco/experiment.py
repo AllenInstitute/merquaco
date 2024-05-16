@@ -13,13 +13,13 @@ import merquaco.perfusion as perfusion
 import merquaco.periodicity as periodicity
 
 # dictionary keys for output metadata
-qc_dict_keys = ["filtered_transcripts_count","transcript_density_um2","transcript_density_um2_per_gene", 
-                "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity", 
-                "periodicity_list", "counts_per_gene", "n_dropped_fovs","n_dropped_genes", "dropped_fovs_dict",
-                "damage_area","tissue_area","lifting_area","ventricles_area","total_area","damage_percent",
-                "tissue_percent","lifting_percent","ventricles_percent","transcript_mask_pixel_model",
-                "transcript_mask_object_model","dapi_mask_pixel_model","dapi_mask_object_model",
-                "ventricle_mask_pixel_model","ventricle_mask_object_model"]
+metrics_dict_keys = ["filtered_transcripts_count","transcript_density_um2","transcript_density_um2_per_gene", 
+                     "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity", 
+                     "periodicity_list", "counts_per_gene", "n_dropped_fovs","n_dropped_genes", "dropped_fovs_dict",
+                     "damage_area","transcripts_area","detachment_area","ventricle_area","total_area","damage_percent",
+                     "transcripts_percent","detachment_percent","ventricle_percent","transcripts_mask_pixel_model",
+                     "transcripts_mask_object_model","dapi_mask_pixel_model","dapi_mask_object_model",
+                     "ventricle_mask_pixel_model","ventricle_mask_object_model"]
 
 
 class Experiment:
@@ -626,7 +626,7 @@ class Experiment:
                 
         # 8. Save metrics
         metrics_dict = {}
-        for key in qc_dict_keys:
+        for key in metrics_dict_keys:
             metrics_dict[key] = getattr(self, key, np.nan)
 
         with open(Path(self.output_dir, "qc_summary.json"), 'w') as outfile:
