@@ -117,7 +117,7 @@ class FOVDropout:
         fovs['on_tissue'] = on_tissue
 
         if not np.any(on_tissue):
-            raise RuntimeError('No on-tissue FOVs found (likely failure in Ilastik tissue mask generation or'
+            raise RuntimeError('No on-tissue FOVs found (likely failure in Ilastik tissue mask generation or '
                                'failure in experiment transcript detection)')
         return fovs
 
