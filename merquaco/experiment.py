@@ -555,6 +555,7 @@ class Experiment:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
+
     def run_all_qc(self, run_pixel_classification: bool = True,
                    run_dropout: bool = True, run_perfusion: bool = False,
                    plot_figures: bool = True):
