@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7):
+def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7, fov_dimensions: tuple = (202, 202)):
     """
     Performs periodicity analysis across z-planes
 
@@ -12,6 +12,8 @@ def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7):
         Transcripts table
     num_planes : int, optional
         Number of planes to get periodicity values for. Default is 7.
+    fov_dimensions : tuple, optional
+        (x, y) dimensions for FOV tiles. Default is (202, 202).
 
     Returns
     -------
@@ -26,8 +28,8 @@ def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7):
         plane = transcripts[transcripts['global_z'] == plane_number]
         plane_x = np.asarray(plane['global_x'])
         plane_y = np.asarray(plane['global_y'])
-        _, chunk_x = get_chunk_values(plane_x, image_dimensions)
-        _, chunk_y = get_chunk_values(plane_y, image_dimensions)
+        _, chunk_x = get_chunk_values(plane_x, image_dimensions, fov_dimensions=fov_dimensions[0])
+        _, chunk_y = get_chunk_values(plane_y, image_dimensions, fov_dimensions=fov_dimensions[1])
         periodicity_x = np.nanmin(chunk_x) / np.max(chunk_x)
         periodicity_y = np.nanmin(chunk_y) / np.max(chunk_y)
         periodicity_list.append((periodicity_x, periodicity_y))
@@ -64,15 +66,15 @@ def get_chunk_values(transcripts: np.ndarray, image_dimensions: int, fov_dimensi
     # Extract 'non-empty' histogram values
     hist_thr = periodicity_hist[int(np.amin(bins_thr)):int(np.amax(bins_thr))]
 
-    # Initialize checkerboard metric values
+    # Initialize periodicity metric values
     periodicity_chunk = np.zeros(fov_dimensions)
     fovs = int(np.floor(len(hist_thr)/fov_dimensions))
 
-    # Calculate checkerboard metric values
+    # Calculate periodicity metric values
     for fov in range(fovs):
         # Chunks are hist_thr values at 1um intervals within an FOV
         fov_chunk = hist_thr[(0+fov)*fov_dimensions:(fov+1)*fov_dimensions]
-        # Determine checkerboard metric at each 1um within FOV
+        # Determine periodicity metric at each 1um within FOV
         periodicity_chunk = periodicity_chunk + fov_chunk/np.mean(fov_chunk)
 
     return periodicity_hist, periodicity_chunk

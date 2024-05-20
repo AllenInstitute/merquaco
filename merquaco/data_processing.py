@@ -9,6 +9,21 @@ import json
 def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
     """
     Helper function processes and returns relevant format for input data
+
+    Parameters
+    ----------
+    input_data : str or Path or np.ndarray or pd.DataFrame or dict
+        Input data or path to input data
+
+    Returns
+    -------
+    np.ndarray or pd.DataFrame or dict
+        Input data in usable format
+
+    Raises
+    ------
+    TypeError
+        If input type is unsupported.
     """
     if isinstance(input_data, pd.DataFrame):
         if not check_if_none(input_data):
@@ -26,7 +41,25 @@ def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
         raise TypeError("Unsupported input type. Must be a DataFrame, numpy array, dictionary, file path, or JSON.")
 
 
-def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray]:
+def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray, dict]:
+    """
+    Helper function determines filetype and returns read file
+
+    Parameters
+    ----------
+    path : str or Path
+        Path to file
+
+    Returns
+    -------
+    pd.DataFrame or np.ndarray or dict
+        Read file
+
+    Raises
+    ------
+    ValueError
+        If file type is not supported or file not found
+    """
     # Determine the type of file based on its extension
     if path.endswith('.csv'):
         return pd.read_csv(path)

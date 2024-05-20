@@ -13,13 +13,13 @@ import merquaco.perfusion as perfusion
 import merquaco.periodicity as periodicity
 
 # dictionary keys for output metadata
-metrics_dict_keys = ["filtered_transcripts_count","transcript_density_um2","transcript_density_um2_per_gene", 
-                     "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity", 
-                     "periodicity_list", "counts_per_gene", "n_dropped_fovs","n_dropped_genes", "dropped_fovs_dict",
-                     "damage_area","transcripts_area","detachment_area","ventricle_area","total_area","damage_percent",
-                     "transcripts_percent","detachment_percent","ventricle_percent","transcripts_mask_pixel_path",
-                     "transcripts_mask_object_path","dapi_mask_pixel_path","dapi_mask_object_path",
-                     "ventricle_mask_pixel_path","ventricle_mask_object_path"]
+metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "transcript_density_um2_per_gene",
+                     "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity",
+                     "periodicity_list", "counts_per_gene", "n_dropped_fovs", "n_dropped_genes", "dropped_fovs_dict",
+                     "damage_area", "transcripts_area", "detachment_area", "ventricle_area", "total_area",
+                     "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
+                     "transcripts_mask_pixel_path", "transcripts_mask_object_path", "dapi_mask_pixel_path",
+                     "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path"]
 
 
 class Experiment:
@@ -219,12 +219,12 @@ class Experiment:
             Transcripts table excluding 'Blank' codewords
         """
         return transcripts[~transcripts['gene'].str.startswith('Blank')]
-    
+
     @staticmethod
     def read_codebook(codebook_input: Union[str, Path, pd.DataFrame]) -> pd.DataFrame:
         """
-        Reads codebook for use with data loss module 
-        
+        Reads codebook for use with data loss module
+
         Parameters
         ----------
         codebook_path : str or Path
@@ -239,7 +239,6 @@ class Experiment:
         codebook = codebook[~codebook.index.str.startswith('Blank')]
 
         return codebook
-
 
     @staticmethod
     def scale_transcripts_xy(transcripts: pd.DataFrame) -> pd.DataFrame:
@@ -555,12 +554,28 @@ class Experiment:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
-
-    def run_all_qc(self, run_pixel_classification: bool = True,
-                   run_dropout: bool = True, run_perfusion: bool = False,
+    def run_all_qc(self,
+                   run_pixel_classification: bool = True,
+                   run_dropout: bool = True,
+                   run_perfusion: bool = False,
                    plot_figures: bool = True):
         """
         Runs all standard QC functions and prints results
+
+        Parameters
+        ----------
+        run_pixel_classification : bool, optional
+            Whether to run pixel classification workflow. Default is True.
+        run_dropout : bool, optional
+            Whether to run FOV dropout workflow. Default is True.
+        run_perfusion : bool, optional
+            Whether to run perfusion workflow. Default is False.
+        plot_figures : bool, optional
+            Whether to plot figures. Default is True.
+
+        Attributes Set
+        --------------
+
         """
         # 1. Run  pixel classification workflow
         if run_pixel_classification:
@@ -624,7 +639,7 @@ class Experiment:
             if plot_figures:
                 figures.plot_perfusion_figure(perfusion_data,
                                               out_file=Path(self.output_dir, "perfusion.png"))
-                
+
         # 8. Save metrics
         metrics_dict = {}
         for key in metrics_dict_keys:
@@ -632,4 +647,3 @@ class Experiment:
 
         with open(Path(self.output_dir, "qc_summary.json"), 'w') as outfile:
             json.dump(metrics_dict, outfile, indent=4)
-
