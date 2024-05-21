@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API &mdash; merquaco  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="merquaco.experiment.Experiment.read_transcripts" href="api/merquaco.experiment.Experiment.read_transcripts.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            merquaco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.experiment.Experiment">Experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.read_transcripts.html">merquaco.experiment.Experiment.read_transcripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.remove_blanks.html">merquaco.experiment.Experiment.remove_blanks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.read_codebook.html">merquaco.experiment.Experiment.read_codebook</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.scale_transcripts_xy.html">merquaco.experiment.Experiment.scale_transcripts_xy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.find_fovs.html">merquaco.experiment.Experiment.find_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.get_fov_neighbors.html">merquaco.experiment.Experiment.get_fov_neighbors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.get_fovs_dataframe.html">merquaco.experiment.Experiment.get_fovs_dataframe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.get_transcript_density.html">merquaco.experiment.Experiment.get_transcript_density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.run_dropout_pipeline.html">merquaco.experiment.Experiment.run_dropout_pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.run_full_pixel_classification.html">merquaco.experiment.Experiment.run_full_pixel_classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.experiment.Experiment.run_all_qc.html">merquaco.experiment.Experiment.run_all_qc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.data_loss">Data Loss</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.find_on_tissue_fovs.html">merquaco.data_loss.FOVDropout.find_on_tissue_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.detect_dropouts.html">merquaco.data_loss.FOVDropout.detect_dropouts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.compare_codebook_fov_genes.html">merquaco.data_loss.FOVDropout.compare_codebook_fov_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.detect_false_positives.html">merquaco.data_loss.FOVDropout.detect_false_positives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.save_fov_tsv.html">merquaco.data_loss.FOVDropout.save_fov_tsv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropout_count.html">merquaco.data_loss.DropoutResult.get_dropout_count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_genes.html">merquaco.data_loss.DropoutResult.get_dropped_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_gene_counts.html">merquaco.data_loss.DropoutResult.get_dropped_gene_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_fovs.html">merquaco.data_loss.DropoutResult.get_dropped_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_fov_counts.html">merquaco.data_loss.DropoutResult.get_dropped_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_genes.html">merquaco.data_loss.DropoutResult.get_considered_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_gene_counts.html">merquaco.data_loss.DropoutResult.get_considered_gene_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_fovs.html">merquaco.data_loss.DropoutResult.get_considered_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_fov_counts.html">merquaco.data_loss.DropoutResult.get_considered_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_false_positive_fovs.html">merquaco.data_loss.DropoutResult.get_false_positive_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_false_positive_fov_counts.html">merquaco.data_loss.DropoutResult.get_false_positive_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.dropout_summary.html">merquaco.data_loss.DropoutResult.dropout_summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov.html">merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.periodicity">Periodicity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.periodicity.get_periodicity_list.html">merquaco.periodicity.get_periodicity_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.periodicity.get_chunk_values.html">merquaco.periodicity.get_chunk_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.periodicity.get_image_dimensions.html">merquaco.periodicity.get_image_dimensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.periodicity.get_periodicity_vals_all_z.html">merquaco.periodicity.get_periodicity_vals_all_z</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.z_plane_detection">Z-Axis Nonuniformity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.z_plane_detection.get_transcripts_per_z.html">merquaco.z_plane_detection.get_transcripts_per_z</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.z_plane_detection.compute_z_ratio.html">merquaco.z_plane_detection.compute_z_ratio</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.perfusion">Perfusion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.perfusion.analyze_flow.html">merquaco.perfusion.analyze_flow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.figures">Figures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.transcripts_overview.html">merquaco.figures.transcripts_overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_periodicity_hist.html">merquaco.figures.plot_periodicity_hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_every_z_plane.html">merquaco.figures.plot_every_z_plane</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_transcripts_per_z.html">merquaco.figures.plot_transcripts_per_z</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_perfusion_figure.html">merquaco.figures.plot_perfusion_figure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_pixel_percentages.html">merquaco.figures.plot_pixel_percentages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_pixel_classification.html">merquaco.figures.plot_pixel_classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_full_pixel_fig.html">merquaco.figures.plot_full_pixel_fig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_mask.html">merquaco.figures.plot_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.figures.plot_masks.html">merquaco.figures.plot_masks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-merquaco.pixel_classification">Pixel Classification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_mask.html">merquaco.pixel_classification.generate_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.create_transcripts_image.html">merquaco.pixel_classification.create_transcripts_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_transcripts_mask.html">merquaco.pixel_classification.generate_transcripts_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.create_dapi_image.html">merquaco.pixel_classification.create_dapi_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_dapi_mask.html">merquaco.pixel_classification.generate_dapi_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_detachment_mask.html">merquaco.pixel_classification.generate_detachment_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.create_ventricle_genes_image.html">merquaco.pixel_classification.create_ventricle_genes_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_ventricle_mask.html">merquaco.pixel_classification.generate_ventricle_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.generate_damage_mask.html">merquaco.pixel_classification.generate_damage_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.classify_pixels.html">merquaco.pixel_classification.classify_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.calculate_class_areas.html">merquaco.pixel_classification.calculate_class_areas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/merquaco.pixel_classification.calculate_class_percentages.html">merquaco.pixel_classification.calculate_class_percentages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">merquaco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this heading"></a></h1>
+<p>Import MERQuaCo as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">merquaco</span> <span class="k">as</span> <span class="nn">mqc</span>
+</pre></div>
+</div>
+<section id="module-merquaco.experiment.Experiment">
+<span id="experiment"></span><h2>Experiment<a class="headerlink" href="#module-merquaco.experiment.Experiment" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.read_transcripts.html#merquaco.experiment.Experiment.read_transcripts" title="merquaco.experiment.Experiment.read_transcripts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_transcripts</span></code></a>(transcripts_path)</p></td>
+<td><p>Reads and returns transcripts table dataframe</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.remove_blanks.html#merquaco.experiment.Experiment.remove_blanks" title="merquaco.experiment.Experiment.remove_blanks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_blanks</span></code></a>(transcripts)</p></td>
+<td><p>Filters transcripts DataFrame to remove 'Blank' codewords</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.read_codebook.html#merquaco.experiment.Experiment.read_codebook" title="merquaco.experiment.Experiment.read_codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_codebook</span></code></a>(codebook_input)</p></td>
+<td><p>Reads codebook for use with data loss module</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.scale_transcripts_xy.html#merquaco.experiment.Experiment.scale_transcripts_xy" title="merquaco.experiment.Experiment.scale_transcripts_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_transcripts_xy</span></code></a>(transcripts)</p></td>
+<td><p>Scales transcripts (x,y) locations based on min (x,y) values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.find_fovs.html#merquaco.experiment.Experiment.find_fovs" title="merquaco.experiment.Experiment.find_fovs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_fovs</span></code></a>(transcripts)</p></td>
+<td><p>Group transcripts by FOV and stores per-FOV information, including coordinates and transcript counts</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.get_fov_neighbors.html#merquaco.experiment.Experiment.get_fov_neighbors" title="merquaco.experiment.Experiment.get_fov_neighbors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fov_neighbors</span></code></a>(fovs)</p></td>
+<td><p>Find neighbors for each FOV using grid coordinates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.get_fovs_dataframe.html#merquaco.experiment.Experiment.get_fovs_dataframe" title="merquaco.experiment.Experiment.get_fovs_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fovs_dataframe</span></code></a>(transcripts)</p></td>
+<td><p>Creates FOVs DataFrame including coordinates, transcript counts, z-ratio, neighbors</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.get_transcript_density.html#merquaco.experiment.Experiment.get_transcript_density" title="merquaco.experiment.Experiment.get_transcript_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_transcript_density</span></code></a>(...)</p></td>
+<td><p>Calculates transcript density per on-tissue micron</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.run_dropout_pipeline.html#merquaco.experiment.Experiment.run_dropout_pipeline" title="merquaco.experiment.Experiment.run_dropout_pipeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_dropout_pipeline</span></code></a>()</p></td>
+<td><p>Runs entire dropout pipeline, including false positive correction</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.run_full_pixel_classification.html#merquaco.experiment.Experiment.run_full_pixel_classification" title="merquaco.experiment.Experiment.run_full_pixel_classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_full_pixel_classification</span></code></a>()</p></td>
+<td><p>Runs entire pixel classification workflow:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.experiment.Experiment.run_all_qc.html#merquaco.experiment.Experiment.run_all_qc" title="merquaco.experiment.Experiment.run_all_qc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_all_qc</span></code></a>([run_pixel_classification, ...])</p></td>
+<td><p>Runs all standard QC functions and prints results</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.data_loss">
+<span id="data-loss"></span><h2>Data Loss<a class="headerlink" href="#module-merquaco.data_loss" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.find_on_tissue_fovs.html#merquaco.data_loss.FOVDropout.find_on_tissue_fovs" title="merquaco.data_loss.FOVDropout.find_on_tissue_fovs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FOVDropout.find_on_tissue_fovs</span></code></a>(transcripts, fovs)</p></td>
+<td><p>Use ilastik transcripts mask to detemine on- and off-tissue FOVs FOV is considered on-tissue if at least 50% of its area is on-tissue</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.detect_dropouts.html#merquaco.data_loss.FOVDropout.detect_dropouts" title="merquaco.data_loss.FOVDropout.detect_dropouts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FOVDropout.detect_dropouts</span></code></a>(transcripts, fovs)</p></td>
+<td><p>Compares cardinal neighbors for each FOV to detect dropout</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.compare_codebook_fov_genes.html#merquaco.data_loss.FOVDropout.compare_codebook_fov_genes" title="merquaco.data_loss.FOVDropout.compare_codebook_fov_genes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FOVDropout.compare_codebook_fov_genes</span></code></a>(fovs, ...)</p></td>
+<td><p>Compares genes in FOVs and codebook dataframes and removes mismatched genes from consideration.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.detect_false_positives.html#merquaco.data_loss.FOVDropout.detect_false_positives" title="merquaco.data_loss.FOVDropout.detect_false_positives"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FOVDropout.detect_false_positives</span></code></a>(fovs, codebook)</p></td>
+<td><p>Detects false positive FOV dropouts by evaluating codebook rounds in which the genes dropped for a target FOV</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.FOVDropout.save_fov_tsv.html#merquaco.data_loss.FOVDropout.save_fov_tsv" title="merquaco.data_loss.FOVDropout.save_fov_tsv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FOVDropout.save_fov_tsv</span></code></a>(fovs, output_dir)</p></td>
+<td><p>Save FOVs dataframe as .txt.gz file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropout_count.html#merquaco.data_loss.DropoutResult.get_dropout_count" title="merquaco.data_loss.DropoutResult.get_dropout_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_dropout_count</span></code></a>()</p></td>
+<td><p>Get total number of dropped FOVs</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_genes.html#merquaco.data_loss.DropoutResult.get_dropped_genes" title="merquaco.data_loss.DropoutResult.get_dropped_genes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_dropped_genes</span></code></a>([fov, dic])</p></td>
+<td><p>Get a list of dropped genes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_gene_counts.html#merquaco.data_loss.DropoutResult.get_dropped_gene_counts" title="merquaco.data_loss.DropoutResult.get_dropped_gene_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_dropped_gene_counts</span></code></a>([fov, dic])</p></td>
+<td><p>Gets number of dropped genes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_fovs.html#merquaco.data_loss.DropoutResult.get_dropped_fovs" title="merquaco.data_loss.DropoutResult.get_dropped_fovs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_dropped_fovs</span></code></a>([gene, dic])</p></td>
+<td><p>Get a list of dropped FOV names.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_dropped_fov_counts.html#merquaco.data_loss.DropoutResult.get_dropped_fov_counts" title="merquaco.data_loss.DropoutResult.get_dropped_fov_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_dropped_fov_counts</span></code></a>([gene, dic])</p></td>
+<td><p>Gets number of unique dropped FOVs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_genes.html#merquaco.data_loss.DropoutResult.get_considered_genes" title="merquaco.data_loss.DropoutResult.get_considered_genes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_considered_genes</span></code></a>([fov, dic])</p></td>
+<td><p>Gets a list of all genes with at least 1 FOV considered for dropout.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_gene_counts.html#merquaco.data_loss.DropoutResult.get_considered_gene_counts" title="merquaco.data_loss.DropoutResult.get_considered_gene_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_considered_gene_counts</span></code></a>([...])</p></td>
+<td><p>Gets number of genes with at least 1 FOV considered for dropout.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_fovs.html#merquaco.data_loss.DropoutResult.get_considered_fovs" title="merquaco.data_loss.DropoutResult.get_considered_fovs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_considered_fovs</span></code></a>()</p></td>
+<td><p>Gets a list of all on-tissue FOVs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_considered_fov_counts.html#merquaco.data_loss.DropoutResult.get_considered_fov_counts" title="merquaco.data_loss.DropoutResult.get_considered_fov_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_considered_fov_counts</span></code></a>()</p></td>
+<td><p>Gets number of on-tissue FOVs</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_false_positive_fovs.html#merquaco.data_loss.DropoutResult.get_false_positive_fovs" title="merquaco.data_loss.DropoutResult.get_false_positive_fovs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_false_positive_fovs</span></code></a>([...])</p></td>
+<td><p>Get list of all FOVs not considered dropped due to false positive correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.get_false_positive_fov_counts.html#merquaco.data_loss.DropoutResult.get_false_positive_fov_counts" title="merquaco.data_loss.DropoutResult.get_false_positive_fov_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.get_false_positive_fov_counts</span></code></a>([...])</p></td>
+<td><p>Get number of FOVs not considered dropped due to false positive correction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.dropout_summary.html#merquaco.data_loss.DropoutResult.dropout_summary" title="merquaco.data_loss.DropoutResult.dropout_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.dropout_summary</span></code></a>([return_summary])</p></td>
+<td><p>Prints a summary of FOV dropout for the experiment</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov.html#merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov" title="merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropoutResult.draw_genes_dropped_per_fov</span></code></a>([...])</p></td>
+<td><p>Draws heatmap of number of genes dropped per FOV</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.periodicity">
+<span id="periodicity"></span><h2>Periodicity<a class="headerlink" href="#module-merquaco.periodicity" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.periodicity.get_periodicity_list.html#merquaco.periodicity.get_periodicity_list" title="merquaco.periodicity.get_periodicity_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_periodicity_list</span></code></a>(transcripts[, ...])</p></td>
+<td><p>Performs periodicity analysis across z-planes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.periodicity.get_chunk_values.html#merquaco.periodicity.get_chunk_values" title="merquaco.periodicity.get_chunk_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_chunk_values</span></code></a>(transcripts, image_dimensions)</p></td>
+<td><p>Calculates histogram and periodicity chunk values for transcripts DataFrame</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.periodicity.get_image_dimensions.html#merquaco.periodicity.get_image_dimensions" title="merquaco.periodicity.get_image_dimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_image_dimensions</span></code></a>(transcripts)</p></td>
+<td><p>Helper method to calculate dimensions for image based on max (x,y) values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.periodicity.get_periodicity_vals_all_z.html#merquaco.periodicity.get_periodicity_vals_all_z" title="merquaco.periodicity.get_periodicity_vals_all_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_periodicity_vals_all_z</span></code></a>(transcripts)</p></td>
+<td><p>Performs periodicity analysis in all z-planes collapsed</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.z_plane_detection">
+<span id="z-axis-nonuniformity"></span><h2>Z-Axis Nonuniformity<a class="headerlink" href="#module-merquaco.z_plane_detection" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.z_plane_detection.get_transcripts_per_z.html#merquaco.z_plane_detection.get_transcripts_per_z" title="merquaco.z_plane_detection.get_transcripts_per_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_transcripts_per_z</span></code></a>(transcripts[, num_planes])</p></td>
+<td><p>Iterates through z-planes and returns array of transcript counts per plane</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.z_plane_detection.compute_z_ratio.html#merquaco.z_plane_detection.compute_z_ratio" title="merquaco.z_plane_detection.compute_z_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_z_ratio</span></code></a>(transcripts[, num_planes, ...])</p></td>
+<td><p>Returns ratio of transcript counts between highest and lowest planes</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.perfusion">
+<span id="perfusion"></span><h2>Perfusion<a class="headerlink" href="#module-merquaco.perfusion" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.perfusion.analyze_flow.html#merquaco.perfusion.analyze_flow" title="merquaco.perfusion.analyze_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze_flow</span></code></a>(log_file_path)</p></td>
+<td><p>Extract and analyze flow rate information from log file</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.figures">
+<span id="figures"></span><h2>Figures<a class="headerlink" href="#module-merquaco.figures" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.figures.transcripts_overview.html#merquaco.figures.transcripts_overview" title="merquaco.figures.transcripts_overview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transcripts_overview</span></code></a>(transcripts[, ...])</p></td>
+<td><p>Plots transcripts overview, subsampling 0.1% by default.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.figures.plot_periodicity_hist.html#merquaco.figures.plot_periodicity_hist" title="merquaco.figures.plot_periodicity_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_periodicity_hist</span></code></a>(transcripts[, ...])</p></td>
+<td><p>Plot transcripts overview with histogram of counts along each axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.figures.plot_every_z_plane.html#merquaco.figures.plot_every_z_plane" title="merquaco.figures.plot_every_z_plane"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_every_z_plane</span></code></a>(transcripts[, subsample, ...])</p></td>
+<td><p>Plots transcripts overview for each z plane in a row</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.figures.plot_transcripts_per_z.html#merquaco.figures.plot_transcripts_per_z" title="merquaco.figures.plot_transcripts_per_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_transcripts_per_z</span></code></a>(transcripts_per_z[, ...])</p></td>
+<td><p>Plot transcript counts for each z plane</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.figures.plot_perfusion_figure.html#merquaco.figures.plot_perfusion_figure" title="merquaco.figures.plot_perfusion_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_perfusion_figure</span></code></a>(flow_data[, title, ...])</p></td>
+<td><p>Plot (and save) figure of extracted fluidics log file data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.figures.plot_pixel_percentages.html#merquaco.figures.plot_pixel_percentages" title="merquaco.figures.plot_pixel_percentages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pixel_percentages</span></code></a>(transcripts_percent, ...)</p></td>
+<td><p>Plots proportion of 'ideal tissue area' for each classified category</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.figures.plot_pixel_classification.html#merquaco.figures.plot_pixel_classification" title="merquaco.figures.plot_pixel_classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pixel_classification</span></code></a>(pixel_classification)</p></td>
+<td><p>Plots pixel classification of an experiment</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.figures.plot_full_pixel_fig.html#merquaco.figures.plot_full_pixel_fig" title="merquaco.figures.plot_full_pixel_fig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_full_pixel_fig</span></code></a>(pixel_classification, ...)</p></td>
+<td><p>Plots full pixel classification figure with pixel classification, pixel percentages, and all binary masks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.figures.plot_mask.html#merquaco.figures.plot_mask" title="merquaco.figures.plot_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_mask</span></code></a>(mask_input[, ax, title, out_file, dpi])</p></td>
+<td><p>Processes and plots binary msk</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.figures.plot_masks.html#merquaco.figures.plot_masks" title="merquaco.figures.plot_masks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_masks</span></code></a>(dapi_mask_input, dapi_mask_ax, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-merquaco.pixel_classification">
+<span id="pixel-classification"></span><h2>Pixel Classification<a class="headerlink" href="#module-merquaco.pixel_classification" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_mask.html#merquaco.pixel_classification.generate_mask" title="merquaco.pixel_classification.generate_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_mask</span></code></a>(ilastik_program_path, ...[, ...])</p></td>
+<td><p>Runs pixel and object classification workflows to create and save binary mask</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.create_transcripts_image.html#merquaco.pixel_classification.create_transcripts_image" title="merquaco.pixel_classification.create_transcripts_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_transcripts_image</span></code></a>(transcripts[, ...])</p></td>
+<td><p>Creates transcripts image from transcripts via 2D histogram</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_transcripts_mask.html#merquaco.pixel_classification.generate_transcripts_mask" title="merquaco.pixel_classification.generate_transcripts_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_transcripts_mask</span></code></a>(...[, transcripts])</p></td>
+<td><p>Return transcripts mask, either from image path (if exists), or by generating from transcripts table</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.create_dapi_image.html#merquaco.pixel_classification.create_dapi_image" title="merquaco.pixel_classification.create_dapi_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dapi_image</span></code></a>(high_res_dapi_image_path, ...)</p></td>
+<td><p>Creates a lower-resolution DAPI image by binning, normalizing, and removing off-tissue pixels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_dapi_mask.html#merquaco.pixel_classification.generate_dapi_mask" title="merquaco.pixel_classification.generate_dapi_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_dapi_mask</span></code></a>(dapi_image_path, ...[, ...])</p></td>
+<td><p>Generate binary DAPI mask from compressde DAPI image or high-res DAPI output image</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_detachment_mask.html#merquaco.pixel_classification.generate_detachment_mask" title="merquaco.pixel_classification.generate_detachment_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_detachment_mask</span></code></a>(...)</p></td>
+<td><p>Generate and save gel detachment mask by subtracting transcript mask from DAPI mask</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.create_ventricle_genes_image.html#merquaco.pixel_classification.create_ventricle_genes_image" title="merquaco.pixel_classification.create_ventricle_genes_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_ventricle_genes_image</span></code></a>(...[, ...])</p></td>
+<td><p>Creates and saves image of ventricle genes superimposed on DAPI image</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_ventricle_mask.html#merquaco.pixel_classification.generate_ventricle_mask" title="merquaco.pixel_classification.generate_ventricle_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ventricle_mask</span></code></a>(...[, ventricle_genes])</p></td>
+<td><p>Creates and saves binary ventricle marker genes mask from transcripts dataframe and ventricle gene list</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.generate_damage_mask.html#merquaco.pixel_classification.generate_damage_mask" title="merquaco.pixel_classification.generate_damage_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_damage_mask</span></code></a>(damage_mask_path, ...)</p></td>
+<td><p>Generate and save binary tissue damage mask</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.classify_pixels.html#merquaco.pixel_classification.classify_pixels" title="merquaco.pixel_classification.classify_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classify_pixels</span></code></a>(transcripts_mask_input, ...)</p></td>
+<td><p>Combine all masks and classify each pixel as either damage, tissue, detachment, ventricle, or off-tissue</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.calculate_class_areas.html#merquaco.pixel_classification.calculate_class_areas" title="merquaco.pixel_classification.calculate_class_areas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_class_areas</span></code></a>(pixel_classification)</p></td>
+<td><p>Calculates class areas in microns</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/merquaco.pixel_classification.calculate_class_percentages.html#merquaco.pixel_classification.calculate_class_percentages" title="merquaco.pixel_classification.calculate_class_percentages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_class_percentages</span></code></a>(damage_area, ...)</p></td>
+<td><p>Computes and uses &quot;ideal&quot; tissue area as denominator for pixel percentage calculations</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/merquaco.experiment.Experiment.read_transcripts.html" class="btn btn-neutral float-right" title="merquaco.experiment.Experiment.read_transcripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Allen Institute.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

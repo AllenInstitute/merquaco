@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>merquaco.pixel_classification.generate_mask &mdash; merquaco  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="merquaco.pixel_classification.create_transcripts_image" href="merquaco.pixel_classification.create_transcripts_image.html" />
+    <link rel="prev" title="merquaco.figures.plot_masks" href="merquaco.figures.plot_masks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            merquaco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.experiment.Experiment">Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.data_loss">Data Loss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.periodicity">Periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.z_plane_detection">Z-Axis Nonuniformity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.perfusion">Perfusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.figures">Figures</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-merquaco.pixel_classification">Pixel Classification</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">merquaco.pixel_classification.generate_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.create_transcripts_image.html">merquaco.pixel_classification.create_transcripts_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.generate_transcripts_mask.html">merquaco.pixel_classification.generate_transcripts_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.create_dapi_image.html">merquaco.pixel_classification.create_dapi_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.generate_dapi_mask.html">merquaco.pixel_classification.generate_dapi_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.generate_detachment_mask.html">merquaco.pixel_classification.generate_detachment_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.create_ventricle_genes_image.html">merquaco.pixel_classification.create_ventricle_genes_image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.generate_ventricle_mask.html">merquaco.pixel_classification.generate_ventricle_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.generate_damage_mask.html">merquaco.pixel_classification.generate_damage_mask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.classify_pixels.html">merquaco.pixel_classification.classify_pixels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.calculate_class_areas.html">merquaco.pixel_classification.calculate_class_areas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.pixel_classification.calculate_class_percentages.html">merquaco.pixel_classification.calculate_class_percentages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">merquaco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">merquaco.pixel_classification.generate_mask</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/merquaco.pixel_classification.generate_mask.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="merquaco-pixel-classification-generate-mask">
+<h1>merquaco.pixel_classification.generate_mask<a class="headerlink" href="#merquaco-pixel-classification-generate-mask" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="merquaco.pixel_classification.generate_mask">
+<span class="sig-prename descclassname"><span class="pre">merquaco.pixel_classification.</span></span><span class="sig-name descname"><span class="pre">generate_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ilastik_program_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_image_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_classification_model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_classification_model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_classification_export_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Probabilities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#merquaco.pixel_classification.generate_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Runs pixel and object classification workflows to create and save binary mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ilastik_program_path</strong> (<em>str</em><em> or </em><em>Path</em>) – Path to ilastik program</p></li>
+<li><p><strong>input_image_path</strong> (<em>str</em><em> or </em><em>Path</em>) – Path to input image</p></li>
+<li><p><strong>pixel_classification_model_path</strong> (<em>str</em><em> or </em><em>Path</em>) – Path to pixel classification model</p></li>
+<li><p><strong>object_classification_model_path</strong> (<em>str</em><em> or </em><em>Path</em>) – Path to object classification model</p></li>
+<li><p><strong>pixel_classification_export_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Export type for pixel classification model. Default is “Probabilities”.</p></li>
+<li><p><strong>mask_path</strong> (<em>str</em><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path at which to save mask. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Binary mask is saved at <cite>mask_path</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="merquaco.figures.plot_masks.html" class="btn btn-neutral float-left" title="merquaco.figures.plot_masks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="merquaco.pixel_classification.create_transcripts_image.html" class="btn btn-neutral float-right" title="merquaco.pixel_classification.create_transcripts_image" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Allen Institute.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

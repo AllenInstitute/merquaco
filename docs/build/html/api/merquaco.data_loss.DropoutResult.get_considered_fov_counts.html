@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>merquaco.data_loss.DropoutResult.get_considered_fov_counts &mdash; merquaco  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="merquaco.data_loss.DropoutResult.get_false_positive_fovs" href="merquaco.data_loss.DropoutResult.get_false_positive_fovs.html" />
+    <link rel="prev" title="merquaco.data_loss.DropoutResult.get_considered_fovs" href="merquaco.data_loss.DropoutResult.get_considered_fovs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            merquaco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-merquaco.experiment.Experiment">Experiment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-merquaco.data_loss">Data Loss</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.FOVDropout.find_on_tissue_fovs.html">merquaco.data_loss.FOVDropout.find_on_tissue_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.FOVDropout.detect_dropouts.html">merquaco.data_loss.FOVDropout.detect_dropouts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.FOVDropout.compare_codebook_fov_genes.html">merquaco.data_loss.FOVDropout.compare_codebook_fov_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.FOVDropout.detect_false_positives.html">merquaco.data_loss.FOVDropout.detect_false_positives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.FOVDropout.save_fov_tsv.html">merquaco.data_loss.FOVDropout.save_fov_tsv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_dropout_count.html">merquaco.data_loss.DropoutResult.get_dropout_count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_dropped_genes.html">merquaco.data_loss.DropoutResult.get_dropped_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_dropped_gene_counts.html">merquaco.data_loss.DropoutResult.get_dropped_gene_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_dropped_fovs.html">merquaco.data_loss.DropoutResult.get_dropped_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_dropped_fov_counts.html">merquaco.data_loss.DropoutResult.get_dropped_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_considered_genes.html">merquaco.data_loss.DropoutResult.get_considered_genes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_considered_gene_counts.html">merquaco.data_loss.DropoutResult.get_considered_gene_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_considered_fovs.html">merquaco.data_loss.DropoutResult.get_considered_fovs</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">merquaco.data_loss.DropoutResult.get_considered_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_false_positive_fovs.html">merquaco.data_loss.DropoutResult.get_false_positive_fovs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.get_false_positive_fov_counts.html">merquaco.data_loss.DropoutResult.get_false_positive_fov_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.dropout_summary.html">merquaco.data_loss.DropoutResult.dropout_summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov.html">merquaco.data_loss.DropoutResult.draw_genes_dropped_per_fov</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">merquaco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">merquaco.data_loss.DropoutResult.get_considered_fov_counts</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/merquaco.data_loss.DropoutResult.get_considered_fov_counts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="merquaco-data-loss-dropoutresult-get-considered-fov-counts">
+<h1>merquaco.data_loss.DropoutResult.get_considered_fov_counts<a class="headerlink" href="#merquaco-data-loss-dropoutresult-get-considered-fov-counts" title="Permalink to this heading"></a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="merquaco.data_loss.DropoutResult.get_considered_fov_counts">
+<span class="sig-prename descclassname"><span class="pre">DropoutResult.</span></span><span class="sig-name descname"><span class="pre">get_considered_fov_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#merquaco.data_loss.DropoutResult.get_considered_fov_counts" title="Permalink to this definition"></a></dt>
+<dd><p>Gets number of on-tissue FOVs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of FOVs with &gt;50% area on tissue</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="merquaco.data_loss.DropoutResult.get_considered_fovs.html" class="btn btn-neutral float-left" title="merquaco.data_loss.DropoutResult.get_considered_fovs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="merquaco.data_loss.DropoutResult.get_false_positive_fovs.html" class="btn btn-neutral float-right" title="merquaco.data_loss.DropoutResult.get_false_positive_fovs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Allen Institute.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
