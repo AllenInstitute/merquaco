@@ -604,6 +604,7 @@ class Experiment:
             # Get raw number of dropped FOVs, genes
             self.n_dropped_fovs = int(dropout.get_dropped_fov_counts())
             self.n_dropped_genes = int(dropout.get_dropped_gene_counts())
+            self.dropped_genes = ", ".join(dropout.get_dropped_genes())
             # Get dictionary of dropped genes per FOV
             self.dropped_fovs_dict = dropout.get_dropped_gene_counts(dic=True)
             if plot_figures:
