@@ -125,6 +125,7 @@ class FOVDropout:
     def detect_dropouts(transcripts: pd.DataFrame, fovs: pd.DataFrame, thresh: float = 0.15) -> pd.DataFrame:
         """
         Compares cardinal neighbors for each FOV to detect dropout
+
         FOVs are considered dropped if:
             - below delta threshold for number of transcripts for all 4 neighbors
             - OR below threshold for 3 neighbors and last neighbor is also a dropped FOV
