@@ -16,7 +16,7 @@ import merquaco.periodicity as periodicity
 metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "transcript_density_um2_per_gene",
                      "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity",
                      "periodicity_list", "counts_per_gene", "n_dropped_fovs", "n_dropped_genes", "dropped_fovs_dict",
-                     "dropped_genes", "damage_area", "transcripts_area", "detachment_area", "ventricle_area", 
+                     "dropped_genes", "damage_area", "transcripts_area", "detachment_area", "ventricle_area",
                      "total_area", "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
                      "transcripts_mask_pixel_path", "transcripts_mask_object_path", "dapi_mask_pixel_path",
                      "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path"]
@@ -26,17 +26,8 @@ class Experiment:
 
     def __init__(self,
                  transcripts_input: Union[pd.DataFrame, str, Path],
-                 ilastik_config_input: Union[dict, str, Path] = None,
-                 transcripts_image_path: Union[str, Path] = None,
-                 transcripts_mask_path: Union[str, Path] = None,
+                 ilastik_program_path: Union[str, Path] = None,
                  dapi_high_res_image_path: Union[str, Path] = None,
-                 dapi_image_path: Union[str, Path] = None,
-                 dapi_mask_path: Union[str, Path] = None,
-                 detachment_mask_path: Union[str, Path] = None,
-                 ventricle_image_path: Union[str, Path] = None,
-                 ventricle_mask_path: Union[str, Path] = None,
-                 damage_mask_path: Union[str, Path] = None,
-                 pixel_classification_path: Union[str, Path] = None,
                  codebook_input: Union[pd.DataFrame, str, Path] = None,
                  perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None):
@@ -47,28 +38,10 @@ class Experiment:
         ----------
         transcripts_input : pd.DataFrame, str, or Path
             DataFrame of or path to transcripts table
-        ilastik_path_input : dict, str, or Path, optional
+        ilastik_config_input : dict, str, or Path, optional
             Dictionary of or path to ilastik paths. Default is None.
-        transcripts_image_path : str or Path, optional
-            Path at which to save transcripts image. Default is None.
-        transcripts_mask_path : str or Path, optional
-            Path at which to save binary transcripts mask. Default is None.
         dapi_high_res_image_path : str or Path, optional
             Path to high resolution DAPI tiff image. Default is None.
-        dapi_image_path : str or Path, optional
-            Path at which to save low-res, modified DAPI image. Default is None.
-        dapi_mask_path : str or Path, optional
-            Path at which to save binary DAPI mask.
-        detachment_mask_path : str or Path, optional
-            Path at which to save detachment binary mask. Default is None.
-        ventricle_image_path : str or Path, optional
-            Path at which to save ventricle image. Default is None.
-        ventricle_mask_path : str or Path, optional
-            Path at which to save binary ventricle mask. Default is None.
-        damage_mask_path : str or Path, optional
-            Path at which to save binary damage mask. Default is None.
-        pixel_classification_path : str or Path, optional
-            Path at which to save final pixel classification results. Default is None.
         codebook_input : pd.DataFrame, str, or Path, optional
             DataFrame of or path to codebook table. Default is None.
         perfusion_path : str or Path, optional
@@ -76,75 +49,38 @@ class Experiment:
         output_dir : str or Path, optional
             Directory at which to save QC outputs
 
-        Attributes Set
-        --------------
-        transcripts_image_path : str or Path
-            Path at which to save transcripts image.
-        transcripts_mask_path : str or Path
-            Path at which to save binary transcripts mask.
-        dapi_high_res_image_path : str or Path
-            Path to high resolution DAPI tiff image.
-        dapi_image_path : str or Path
-            Path at which to save low-res, modified DAPI image.
-        dapi_mask_path : str or Path
-            Path at which to save binary DAPI mask.
-        detachment_mask_path : str or Path
-            Path at which to save detachment binary mask.
-        ventricle_image_path : str or Path
-            Path at which to save ventricle image.
-        ventricle_mask_path : str or Path
-            Path at which to save binary ventricle mask.
-        damage_mask_path : str or Path
-            Path at which to save binary damage mask.
-        pixel_classification_path : str or Path
-            Path at which to save final pixel classification results.
-        codebook : pd.DataFrame
-            Codebook table.
-        perfusion_path : str or Path
-            Path to perfusion log file.
-        output_dir : str or Path
-            Directory at which to save QC outputs.
-        transcripts : pd.DataFrame
-            Transcripts table
-        counts_per_gene : dict
-            Dictionary of transcript counts pergene
-        filtered_transcripts : pd.DataFrame
-            Transcripts table excluding blanks
-        n_genes : int
-            Number of genes imaged
-        genes : list
-            List of genes
-        total_transcripts_count : int
-            Total detected transcripts
-        filtered_transcripts_count : int
-            Total detected transcripts, excluding blanks
-        num_planes : int
-            Number of z-planes imaged
-        fovs_df : pd.DataFrame
-            DataFrame of FOV coordinates, transcript counts, neighbors
-        """
-        # Assign ilastik paths as attributes
-        ilastik_config_dict = data_processing.process_input(ilastik_config_input)
-        # Unpack dictionary as self attributes
-        try:
-            for key, val in ilastik_config_dict.items():
-                setattr(self, key, val)
-        except AttributeError:
-            pass
-
+        Notes
+        -----
+        `ilastik_config_input` must contain values for each of the following keys:
+            - ilastik_program_path
+            - transcripts_mask_pixel_path,
+            - transcripts_mask_object_path
+            - transcripts_image_path
+            - transcripts_mask_path
+        """        
         # Assign parameters as self attributes
-        self.transcripts_image_path = transcripts_image_path
-        self.transcripts_mask_path = transcripts_mask_path
+        if output_dir is not None:
+            self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
+            self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
+            self.dapi_image_path = Path(output_dir, 'dapi.tiff')
+            self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
+            self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
+            self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
+            self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
+            self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
+            self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
+
         self.dapi_high_res_image_path = dapi_high_res_image_path
-        self.dapi_image_path = dapi_image_path
-        self.dapi_mask_path = dapi_mask_path
-        self.detachment_mask_path = detachment_mask_path
-        self.ventricle_image_path = ventricle_image_path
-        self.ventricle_mask_path = ventricle_mask_path
-        self.damage_mask_path = damage_mask_path
-        self.pixel_classification_path = pixel_classification_path
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
+        self.ilastik_program_path = ilastik_program_path
+        self.transcripts_mask_pixel_path = 'ilastik_programs/TissueMaskPixelClassification_v1.0.ilp'
+        self.transcripts_mask_object_path = 'ilastik_programs/TissueMaskObjects_v1.1.ilp'
+        self.dapi_mask_pixel_path = 'ilastik_programs/DapiMaskPixelClassification_Mouse.ilp'
+        self.dapi_mask_object_path = 'ilastik_programs/DapiMaskObjectClassification_Mouse.ilp'
+        self.ventricle_mask_pixel_path = 'ilastik_programs/VentriclesPixelClassification.ilp'
+        self.ventricle_mask_object_path = 'ilastik_programs/VentriclesObjectClassification.ilp'
+
         try:
             self.codebook = Experiment.read_codebook(codebook_input)
         except AttributeError:
@@ -174,12 +110,8 @@ class Experiment:
 
         # Create transcripts mask if parameters are provided
         try:
-            if not data_processing.check_if_none(self.ilastik_program_path,
-                                                 self.transcripts_mask_pixel_path,
-                                                 self.transcripts_mask_object_path,
-                                                 self.transcripts_image_path,
-                                                 self.transcripts_mask_path):
-    
+            if self.ilastik_program_path is not None:
+                print('Generaating transcript mask')
                 self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                      self.ilastik_program_path,
                                                                      self.transcripts_mask_pixel_path,
@@ -187,7 +119,6 @@ class Experiment:
                                                                      self.filtered_transcripts)
         except AttributeError:
             pass
-      
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
