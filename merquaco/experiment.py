@@ -151,12 +151,14 @@ class Experiment:
             self.codebook = codebook_input
 
         # Transcripts dataframe
+        print('Processing transcripts dataframe')
         transcripts = data_processing.process_input(transcripts_input)
         # Adjust (x,y) locations
         self.transcripts = self.scale_transcripts_xy(transcripts)
         # Counts per gene (including blanks)
         self.counts_per_gene = self.transcripts.groupby('gene').size().to_dict()
         # Remove 'Blank' codewords
+        print('Filtering Blank codewords')
         self.filtered_transcripts = self.remove_blanks(self.transcripts)
         self.n_genes = self.filtered_transcripts['gene'].nunique()
         self.genes = [gene for gene in self.filtered_transcripts['gene'].unique()]
@@ -167,6 +169,7 @@ class Experiment:
         # Number of z-planes imaged
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
+        print('Creating FOVs dataframe')
         self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
 
         # Create transcripts mask if parameters are provided
