@@ -126,8 +126,11 @@ class Experiment:
         # Assign ilastik paths as attributes
         ilastik_config_dict = data_processing.process_input(ilastik_config_input)
         # Unpack dictionary as self attributes
-        for key, val in ilastik_config_dict.items():
-            setattr(self, key, val)
+        try:
+            for key, val in ilastik_config_dict.items():
+                setattr(self, key, val)
+        except AttributeError:
+            pass
 
         # Assign parameters as self attributes
         self.transcripts_image_path = transcripts_image_path
