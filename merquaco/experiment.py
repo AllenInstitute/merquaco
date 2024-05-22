@@ -173,17 +173,21 @@ class Experiment:
         self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
 
         # Create transcripts mask if parameters are provided
-        if not data_processing.check_if_none(self.ilastik_program_path,
-                                             self.transcripts_mask_pixel_path,
-                                             self.transcripts_mask_object_path,
-                                             self.transcripts_image_path,
-                                             self.transcripts_mask_path):
-
-            self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
-                                                                 self.ilastik_program_path,
-                                                                 self.transcripts_mask_pixel_path,
-                                                                 self.transcripts_mask_object_path,
-                                                                 self.filtered_transcripts)
+        try:
+            if not data_processing.check_if_none(self.ilastik_program_path,
+                                                 self.transcripts_mask_pixel_path,
+                                                 self.transcripts_mask_object_path,
+                                                 self.transcripts_image_path,
+                                                 self.transcripts_mask_path):
+    
+                self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
+                                                                     self.ilastik_program_path,
+                                                                     self.transcripts_mask_pixel_path,
+                                                                     self.transcripts_mask_object_path,
+                                                                     self.filtered_transcripts)
+        except AttributeError:
+            pass
+      
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
