@@ -26,23 +26,17 @@ def process_input(input_data: Union[str, Path, np.ndarray, pd.DataFrame, dict]):
         If input type is unsupported.
     """
     if isinstance(input_data, pd.DataFrame):
-        if not check_if_none(input_data):
-            return input_data
+        return input_data
     elif isinstance(input_data, np.ndarray):
-        if not check_if_none(input_data):
-            return input_data
+        return input_data
     elif isinstance(input_data, dict):
         return input_data
     elif isinstance(input_data, str):
-        if not check_if_none(input_data):
-            return process_path(input_data)
-        else:
-            return None
+        return process_path(input_data)
     elif isinstance(input_data, Path):
-        if not check_if_none(input_data):
-            return process_path(str(input_data))
-        else:
-            return None
+        return process_path(str(input_data))
+    elif input_data is None:
+        return input_data
     else:
         raise TypeError("Unsupported input type. Must be a DataFrame, numpy array, dictionary, file path, or JSON.")
 
