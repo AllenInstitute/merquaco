@@ -413,7 +413,7 @@ class Experiment:
         Returns
         -------
         tuple
-            on_tissue_filtered_transcripts_count : float
+            on_tissue_filtered_transcript_count : float
                 Number of on-tissue transcripts
             transcript_density_um2 : float
                 Number of transcripts per on-tissue micron
@@ -421,16 +421,16 @@ class Experiment:
         transcripts_image = data_processing.process_input(transcripts_image_input)
         transcripts_mask = data_processing.process_input(transcripts_mask_input)
 
-        on_tissue_filtered_transcripts_count = np.sum(transcripts_image[transcripts_mask == 1])
+        on_tissue_filtered_transcript_count = np.sum(transcripts_image[transcripts_mask == 1])
         transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
         if transcripts_mask_area > 0:
-            transcript_density_um2 = on_tissue_filtered_transcripts_count / transcripts_mask_area
+            transcript_density_um2 = on_tissue_filtered_transcript_count / transcripts_mask_area
         else:
             transcript_density_um2 = np.nan
 
-        return on_tissue_filtered_transcripts_count, transcript_density_um2
+        return on_tissue_filtered_transcript_count, transcript_density_um2
     
     @staticmethod
     def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
@@ -634,7 +634,7 @@ class Experiment:
                     dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
-        self.on_tissue_filtered_transcripts_count, \
+        self.on_tissue_filtered_transcript_count, \
             self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
                                                                              self.transcripts_mask)
         self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
