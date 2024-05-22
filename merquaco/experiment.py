@@ -57,8 +57,8 @@ class Experiment:
             - transcripts_mask_object_path
             - transcripts_image_path
             - transcripts_mask_path
-        """        
-        # Assign parameters as self attributes
+        """
+        # Assign mask paths as attributes if they exist
         if output_dir is not None:
             self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
             self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
@@ -70,10 +70,13 @@ class Experiment:
             self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
             self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
 
+        # Assign data paths as attributes (even if None)
         self.dapi_high_res_image_path = dapi_high_res_image_path
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
         self.ilastik_program_path = ilastik_program_path
+
+        # Paths to ilastik models assigned as attributes
         self.transcripts_mask_pixel_path = 'ilastik_programs/TissueMaskPixelClassification_v1.0.ilp'
         self.transcripts_mask_object_path = 'ilastik_programs/TissueMaskObjects_v1.1.ilp'
         self.dapi_mask_pixel_path = 'ilastik_programs/DapiMaskPixelClassification_Mouse.ilp'
