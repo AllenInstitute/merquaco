@@ -668,4 +668,4 @@ class Experiment:
             metrics_dict[key] = getattr(self, key, np.nan)
 
         if save_metrics:
-            Experiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"))
+            Experiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"), metrics_dict)
