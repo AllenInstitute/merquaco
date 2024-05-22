@@ -415,7 +415,7 @@ class Experiment:
         tuple
             on_tissue_filtered_transcripts_count : float
                 Number of on-tissue transcripts
-            transcripts_density_um2 : float
+            transcript_density_um2 : float
                 Number of transcripts per on-tissue micron
         """
         transcripts_image = data_processing.process_input(transcripts_image_input)
@@ -426,11 +426,11 @@ class Experiment:
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
         if transcripts_mask_area > 0:
-            transcripts_density_um2 = on_tissue_filtered_transcripts_count / transcripts_mask_area
+            transcript_density_um2 = on_tissue_filtered_transcripts_count / transcripts_mask_area
         else:
-            transcripts_density_um2 = np.nan
+            transcript_density_um2 = np.nan
 
-        return on_tissue_filtered_transcripts_count, transcripts_density_um2
+        return on_tissue_filtered_transcripts_count, transcript_density_um2
     
     @staticmethod
     def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
@@ -637,7 +637,7 @@ class Experiment:
         self.on_tissue_filtered_transcripts_count, \
             self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
                                                                              self.transcripts_mask)
-        self.transcript_density_um2_per_gene = self.transcripts_density_um2 / self.n_genes
+        self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
 
         # 4. Periodicity
         print('Calculating periodicity')
