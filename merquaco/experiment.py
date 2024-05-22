@@ -614,7 +614,7 @@ class Experiment:
 
         # 3. On-tissue metrics
         self.on_tissue_filtered_transcripts_count, \
-            self.transcripts_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
+            self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
                                                                              self.transcripts_mask)
         self.transcript_density_um2_per_gene = self.transcripts_density_um2 / self.n_genes
 
