@@ -143,9 +143,12 @@ class Experiment:
         self.ventricle_mask_path = ventricle_mask_path
         self.damage_mask_path = damage_mask_path
         self.pixel_classification_path = pixel_classification_path
-        self.codebook = Experiment.read_codebook(codebook_input)
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
+        try:
+            self.codebook = Experiment.read_codebook(codebook_input)
+        except AttributeError:
+            self.codebook = codebook_input
 
         # Transcripts dataframe
         transcripts = data_processing.process_input(transcripts_input)
