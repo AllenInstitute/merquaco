@@ -16,8 +16,8 @@ import merquaco.periodicity as periodicity
 metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "transcript_density_um2_per_gene",
                      "on_tissue_filtered_transcript_count", "z_ratio", "transcripts_per_z", "periodicity",
                      "periodicity_list", "counts_per_gene", "n_dropped_fovs", "n_dropped_genes", "dropped_fovs_dict",
-                     "damage_area", "transcripts_area", "detachment_area", "ventricle_area", "total_area",
-                     "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
+                     "dropped_genes", "damage_area", "transcripts_area", "detachment_area", "ventricle_area", 
+                     "total_area", "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
                      "transcripts_mask_pixel_path", "transcripts_mask_object_path", "dapi_mask_pixel_path",
                      "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path"]
 
@@ -431,6 +431,26 @@ class Experiment:
             transcripts_density_um2 = np.nan
 
         return on_tissue_filtered_transcripts_count, transcripts_density_um2
+    
+    @staticmethod
+    def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
+
+        # Check if the file exists and load existing data
+        if qc_summary_path.exists():
+            with open(qc_summary_path, 'r') as file:
+                existing_data = json.load(file)
+        else:
+            existing_data = {}
+
+        # Update only the fields that are "NA" in the existing data
+        for key, value in qc_dict.items():
+            if existing_data.get(key, "NA") == "NA":
+                existing_data[key] = value
+
+        # Write the updated data back to the file
+        with open(qc_summary_path, 'w') as file:
+            json.dump(existing_data, file, indent=4)
+
 
     def run_dropout_pipeline(self):
         """
@@ -558,7 +578,8 @@ class Experiment:
                    run_pixel_classification: bool = True,
                    run_dropout: bool = True,
                    run_perfusion: bool = False,
-                   plot_figures: bool = True):
+                   plot_figures: bool = True,
+                   save_metrics: bool = True):
         """
         Runs all standard QC functions and prints results
 
@@ -646,5 +667,5 @@ class Experiment:
         for key in metrics_dict_keys:
             metrics_dict[key] = getattr(self, key, np.nan)
 
-        with open(Path(self.output_dir, "qc_summary.json"), 'w') as outfile:
-            json.dump(metrics_dict, outfile, indent=4)
+        if save_metrics:
+            Experiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"))
