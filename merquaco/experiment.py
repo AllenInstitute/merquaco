@@ -444,7 +444,7 @@ class Experiment:
 
         # Update only the fields that are "NA" in the existing data
         for key, value in qc_dict.items():
-            if np.isnan(existing_data.get(key)):
+            if key in existing_data and np.isnan(existing_data.get(key)):
                 existing_data[key] = value
 
         # Write the updated data back to the file
