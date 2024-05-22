@@ -57,19 +57,30 @@ def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray, dict
 
     Raises
     ------
+    FileNotFoundError
+        If file is not found
     ValueError
-        If file type is not supported or file not found
+        If file type is not supported
     """
     # Determine the type of file based on its extension
     if path.endswith('.csv'):
-        return pd.read_csv(path)
+        try:
+            return pd.read_csv(path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f'File not found at {path}')
     elif path.endswith(('.tif', '.tiff')):
-        return tiff.imread(path)
+        try:
+            return tiff.imread(path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f'File not found at {path}')
     elif path.endswith('.json'):
-        with open(path, 'r') as file:
-            return json.load(file)
+        try:
+            with open(path, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError(f'File not found at {path}')
     else:
-        raise ValueError("File type not supported or file not found.")
+        raise ValueError("File type not supported")
 
 
 def check_if_none(*args):
