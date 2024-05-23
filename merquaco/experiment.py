@@ -1,3 +1,4 @@
+import os
 from typing import Union
 from pathlib import Path
 import pandas as pd
@@ -77,12 +78,13 @@ class Experiment:
         self.ilastik_program_path = ilastik_program_path
 
         # Paths to ilastik models assigned as attributes
-        self.transcripts_mask_pixel_path = 'ilastik_programs/TissueMaskPixelClassification_v1.0.ilp'
-        self.transcripts_mask_object_path = 'ilastik_programs/TissueMaskObjects_v1.1.ilp'
-        self.dapi_mask_pixel_path = 'ilastik_programs/DapiMaskPixelClassification_Mouse.ilp'
-        self.dapi_mask_object_path = 'ilastik_programs/DapiMaskObjectClassification_Mouse.ilp'
-        self.ventricle_mask_pixel_path = 'ilastik_programs/VentriclesPixelClassification.ilp'
-        self.ventricle_mask_object_path = 'ilastik_programs/VentriclesObjectClassification.ilp'
+        ilastik_models_dir = os.path.join(os.path.dirname(__file__),'..','ilastik_models')
+        self.transcripts_mask_pixel_path = Path(ilastik_models_dir,'TissueMaskPixelClassification_v1.0.ilp')
+        self.transcripts_mask_object_path = Path(ilastik_models_dir,'TissueMaskObjects_v1.1.ilp')
+        self.dapi_mask_pixel_path = Path(ilastik_models_dir,'DapiMaskPixelClassification_Mouse.ilp')
+        self.dapi_mask_object_path = Path(ilastik_models_dir,'DapiMaskObjectClassification_Mouse.ilp')
+        self.ventricle_mask_pixel_path = Path(ilastik_models_dir,'VentriclesPixelClassification.ilp')
+        self.ventricle_mask_object_path = Path(ilastik_models_dir,'VentriclesObjectClassification.ilp')
 
         try:
             self.codebook = Experiment.read_codebook(codebook_input)
