@@ -385,20 +385,20 @@ class Experiment:
     def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
 
         # Check if the file exists and load existing data
-        if qc_summary_path.exists():
+        if os.path.exists(qc_summary_path):
             with open(qc_summary_path, 'r') as file:
-                existing_data = json.load(file)
-        else:
-            existing_data = {}
+                data = json.load(file)
 
-        # Update only the fields that are "NA" in the existing data
-        for key, value in qc_dict.items():
-            if isinstance(existing_data.get(key), float) and np.isnan(existing_data.get(key)):
-                existing_data[key] = value
+            # Update only the fields that are "NA" in the existing data
+            for key, value in qc_dict.items():
+                if isinstance(data.get(key), float) and np.isnan(data.get(key)):
+                    data[key] = value
+        else:
+            data = qc_dict.copy()
 
         # Write the updated data back to the file
         with open(qc_summary_path, 'w') as file:
-            json.dump(existing_data, file, indent=4)
+            json.dump(data, file, indent=4)
 
 
     def run_dropout_pipeline(self):
