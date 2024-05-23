@@ -120,7 +120,7 @@ class Experiment:
         # Create transcripts mask if parameters are provided
         try:
             if self.ilastik_program_path is not None:
-                print('Generaating transcript mask')
+                print('Generating transcript mask')
                 self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                      self.ilastik_program_path,
                                                                      self.transcripts_mask_pixel_path,
