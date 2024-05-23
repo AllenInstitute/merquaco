@@ -31,7 +31,8 @@ class Experiment:
                  dapi_high_res_image_path: Union[str, Path] = None,
                  codebook_input: Union[pd.DataFrame, str, Path] = None,
                  perfusion_path: Union[str, Path] = None,
-                 output_dir: Union[str, Path] = None):
+                 output_dir: Union[str, Path] = None,
+                 ventricle_genes_list: list = ["Crb2","Glis3","Inhbb","Naaa","Cd24a","Dsg2","Hdc","Shroom3","Vit","Rgs12","Trp73"]):
         """
         Initialize an Experiment instance from transcripts table dataframe
 
@@ -72,10 +73,11 @@ class Experiment:
             self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
 
         # Assign data paths as attributes (even if None)
+        self.ilastik_program_path = ilastik_program_path
         self.dapi_high_res_image_path = dapi_high_res_image_path
         self.perfusion_path = perfusion_path
         self.output_dir = output_dir
-        self.ilastik_program_path = ilastik_program_path
+        self.ventricle_genes_list = ventricle_genes_list
 
         # Paths to ilastik models assigned as attributes
         ilastik_models_dir = os.path.join(os.path.dirname(__file__),'..','ilastik_models')
