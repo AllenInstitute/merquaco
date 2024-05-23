@@ -18,10 +18,11 @@ setup(
     url="https://github.com/AllenInstitute/merquaco",
     license = "LICENSE",
     packages=find_packages(where="."),
-    include_package_data=True,
 	package_data={
-        'merquaco': ['ilastik_models/*.ilp'],
+		'': ['*.ilp']
+        'merquaco': ['../ilastik_models/*.ilp'],
     },
+	include_package_data=True,
     install_requires=requirements,
     # entry_points={
     #     "console_scripts": [

@@ -1,1 +1,1 @@
-recursive-include merquaco/ilastik_models *.ilp
+recursive-include ilastik_models *.ilp
