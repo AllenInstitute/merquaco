@@ -19,6 +19,10 @@ setup(
     license = "LICENSE",
     packages=find_packages(where="."),
     include_package_data=True,
+	package_data={
+        # Ensure the package name is correct and the path to the files is correct
+        'merquaco': ['ilastik_models/*.ilp'],
+    },
     install_requires=requirements,
     # entry_points={
     #     "console_scripts": [
