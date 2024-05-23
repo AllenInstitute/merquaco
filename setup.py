@@ -19,7 +19,7 @@ setup(
     license = "LICENSE",
     packages=find_packages(where="."),
 	package_data={
-		'': ['*.ilp']
+		'': ['*.ilp'],
         'merquaco': ['../ilastik_models/*.ilp'],
     },
 	include_package_data=True,
