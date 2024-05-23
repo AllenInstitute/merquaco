@@ -79,7 +79,9 @@ class Experiment:
 
         # Paths to ilastik models assigned as attributes
         ilastik_models_dir = os.path.join(os.path.dirname(__file__),'..','ilastik_models')
+        print(os.path.exists(ilastik_models_dir))
         self.transcripts_mask_pixel_path = Path(ilastik_models_dir,'TissueMaskPixelClassification_v1.0.ilp')
+        print(os.path.exists(self.transcripts_mask_path))
         self.transcripts_mask_object_path = Path(ilastik_models_dir,'TissueMaskObjects_v1.1.ilp')
         self.dapi_mask_pixel_path = Path(ilastik_models_dir,'DapiMaskPixelClassification_Mouse.ilp')
         self.dapi_mask_object_path = Path(ilastik_models_dir,'DapiMaskObjectClassification_Mouse.ilp')
