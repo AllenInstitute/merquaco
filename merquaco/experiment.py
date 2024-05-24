@@ -12,6 +12,7 @@ import merquaco.figures as figures
 import merquaco.z_plane_detection as zp
 import merquaco.perfusion as perfusion
 import merquaco.periodicity as periodicity
+from merquaco.__init__ import __version__ as version
 
 # dictionary keys for output metadata
 metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "transcript_density_um2_per_gene",
@@ -20,7 +21,7 @@ metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "tr
                      "dropped_genes", "damage_area", "transcripts_area", "detachment_area", "ventricle_area",
                      "total_area", "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
                      "transcripts_mask_pixel_path", "transcripts_mask_object_path", "dapi_mask_pixel_path",
-                     "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path"]
+                     "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path", "merquaco_version"]
 
 
 class Experiment:
@@ -114,6 +115,8 @@ class Experiment:
         # DataFrame grouped by FOVs and storing FOV information
         print('Creating FOVs dataframe')
         self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
+        # Get version
+        self.merquaco_version = version
 
         # Create transcripts mask if parameters are provided
         try:
