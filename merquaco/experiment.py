@@ -61,6 +61,10 @@ class Experiment:
             - transcripts_image_path
             - transcripts_mask_path
         """
+        # Create output directory if does not exist
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
         # Assign mask paths as attributes if they exist
         if output_dir is not None:
             self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
