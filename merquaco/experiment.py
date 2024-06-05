@@ -134,6 +134,7 @@ class Experiment:
 
         # Create transcripts mask if parameters are provided
         try:
+            self.transcripts_mask = None
             if self.ilastik_program_path is not None:
                 if not os.path.exists(self.transcripts_mask_path) or force_mask:
                     print('Generating transcript mask')
