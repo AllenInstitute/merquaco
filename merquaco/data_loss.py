@@ -694,8 +694,67 @@ class DropoutResult:
 
         Returns
         -------
-
+        # TODO: fill this out
         """
+
+    def draw_dropout(self, gene: str, out_path: Union[str, Path] = None):
+        """
+        Draws the detected dropout for a given gene.
+
+        Transcripts are drawn in the left plot, transcripts and highlighted FOVs with data loss are in the right plot.
+
+        Parameters
+        ----------
+        gene : str
+            Gene to draw plots of
+        out_file : str or Path, optional
+            Path at which to save plots. Default is ''
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If `gene` is not found in FOVs dataframe
+        """
+        if gene.isin(self.transcripts['gene'].unique()):
+            pass
+        else:
+            example = self.trancsripts.iloc[0]['gene']
+            raise ValueError(f'The gene passed gene ({gene}) was not found.\n Capitalization should match {example}')
+
+        fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+
+        plot_min = min((np.min(self.transcripts['global_x']), np.min(self.transcripts['global_y'])))
+        plot_max = max((np.max(self.transcripts['global_x']), np.max(self.transcripts['global_y'])))
+        plt.setp(ax, xlim=(plot_min, plot_max), ylim=(plot_max, plot_min))
+
+        ax[0].scatter(self.transcripts[self.transcripts['gene'] == gene]['global_x'],
+                      self.transcripts[self.transcripts['gene'] == gene]['global_y'],
+                      s=0.001, c='k', marker='.')
+        ax[1].scatter(self.transcripts[self.transcripts['gene'] == gene]['global_x'],
+                      self.transcripts[self.transcripts['gene'] == gene]['global_y'],
+                      s=0.001, c='k', marker='.')
+
+        ax[0].set_title(gene)
+        ax[1].set_title(gene)
+
+        grid_sq_size = max((np.max(self.fovs['width']), np.max(self.fovs['height'])))
+
+        for fov in self.get_dropped_fovs(gene):
+            ax[1].add_patch(Rectangle((self.fovs.loc[fov, 'x_min'], self.fovs.loc[fov, 'y_min']),
+                                      grid_sq_size,
+                                      grid_sq_size,
+                                      facecolor='blue',
+                                      fill=True,
+                                      lw=0,
+                                      alpha=0.5))
+
+        if out_path != '':
+            fig.savefig(out_path, format='png', bbox_inches='tight', dpi=400,
+                        facecolor="#FFFFFF", edgecolor="#FFFFFF", transparent=False)
 
     def dropout_summary(self, return_summary: bool = False):
         """
