@@ -231,6 +231,7 @@ class FOVDropout:
 
         return fovs
 
+
     @staticmethod
     def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
         """
@@ -301,7 +302,7 @@ class FOVDropout:
         """
         # Create dataframe to store information on imaging rounds (3 codebook bits to a round)
         bits = codebook.shape[1]
-        round_df = codebook.T.groupby((np.arange(bits) // 3) + 1).sum()
+        round_df = codebook.groupby((np.arange(bits) // 3) + 1, axis=1).sum()
 
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=pd.errors.PerformanceWarning)
@@ -311,7 +312,7 @@ class FOVDropout:
         for fov in fovs[np.any(fovs.filter(regex='dropout'), axis=1)].index:
             dropped_genes = list(fovs.filter(regex='dropout').columns[np.where(fovs.filter(regex='dropout').loc[fov])].str.replace('dropout_', ''))
             # Find distribution of imaging rounds for all genes that experienced dropout in the FOV
-            round_freqs = np.array(round_df.loc[dropped_genes].astype(bool).sum() / len(dropped_genes))
+            round_freqs = np.array(round_df.loc[dropped_genes].astype(bool).sum(axis=0) / len(dropped_genes))
 
             # If one of the rounds is present in 100% of the genes, know it is truly dropped
             # Must have more than `gene_thresh` genes to be considered, since can randomly choose N genes such that
