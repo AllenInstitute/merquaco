@@ -369,8 +369,8 @@ class Experiment:
         return fovs
 
     @staticmethod
-    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path],
-                               transcripts_mask_input: Union[np.ndarray, str, Path]):
+    def get_transcript_density(transcripts_mask_input: Union[np.ndarray, str, Path],
+                               on_tissue_filtered_transcript_count: Union[int, float]):
         """
         Calculates transcript density per on-tissue micron
 
@@ -386,11 +386,7 @@ class Experiment:
         transcript_density_um2 : float
             Number of transcripts per on-tissue micron
         """
-        transcripts_image = data_processing.process_input(transcripts_image_input)
         transcripts_mask = data_processing.process_input(transcripts_mask_input)
-
-        on_tissue_filtered_transcript_count = Experiment.get_on_tissue_transcript_count(transcripts_image,
-                                                                                        transcripts_mask)
         transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
@@ -625,9 +621,9 @@ class Experiment:
                     dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
-        self.on_tissue_filtered_transcript_count, \
-            self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
-                                                                            self.transcripts_mask)
+        self.on_tissue_filtered_transcript_count = Experiment.get_on_tissue_transcript_count(self.transcripts_image_path, 
+                                                                                             self.transcripts_mask)
+        self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_mask, self.on_tissue_filtered_transcript_count)
         self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
 
         # 4. Periodicity
