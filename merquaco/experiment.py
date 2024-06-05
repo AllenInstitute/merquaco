@@ -494,7 +494,6 @@ class Experiment:
                                                                  self.ilastik_program_path,
                                                                  self.transcripts_mask_pixel_path,
                                                                  self.transcripts_mask_object_path,
-                                                                 self.transcripts_mask_path,
                                                                  self.filtered_transcripts)
 
         print("Generating DAPI mask...")
