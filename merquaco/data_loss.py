@@ -231,7 +231,6 @@ class FOVDropout:
 
         return fovs
 
-
     @staticmethod
     def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
         """
@@ -772,9 +771,9 @@ class DropoutResult:
         if out_path != '':
             fig.savefig(out_path, bbox_inches='tight', dpi=400,
                         facecolor="#FFFFFF", edgecolor="#FFFFFF", transparent=False)
-        
+
         plt.show()
-        plt.close();
+        plt.close()
 
     def _determine_ticks(self, fig: plt.Figure, ax: plt.Axes, norm: color_normalize, max_tick: float):
         """
