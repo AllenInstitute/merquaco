@@ -311,7 +311,7 @@ class FOVDropout:
         for fov in fovs[np.any(fovs.filter(regex='dropout'), axis=1)].index:
             dropped_genes = list(fovs.filter(regex='dropout').columns[np.where(fovs.filter(regex='dropout').loc[fov])].str.replace('dropout_', ''))
             # Find distribution of imaging rounds for all genes that experienced dropout in the FOV
-            round_freqs = np.array(round_df.loc[dropped_genes].astype(bool).sum(axis=0) / len(dropped_genes))
+            round_freqs = np.array(round_df.loc[dropped_genes].astype(bool).sum() / len(dropped_genes))
 
             # If one of the rounds is present in 100% of the genes, know it is truly dropped
             # Must have more than `gene_thresh` genes to be considered, since can randomly choose N genes such that
