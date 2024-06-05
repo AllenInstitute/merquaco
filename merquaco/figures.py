@@ -555,6 +555,9 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
         transcripts_mask_ax.axis('off')
         detachment_mask_ax = fig.add_subplot(gs[2:, 4:6])
         detachment_mask_ax.axis('off')
+        damage_mask_ax = None
+        ventricle_mask_ax = None
+
 
     else:
         raise ValueError("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
