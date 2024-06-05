@@ -142,6 +142,8 @@ class Experiment:
                                                                         self.transcripts_mask_pixel_path,
                                                                         self.transcripts_mask_object_path,
                                                                         self.filtered_transcripts)
+                else:
+                    self.transcripts_mask = data_processing.process_path(Path(output_dir, "transcripts_mask.tiff"))
         except AttributeError:
             pass
 
