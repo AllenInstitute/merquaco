@@ -133,21 +133,19 @@ class Experiment:
         self.merquaco_version = version
 
         # Create transcripts mask if parameters are provided
-        try:
-            self.transcripts_mask = None
-            if self.ilastik_program_path is not None:
-                if not os.path.exists(self.transcripts_mask_path) or force_mask:
-                    print('Generating transcript mask')
-                    self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
-                                                                        self.ilastik_program_path,
-                                                                        self.transcripts_mask_pixel_path,
-                                                                        self.transcripts_mask_object_path,
-                                                                        self.filtered_transcripts)
-                else:
-                    print('Reading in transcript mask')
-                    self.transcripts_mask = data_processing.process_path(Path(output_dir, "transcripts_mask.tiff"))
-        except AttributeError:
-            pass
+        self.transcripts_mask = None
+        if self.ilastik_program_path is not None:
+            if not os.path.exists(self.transcripts_mask_path) or force_mask:
+                print('Generating transcript mask')
+                self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
+                                                                    self.ilastik_program_path,
+                                                                    self.transcripts_mask_pixel_path,
+                                                                    self.transcripts_mask_object_path,
+                                                                    self.filtered_transcripts)
+            else:
+                print('Reading in transcript mask')
+                self.transcripts_mask = data_processing.process_path(Path(output_dir, "transcripts_mask.tiff"))
+
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
