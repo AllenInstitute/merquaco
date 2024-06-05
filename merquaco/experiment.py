@@ -370,8 +370,8 @@ class Experiment:
         return fovs
 
     @staticmethod
-    def get_transcript_density(transcripts_mask_input: Union[np.ndarray, str, Path],
-                               on_tissue_filtered_transcript_count: Union[int, float]):
+    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path],
+                               transcripts_mask_input: Union[np.ndarray, str, Path]):
         """
         Calculates transcript density per on-tissue micron
 
@@ -387,12 +387,16 @@ class Experiment:
         transcript_density_um2 : float
             Number of transcripts per on-tissue micron
         """
+        transcripts_image = data_processing.process_input(transcripts_image_input)
         transcripts_mask = data_processing.process_input(transcripts_mask_input)
+        on_tissue_transcript_count = Experiment.get_on_tissue_transcript_count(transcripts_image,
+                                                                               transcripts_mask)
+
         transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
         if transcripts_mask_area > 0:
-            transcript_density_um2 = on_tissue_filtered_transcript_count / transcripts_mask_area
+            transcript_density_um2 = on_tissue_transcript_count / transcripts_mask_area
         else:
             transcript_density_um2 = np.nan
 
