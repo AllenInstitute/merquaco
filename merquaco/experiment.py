@@ -144,7 +144,7 @@ class Experiment:
                                                                     self.filtered_transcripts)
             else:
                 print('Reading in transcript mask')
-                self.transcripts_mask = data_processing.process_path(Path(output_dir, "transcripts_mask.tiff"))
+                self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
 
 
     @staticmethod
