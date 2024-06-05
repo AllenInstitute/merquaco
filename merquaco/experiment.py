@@ -35,7 +35,7 @@ class Experiment:
                  perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None,
                  ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a",
-                                               "Dsg2",  "Hdc","Shroom3", "Vit", "Rgs12", "Trp73"],
+                                               "Dsg2",  "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"],
                  force_mask: bool = False):
         """
         Initialize an Experiment instance from transcripts table dataframe
@@ -138,10 +138,10 @@ class Experiment:
                 if not os.path.exists(self.transcripts_mask_path) or force_mask:
                     print('Generating transcript mask')
                     self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
-                                                                        self.ilastik_program_path,
-                                                                        self.transcripts_mask_pixel_path,
-                                                                        self.transcripts_mask_object_path,
-                                                                        self.filtered_transcripts)
+                                                                         self.ilastik_program_path,
+                                                                         self.transcripts_mask_pixel_path,
+                                                                         self.transcripts_mask_object_path,
+                                                                         self.filtered_transcripts)
         except AttributeError:
             pass
 
