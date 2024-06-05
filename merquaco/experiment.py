@@ -65,21 +65,22 @@ class Experiment:
             - transcripts_mask_path
         """
         # Assign mask paths as attributes if they exist
-        if output_dir is not None:
+        if output_dir is None:
+            output_dir = Path(os.getcwd(), 'qc_output')
 
-            # Create output directory if does not exist
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+        # Create output directory if does not exist
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
-            self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
-            self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
-            self.dapi_image_path = Path(output_dir, 'dapi.tiff')
-            self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
-            self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
-            self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
-            self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
-            self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
-            self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
+        self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
+        self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
+        self.dapi_image_path = Path(output_dir, 'dapi.tiff')
+        self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
+        self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
+        self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
+        self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
+        self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
+        self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
 
         # Assign data paths as attributes (even if None)
         self.ilastik_program_path = ilastik_program_path
@@ -138,10 +139,10 @@ class Experiment:
             if not os.path.exists(self.transcripts_mask_path) or force_mask:
                 print('Generating transcript mask')
                 self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
-                                                                    self.ilastik_program_path,
-                                                                    self.transcripts_mask_pixel_path,
-                                                                    self.transcripts_mask_object_path,
-                                                                    self.filtered_transcripts)
+                                                                     self.ilastik_program_path,
+                                                                     self.transcripts_mask_pixel_path,
+                                                                     self.transcripts_mask_object_path,
+                                                                     self.filtered_transcripts)
             else:
                 print('Reading in transcript mask')
                 self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
