@@ -159,8 +159,8 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     # Plot histograms
     if scale is None:
         scale = int(xmax * ymax) / 15
-    ax.plot(hist_x*scale, alpha=alpha, linewidth=0.5, color=hist_color)
-    ax.plot(hist_y*scale, indices, alpha=alpha, linewidth=0.5, color=hist_color)
+    ax.plot(hist_x*scale, alpha=0.75, linewidth=0.5, color=hist_color)
+    ax.plot(hist_y*scale, indices, alpha=0.75, linewidth=0.5, color=hist_color)
 
     # Axis scaling
     ax.set_xlim(xmin, xmax)
@@ -235,7 +235,6 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, alpha=alpha, color=color, ax=ax)
 
-
     if title != '':
         fig.suptitle("Transcripts per z plane", fontsize=16)
 
@@ -279,6 +278,10 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray,
     ax.set_xlabel('Z-Plane')
     ax.set_ylabel('Transcript Counts')
     ax.set_title('Transcript Counts per Z-Plane')
+    ax.grid(which='both', alpha=0.2)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+
 
     if title != '':
         ax.set_title(title)
@@ -557,7 +560,6 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
         detachment_mask_ax.axis('off')
         damage_mask_ax = None
         ventricle_mask_ax = None
-
 
     else:
         raise ValueError("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
