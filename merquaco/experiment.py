@@ -466,7 +466,8 @@ class Experiment:
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs_df, self.output_dir)
 
-    def run_full_pixel_classification(self):
+
+    def run_full_pixel_classification(self, save_metrics: bool=True):
         """
         Runs entire pixel classification workflow:
             - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
@@ -551,20 +552,21 @@ class Experiment:
                                                                     self.ventricle_area,
                                                                     self.total_area)
 
-        pixel_stats_dict = {'damage_area': self.damage_area,
-                            'transcripts_area': self.transcripts_area,
-                            'detachment_area': self.detachment_area,
-                            'ventricle_area': self.ventricle_area,
-                            'damage_percent': self.damage_percent,
-                            'transcripts_percent': self.transcripts_percent,
-                            'detachment_percent': self.detachment_percent,
-                            'ventricle_percent': self.ventricle_percent,
-                            'total_area': self.total_area}
+        # Write data to json file
+        if self.output_dir is not None and save_metrics:
+            pixel_stats_dict = {'damage_area': self.damage_area,
+                    'transcripts_area': self.transcripts_area,
+                    'detachment_area': self.detachment_area,
+                    'ventricle_area': self.ventricle_area,
+                    'damage_percent': self.damage_percent,
+                    'transcripts_percent': self.transcripts_percent,
+                    'detachment_percent': self.detachment_percent,
+                    'ventricle_percent': self.ventricle_percent,
+                    'total_area': self.total_area}
 
-        # Convert and write JSON object to file
-        if self.output_dir is not None:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
+
 
     def run_all_qc(self,
                    run_pixel_classification: bool = True,
@@ -592,7 +594,7 @@ class Experiment:
         """
         # 1. Run  pixel classification workflow
         if run_pixel_classification:
-            self.run_full_pixel_classification()
+            self.run_full_pixel_classification(save_metrics)
 
             if plot_figures:
                 figures.plot_full_pixel_fig(self.pixel_classification,
