@@ -719,7 +719,7 @@ class DropoutResult:
         ValueError
             If `gene` is not found in FOVs dataframe
         """
-        if gene.isin(self.transcripts['gene'].unique()):
+        if gene in self.transcripts['gene'].unique():
             pass
         else:
             example = self.trancsripts.iloc[0]['gene']
