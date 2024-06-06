@@ -697,7 +697,7 @@ class DropoutResult:
         # TODO: fill this out
         """
 
-    def draw_dropout(self, gene: str, out_path: Union[str, Path] = None):
+    def draw_dropout(self, gene: str, out_path: Union[str, Path] = ''):
         """
         Draws the detected dropout for a given gene.
 
@@ -740,6 +740,9 @@ class DropoutResult:
 
         ax[0].set_title(gene)
         ax[1].set_title(gene)
+
+        ax[0].axis('off')
+        ax[1].axis('off')
 
         grid_sq_size = max((np.max(self.fovs['width']), np.max(self.fovs['height'])))
 
