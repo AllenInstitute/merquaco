@@ -100,7 +100,7 @@ def get_image_dimensions(transcripts: pd.DataFrame):
     return np.round(max(max_x, max_y)) + 1000
 
 
-def get_periodicity_vals_all_z(transcripts: pd.DataFrame):
+def get_periodicity_vals_all_z(transcripts: pd.DataFrame, fov_dimensions: int = 202):
     """
     Performs periodicity analysis in all z-planes collapsed
 
@@ -118,8 +118,8 @@ def get_periodicity_vals_all_z(transcripts: pd.DataFrame):
     x = np.asarray(transcripts['global_x'])
     y = np.asarray(transcripts['global_y'])
 
-    _, periodicity_chunk_x = get_chunk_values(x, image_dimensions)
-    _, periodicity_chunk_y = get_chunk_values(y, image_dimensions)
+    _, periodicity_chunk_x = get_chunk_values(x, image_dimensions, fov_dimensions)
+    _, periodicity_chunk_y = get_chunk_values(y, image_dimensions, fov_dimensions)
     periodicity_x = np.nanmin(periodicity_chunk_x) / np.max(periodicity_chunk_x)
     periodicity_y = np.nanmin(periodicity_chunk_y) / np.max(periodicity_chunk_y)
     return (periodicity_x, periodicity_y)
