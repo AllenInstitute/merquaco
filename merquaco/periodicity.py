@@ -61,7 +61,7 @@ def get_chunk_values(transcripts: np.ndarray, image_dimensions: int, fov_dimensi
     # Get transcripts histogram
     periodicity_hist, bins = np.histogram(transcripts, bins=np.arange(0, image_dimensions, 1), density=True)
     # Threshold bins to only consider "non-empty" bins
-    bins_thr = bins[:-1][periodicity_hist > 0.0001]
+    bins_thr = bins[:-1][periodicity_hist > 0.00001]
 
     # Extract 'non-empty' histogram values
     hist_thr = periodicity_hist[int(np.amin(bins_thr)):int(np.amax(bins_thr))]
