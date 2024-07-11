@@ -1,3 +1,4 @@
+python==3.12.3
 numpy==1.26.4
 pandas==2.2.2
 tifffile==2024.5.10
