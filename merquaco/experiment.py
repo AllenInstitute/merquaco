@@ -21,7 +21,8 @@ metrics_dict_keys = ["filtered_transcripts_count", "transcript_density_um2", "tr
                      "dropped_genes", "damage_area", "transcripts_area", "detachment_area", "ventricle_area",
                      "total_area", "damage_percent", "transcripts_percent", "detachment_percent", "ventricle_percent",
                      "transcripts_mask_pixel_path", "transcripts_mask_object_path", "dapi_mask_pixel_path",
-                     "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path", "merquaco_version"]
+                     "dapi_mask_object_path", "ventricle_mask_pixel_path", "ventricle_mask_object_path",
+                     "merquaco_version"]
 
 
 class Experiment:
@@ -33,7 +34,8 @@ class Experiment:
                  codebook_input: Union[pd.DataFrame, str, Path] = None,
                  perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None,
-                 ventricle_genes_list: list = ["Crb2","Glis3","Inhbb","Naaa","Cd24a","Dsg2","Hdc","Shroom3","Vit","Rgs12","Trp73"]):
+                 ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a", "Dsg2", "Hdc", "Shroom3",
+                                               "Vit", "Rgs12", "Trp73"]):
         """
         Initialize an Experiment instance from transcripts table dataframe
 
@@ -51,15 +53,9 @@ class Experiment:
             Path to perfusion log file. Default is None.
         output_dir : str or Path, optional
             Directory at which to save QC outputs
-
-        Notes
-        -----
-        `ilastik_config_input` must contain values for each of the following keys:
-            - ilastik_program_path
-            - transcripts_mask_pixel_path,
-            - transcripts_mask_object_path
-            - transcripts_image_path
-            - transcripts_mask_path
+        ventricle_genes_list : list, optional
+            List of genes marking ventricle outlines in mouse brain. Default is ["Crb2", "Glis3", "Inhbb", "Naaa",
+            "Cd24a", "Dsg2", "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"]
         """
         # Create output directory if does not exist
         if not os.path.exists(output_dir):
@@ -85,13 +81,19 @@ class Experiment:
         self.ventricle_genes_list = ventricle_genes_list
 
         # Paths to ilastik models assigned as attributes
-        ilastik_models_dir = os.path.join(os.path.dirname(__file__),'..','ilastik_models')
-        self.transcripts_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,'TissueMaskPixelClassification_v1.0.ilp'))
-        self.transcripts_mask_object_path = os.path.normpath(Path(ilastik_models_dir,'TissueMaskObjects_v1.1.ilp'))
-        self.dapi_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,'DapiMaskPixelClassification_Mouse.ilp'))
-        self.dapi_mask_object_path = os.path.normpath(Path(ilastik_models_dir,'DapiMaskObjectClassification_Mouse.ilp'))
-        self.ventricle_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,'VentriclesPixelClassification.ilp'))
-        self.ventricle_mask_object_path = os.path.normpath(Path(ilastik_models_dir,'VentriclesObjectClassification.ilp'))
+        ilastik_models_dir = os.path.join(os.path.dirname(__file__), '..', 'ilastik_models')
+        self.transcripts_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                 'TissueMaskPixelClassification_v1.0.ilp'))
+        self.transcripts_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                  'TissueMaskObjects_v1.1.ilp'))
+        self.dapi_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                          'DapiMaskPixelClassification_Mouse.ilp'))
+        self.dapi_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                           'DapiMaskObjectClassification_Mouse.ilp'))
+        self.ventricle_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                               'VentriclesPixelClassification.ilp'))
+        self.ventricle_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                'VentriclesObjectClassification.ilp'))
 
         try:
             self.codebook = Experiment.read_codebook(codebook_input)
