@@ -61,7 +61,7 @@ def get_chunk_values(transcripts: np.ndarray, image_dimensions: int, fov_dimensi
     # Get transcripts histogram
     periodicity_hist, bins = np.histogram(transcripts, bins=np.arange(0, image_dimensions, 1), density=True)
     # Threshold bins to only consider "non-empty" bins
-    bins_thr = bins[:-1][periodicity_hist > 0.0001]
+    bins_thr = bins[:-1][periodicity_hist > 0.00001]
 
     # Extract 'non-empty' histogram values
     hist_thr = periodicity_hist[int(np.amin(bins_thr)):int(np.amax(bins_thr))]
@@ -100,7 +100,7 @@ def get_image_dimensions(transcripts: pd.DataFrame):
     return np.round(max(max_x, max_y)) + 1000
 
 
-def get_periodicity_vals_all_z(transcripts: pd.DataFrame):
+def get_periodicity_vals_all_z(transcripts: pd.DataFrame, fov_dimensions: int = 202):
     """
     Performs periodicity analysis in all z-planes collapsed
 
@@ -118,8 +118,8 @@ def get_periodicity_vals_all_z(transcripts: pd.DataFrame):
     x = np.asarray(transcripts['global_x'])
     y = np.asarray(transcripts['global_y'])
 
-    _, periodicity_chunk_x = get_chunk_values(x, image_dimensions)
-    _, periodicity_chunk_y = get_chunk_values(y, image_dimensions)
+    _, periodicity_chunk_x = get_chunk_values(x, image_dimensions, fov_dimensions)
+    _, periodicity_chunk_y = get_chunk_values(y, image_dimensions, fov_dimensions)
     periodicity_x = np.nanmin(periodicity_chunk_x) / np.max(periodicity_chunk_x)
     periodicity_y = np.nanmin(periodicity_chunk_y) / np.max(periodicity_chunk_y)
     return (periodicity_x, periodicity_y)

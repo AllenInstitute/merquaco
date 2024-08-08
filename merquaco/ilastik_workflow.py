@@ -43,7 +43,7 @@ def get_pixel_workflow_args(ilastik_program_path: Union[str, Path],
     ]
 
 
-def get_object_workflow_args(ilastik_program_path: Union[str, Path], 
+def get_object_workflow_args(ilastik_program_path: Union[str, Path],
                              object_classification_model_path: Union[str, Path],
                              input_image_path: Union[str, Path],
                              probability_map_path: Union[str, Path],

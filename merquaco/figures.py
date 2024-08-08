@@ -11,7 +11,7 @@ import merquaco.periodicity as periodicity
 
 
 def transcripts_overview(transcripts: pd.DataFrame, subsample: int = 1000,
-                         rotation_degrees: int = -90, ax: plt.Axes = None, 
+                         rotation_degrees: int = -90, ax: plt.Axes = None,
                          out_file: Union[str, Path] = '',
                          ms: float = 1, alpha: float = 0.5, color: str = "black",
                          title: str = ''):
@@ -94,7 +94,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
                           fov_height: Union[int, float] = 202,
                           alpha: Union[int, float] = 0.25, ms: Union[int, float] = 0.1,
                           ts_color: str = "black", hist_color: str = "red",
-                          title: str = "", out_file: Union[str, Path] = '', 
+                          title: str = "", out_file: Union[str, Path] = '',
                           dpi: int = 200):
     """
     Plot transcripts overview with histogram of counts along each axis.
@@ -129,7 +129,7 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
         DPI value. Default is 200.
     """
     if ax is None:
-        _, ax = plt.subplots(figsize=(6,6))
+        _, ax = plt.subplots(figsize=(6, 6))
 
     # Define transcript arrays in x, y
     x = np.asarray(transcripts['global_x'])
@@ -159,8 +159,8 @@ def plot_periodicity_hist(transcripts: pd.DataFrame,
     # Plot histograms
     if scale is None:
         scale = int(xmax * ymax) / 15
-    ax.plot(hist_x*scale, alpha=alpha, linewidth=0.5, color=hist_color)
-    ax.plot(hist_y*scale, indices, alpha=alpha, linewidth=0.5, color=hist_color)
+    ax.plot(hist_x*scale, alpha=0.75, linewidth=0.5, color=hist_color)
+    ax.plot(hist_y*scale, indices, alpha=0.75, linewidth=0.5, color=hist_color)
 
     # Axis scaling
     ax.set_xlim(xmin, xmax)
@@ -235,7 +235,6 @@ def plot_every_z_plane(transcripts: pd.DataFrame,
             transcripts_overview(z_df, subsample=subsample, rotation_degrees=rotation_degrees,
                                  ms=ms, alpha=alpha, color=color, ax=ax)
 
-
     if title != '':
         fig.suptitle("Transcripts per z plane", fontsize=16)
 
@@ -279,6 +278,9 @@ def plot_transcripts_per_z(transcripts_per_z: np.ndarray,
     ax.set_xlabel('Z-Plane')
     ax.set_ylabel('Transcript Counts')
     ax.set_title('Transcript Counts per Z-Plane')
+    ax.grid(which='both', alpha=0.2)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
 
     if title != '':
         ax.set_title(title)
@@ -543,7 +545,7 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
 
     elif damage_mask is None and ventricle_mask is None:
         # Create axes with gridspec
-        gs = gridspec.GridSpec(4,6)
+        gs = gridspec.GridSpec(4, 6)
         fig = plt.figure(figsize=(16, 12))
 
         pixel_class_ax = fig.add_subplot(gs[0:2, 0:3])
@@ -558,7 +560,6 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
         damage_mask_ax = None
         ventricle_mask_ax = None
 
-
     else:
         raise ValueError("Both of or none of damage_mask_input and ventricle_mask_input must be provided.")
 
@@ -571,7 +572,7 @@ def plot_full_pixel_fig(pixel_classification: np.ndarray, dapi_mask_input: Union
 
     # Plot masks
     plot_masks(dapi_mask, dapi_mask_ax, transcripts_mask, transcripts_mask_ax, detachment_mask,
-               detachment_mask_ax, damage_mask, damage_mask_ax, ventricle_mask, ventricle_mask_ax, 
+               detachment_mask_ax, damage_mask, damage_mask_ax, ventricle_mask, ventricle_mask_ax,
                out_file)
 
     fig.subplots_adjust(hspace=0.7)
@@ -647,7 +648,7 @@ def plot_masks(dapi_mask_input: Union[np.ndarray, str, Path],
         dapi_mask_ax.axis('off')
 
     if transcripts_mask_ax is not None:
-        transcripts_mask_ax.imshow( transcripts_mask)
+        transcripts_mask_ax.imshow(transcripts_mask)
         transcripts_mask_ax.set_title("Transcript Mask")
         transcripts_mask_ax.axis('off')
 

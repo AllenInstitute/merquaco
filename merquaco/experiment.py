@@ -34,8 +34,9 @@ class Experiment:
                  codebook_input: Union[pd.DataFrame, str, Path] = None,
                  perfusion_path: Union[str, Path] = None,
                  output_dir: Union[str, Path] = None,
-                 ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a", "Dsg2", "Hdc", "Shroom3",
-                                               "Vit", "Rgs12", "Trp73"]):
+                 ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a",
+                                               "Dsg2",  "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"],
+                 force_mask: bool = False):
         """
         Initialize an Experiment instance from transcripts table dataframe
 
@@ -53,25 +54,33 @@ class Experiment:
             Path to perfusion log file. Default is None.
         output_dir : str or Path, optional
             Directory at which to save QC outputs
-        ventricle_genes_list : list, optional
-            List of genes marking ventricle outlines in mouse brain. Default is ["Crb2", "Glis3", "Inhbb", "Naaa",
-            "Cd24a", "Dsg2", "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"]
+
+        Notes
+        -----
+        `ilastik_config_input` must contain values for each of the following keys:
+            - ilastik_program_path
+            - transcripts_mask_pixel_path,
+            - transcripts_mask_object_path
+            - transcripts_image_path
+            - transcripts_mask_path
         """
+        # Assign mask paths as attributes if they exist
+        if output_dir is None:
+            output_dir = Path(os.getcwd(), 'qc_output')
+
         # Create output directory if does not exist
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        # Assign mask paths as attributes if they exist
-        if output_dir is not None:
-            self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
-            self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
-            self.dapi_image_path = Path(output_dir, 'dapi.tiff')
-            self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
-            self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
-            self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
-            self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
-            self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
-            self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
+        self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
+        self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
+        self.dapi_image_path = Path(output_dir, 'dapi.tiff')
+        self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
+        self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
+        self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
+        self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
+        self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
+        self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
 
         # Assign data paths as attributes (even if None)
         self.ilastik_program_path = ilastik_program_path
@@ -125,16 +134,18 @@ class Experiment:
         self.merquaco_version = version
 
         # Create transcripts mask if parameters are provided
-        try:
-            if self.ilastik_program_path is not None:
+        self.transcripts_mask = None
+        if self.ilastik_program_path is not None:
+            if not os.path.exists(self.transcripts_mask_path) or force_mask:
                 print('Generating transcript mask')
                 self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                      self.ilastik_program_path,
                                                                      self.transcripts_mask_pixel_path,
                                                                      self.transcripts_mask_object_path,
                                                                      self.filtered_transcripts)
-        except AttributeError:
-            pass
+            else:
+                print('Reading in transcript mask')
+                self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
 
     @staticmethod
     def read_transcripts(transcripts_path: Union[str, Path]) -> pd.DataFrame:
@@ -372,26 +383,48 @@ class Experiment:
 
         Returns
         -------
-        tuple
-            on_tissue_filtered_transcript_count : float
-                Number of on-tissue transcripts
-            transcript_density_um2 : float
-                Number of transcripts per on-tissue micron
+        transcript_density_um2 : float
+            Number of transcripts per on-tissue micron
         """
         transcripts_image = data_processing.process_input(transcripts_image_input)
         transcripts_mask = data_processing.process_input(transcripts_mask_input)
+        on_tissue_transcript_count = Experiment.get_on_tissue_transcript_count(transcripts_image,
+                                                                               transcripts_mask)
 
-        on_tissue_filtered_transcript_count = np.sum(transcripts_image[transcripts_mask == 1])
         transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
 
         # When issue with Ilastik mask or experiment such that transcript counts are way low
         if transcripts_mask_area > 0:
-            transcript_density_um2 = on_tissue_filtered_transcript_count / transcripts_mask_area
+            transcript_density_um2 = on_tissue_transcript_count / transcripts_mask_area
         else:
             transcript_density_um2 = np.nan
 
-        return on_tissue_filtered_transcript_count, transcript_density_um2
-    
+        return transcript_density_um2
+
+    @staticmethod
+    def get_on_tissue_transcript_count(transcripts_image_input: Union[np.ndarray, str, Path],
+                                       transcripts_mask_input: Union[np.ndarray, str, Path]):
+        """
+        Calculates number of on-tissue transcripts
+
+        Parameters
+        ----------
+        transcripts_image_input : np.ndarray, str, or Path
+            Array of or path to transcripts image.
+        transcripts_mask_input : np.ndarray, str, or Path
+            Array of or path to binary transcripts mask.
+
+        Returns
+        -------
+        int
+            Number of on-tissue transcripts
+        """
+        transcripts_image = data_processing.process_input(transcripts_image_input)
+        transcripts_mask = data_processing.process_input(transcripts_mask_input)
+
+        on_tissue_transcript_count = int(np.sum(transcripts_image[transcripts_mask == 1]))
+        return on_tissue_transcript_count
+
     @staticmethod
     def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
 
@@ -410,7 +443,6 @@ class Experiment:
         # Write the updated data back to the file
         with open(qc_summary_path, 'w') as file:
             json.dump(data, file, indent=4)
-
 
     def run_dropout_pipeline(self):
         """
@@ -433,7 +465,7 @@ class Experiment:
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs_df, self.output_dir)
 
-    def run_full_pixel_classification(self):
+    def run_full_pixel_classification(self, save_metrics: bool = True):
         """
         Runs entire pixel classification workflow:
             - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
@@ -460,7 +492,6 @@ class Experiment:
                                                                  self.ilastik_program_path,
                                                                  self.transcripts_mask_pixel_path,
                                                                  self.transcripts_mask_object_path,
-                                                                 self.transcripts_mask_path,
                                                                  self.filtered_transcripts)
 
         print("Generating DAPI mask...")
@@ -519,18 +550,18 @@ class Experiment:
                                                                     self.ventricle_area,
                                                                     self.total_area)
 
-        pixel_stats_dict = {'damage_area': self.damage_area,
-                            'transcripts_area': self.transcripts_area,
-                            'detachment_area': self.detachment_area,
-                            'ventricle_area': self.ventricle_area,
-                            'damage_percent': self.damage_percent,
-                            'transcripts_percent': self.transcripts_percent,
-                            'detachment_percent': self.detachment_percent,
-                            'ventricle_percent': self.ventricle_percent,
-                            'total_area': self.total_area}
+        # Write data to json file
+        if self.output_dir is not None and save_metrics:
+            pixel_stats_dict = {'damage_area': self.damage_area,
+                                'transcripts_area': self.transcripts_area,
+                                'detachment_area': self.detachment_area,
+                                'ventricle_area': self.ventricle_area,
+                                'damage_percent': self.damage_percent,
+                                'transcripts_percent': self.transcripts_percent,
+                                'detachment_percent': self.detachment_percent,
+                                'ventricle_percent': self.ventricle_percent,
+                                'total_area': self.total_area}
 
-        # Convert and write JSON object to file
-        if self.output_dir is not None:
             with open(Path(self.output_dir, "pixel_stats.json"), "w") as outfile:
                 json.dump(pixel_stats_dict, outfile, indent=4)
 
@@ -560,7 +591,7 @@ class Experiment:
         """
         # 1. Run  pixel classification workflow
         if run_pixel_classification:
-            self.run_full_pixel_classification()
+            self.run_full_pixel_classification(save_metrics)
 
             if plot_figures:
                 figures.plot_full_pixel_fig(self.pixel_classification,
@@ -594,9 +625,10 @@ class Experiment:
                     dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
-        self.on_tissue_filtered_transcript_count, \
-            self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
-                                                                             self.transcripts_mask)
+        self.on_tissue_filtered_transcript_count = Experiment.get_on_tissue_transcript_count(self.transcripts_image_path,
+                                                                                             self.transcripts_mask)
+        self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
+                                                                        self.transcripts_mask)
         self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
 
         # 4. Periodicity

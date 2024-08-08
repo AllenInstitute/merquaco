@@ -62,6 +62,7 @@ def process_path(path: Union[str, Path]) -> Union[pd.DataFrame, np.ndarray, dict
     ValueError
         If file type is not supported
     """
+    path = str(path)
     # Determine the type of file based on its extension
     if path.endswith('.csv'):
         try:
