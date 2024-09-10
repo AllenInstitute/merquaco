@@ -359,7 +359,7 @@ class MerscopeExperiment:
                                                                 'VentriclesObjectClassification.ilp'))
 
         try:
-            self.codebook = Experiment.read_codebook(codebook_input)
+            self.codebook = MerscopeExperiment.read_codebook(codebook_input)
         except AttributeError:
             self.codebook = codebook_input
 
