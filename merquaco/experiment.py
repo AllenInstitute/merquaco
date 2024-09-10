@@ -123,7 +123,7 @@ def get_fov_neighbors(fovs: pd.DataFrame) -> pd.DataFrame:
     """
     max_width = np.max(fovs['width'])
     max_height = np.max(fovs['height'])
-    
+
     centers_array = np.array(fovs[['center_x', 'center_y']])
 
     neighbors = [[] for i in range(len(fovs))]
@@ -151,19 +151,131 @@ def get_fov_neighbors(fovs: pd.DataFrame) -> pd.DataFrame:
 
         # Neighbor right
         right_fovs = np.unique(np.where((centers_array[:, 0] > fovs.loc[fov, 'x_max']) &
-                                            (abs(centers_array[:, 1] - centers_array[i, 1]) <= max_width / 2) &
-                                            (abs(centers_array[:, 0] - centers_array[i, 0]) <= max_width * 1.5))[0])
+                                        (abs(centers_array[:, 1] - centers_array[i, 1]) <= max_width / 2) &
+                                        (abs(centers_array[:, 0] - centers_array[i, 0]) <= max_width * 1.5))[0])
         if len(right_fovs) > 0:
             neighbors[i].append(fovs.index[euclidian_distances[np.isin(euclidian_distances, right_fovs)][0]])
 
         # Neighbor left
         left_fovs = np.unique(np.where((centers_array[:, 0] > fovs.loc[fov, 'x_min']) &
-                                        (abs(centers_array[:, 1] - centers_array[i, 1]) <= max_width / 2) &
-                                        (abs(centers_array[:, 0] - centers_array[i, 0]) <= max_width * 1.5))[0])
+                                       (abs(centers_array[:, 1] - centers_array[i, 1]) <= max_width / 2) &
+                                       (abs(centers_array[:, 0] - centers_array[i, 0]) <= max_width * 1.5))[0])
         if len(left_fovs) > 0:
             neighbors[i].append(fovs.index[euclidian_distances[np.isin(euclidian_distances, left_fovs)][0]])
 
     fovs['neighbors'] = neighbors
+    return fovs
+
+
+@staticmethod
+def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path],
+                           transcripts_mask_input: Union[np.ndarray, str, Path]):
+    """
+    Calculates transcript density per on-tissue micron
+
+    Parameters
+    ----------
+    transcripts_image_input : np.ndarray, str, or Path
+        Array of or path to transcripts image.
+    transcripts_mask_input : np.ndarray, str, or Path
+        Array of or path to binary transcripts mask.
+
+    Returns
+    -------
+    transcript_density_um2 : float
+        Number of transcripts per on-tissue micron
+    """
+    transcripts_image = data_processing.process_input(transcripts_image_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
+    on_tissue_transcript_count = get_on_tissue_transcript_count(transcripts_image, transcripts_mask)
+    transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
+
+    # When issue with Ilastik mask or experiment such that transcript counts are way low
+    if transcripts_mask_area > 0:
+        transcript_density_um2 = on_tissue_transcript_count / transcripts_mask_area
+    else:
+        transcript_density_um2 = np.nan
+
+    return transcript_density_um2
+
+
+@staticmethod
+def get_on_tissue_transcript_count(transcripts_image_input: Union[np.ndarray, str, Path],
+                                   transcripts_mask_input: Union[np.ndarray, str, Path]) -> int:
+    """
+    Calculates number of on-tissue transcripts
+
+    Parameters
+    ----------
+    transcripts_image_input : np.ndarray, str, or Path
+        Array of or path to transcripts image
+    transcripts_mask_input : np.ndarray, str, or Path
+        Array of or path to binary transcripts mask
+
+    Returns
+    -------
+    int
+        Number of on-tissue transcripts
+    """
+    transcripts_image = data_processing.process_input(transcripts_image_input)
+    transcripts_mask = data_processing.process_input(transcripts_mask_input)
+
+    on_tissue_transcript_count = int(np.sum(transcripts_image[transcripts_mask == 1]))
+    return on_tissue_transcript_count
+
+
+@staticmethod
+def scale_transcripts_xy(transcripts: pd.DataFrame) -> pd.DataFrame:
+    """
+    Scales transcripts (x,y) locations based on min (x,y) values
+
+    Parameters
+    ----------
+    transcripts : pd.DataFrame
+        Transcripts DataFrame
+
+    Returns
+    -------
+    transcripts : pd.DataFrame
+        Rescaled transcripts DataFrame
+
+    Notes
+    -----
+    This is necessary for generating accurate masks in experiments with multiple regions, where (x,y) transcript
+    locations are on a global scale.
+    """
+    min_x = transcripts['global_x'].min()
+    min_y = transcripts['global_y'].min()
+
+    transcripts.loc[:, 'global_x'] -= min_x
+    transcripts.loc[:, 'global_y'] -= min_y
+
+    return transcripts
+
+
+@staticmethod
+def get_fovs_dataframe(transcripts: pd.DataFrame) -> pd.DataFrame:
+    """
+    Creates FOVs dataframe including coordinates, trancsript counts, neighbors
+
+    Parameters
+    ----------
+    transcripts : pd.DataFrame
+        Transcripts DataFrame
+
+    Returns
+    -------
+    fovs : pd.DataFrame
+        DataFrame of FOV coordinates, transcript counts, neighbors
+    """
+    # Get coordinates, transcript counts
+    fovs = find_fovs(transcripts)
+    # Get cardinal neighbors
+    fovs = get_fov_neighbors(fovs)
+
+    # Counts per gene
+    counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
+    fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
     return fovs
 
 
@@ -180,7 +292,7 @@ class MerscopeExperiment:
                                                "Dsg2",  "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"],
                  force_mask: bool = False):
         """
-        Initialize an Experiment instance from transcripts table dataframe
+        Initialize a MerscopeExperiment instance from transcripts table dataframe
 
         Parameters
         ----------
@@ -327,117 +439,21 @@ class MerscopeExperiment:
         return codebook
 
     @staticmethod
-    def scale_transcripts_xy(transcripts: pd.DataFrame) -> pd.DataFrame:
+    def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict) -> None:
         """
-        Scales transcripts (x,y) locations based on min (x,y) values
+        Writes JSON file with summary of QC metrics
 
         Parameters
         ----------
-        transcripts : pd.DataFrame
-            Transcripts DataFrame
+        qc_summary_path : str or Path
+            Path to JSON QC summary location
+        qc_dict : dict
+            Dictionary of QC metrics keys and values
 
         Returns
         -------
-        transcripts : pd.DataFrame
-            Rescaled transcripts DataFrame
-
-        Notes
-        -----
-        This is especially necessary for generating accurate masks in experiments with multiple regions, where x,y
-        transcript locations are on a global scale.
+        None
         """
-        min_x = transcripts['global_x'].min()
-        min_y = transcripts['global_y'].min()
-
-        transcripts.loc[:, 'global_x'] -= min_x
-        transcripts.loc[:, 'global_y'] -= min_y
-
-        return transcripts
-
-    @staticmethod
-    def get_fovs_dataframe(transcripts: pd.DataFrame):
-        """
-        Creates FOVs DataFrame including coordinates, transcript counts, z-ratio, neighbors
-
-        Parameters
-        ----------
-        transcripts : pd.DataFrame
-            Transcripts DataFrame
-
-        Returns
-        --------------
-        fovs : pd.DataFrame
-            DataFrame of FOV coordinates, transcript counts, neighbors
-        """
-        # Get coordinates, transcript counts
-        fovs = find_fovs(transcripts)
-        # Get cardinal neighbors
-        fovs = get_fov_neighbors(fovs)
-        # Get z-ratio per FOV
-        num_planes = transcripts['global_z'].nunique()
-        fovs['z_ratio'] = fovs[f'z_{num_planes - 1}_count'] - fovs['z0_count']
-
-        return fovs
-
-    @staticmethod
-    def get_transcript_density(transcripts_image_input: Union[np.ndarray, str, Path],
-                               transcripts_mask_input: Union[np.ndarray, str, Path]):
-        """
-        Calculates transcript density per on-tissue micron
-
-        Parameters
-        ----------
-        transcripts_image_input : np.ndarray, str, or Path
-            Array of or path to transcripts image.
-        transcripts_mask_input : np.ndarray, str, or Path
-            Array of or path to binary transcripts mask.
-
-        Returns
-        -------
-        transcript_density_um2 : float
-            Number of transcripts per on-tissue micron
-        """
-        transcripts_image = data_processing.process_input(transcripts_image_input)
-        transcripts_mask = data_processing.process_input(transcripts_mask_input)
-        on_tissue_transcript_count = Experiment.get_on_tissue_transcript_count(transcripts_image,
-                                                                               transcripts_mask)
-
-        transcripts_mask_area = np.count_nonzero(transcripts_mask) * 100  # Mask has 10um pixels
-
-        # When issue with Ilastik mask or experiment such that transcript counts are way low
-        if transcripts_mask_area > 0:
-            transcript_density_um2 = on_tissue_transcript_count / transcripts_mask_area
-        else:
-            transcript_density_um2 = np.nan
-
-        return transcript_density_um2
-
-    @staticmethod
-    def get_on_tissue_transcript_count(transcripts_image_input: Union[np.ndarray, str, Path],
-                                       transcripts_mask_input: Union[np.ndarray, str, Path]):
-        """
-        Calculates number of on-tissue transcripts
-
-        Parameters
-        ----------
-        transcripts_image_input : np.ndarray, str, or Path
-            Array of or path to transcripts image.
-        transcripts_mask_input : np.ndarray, str, or Path
-            Array of or path to binary transcripts mask.
-
-        Returns
-        -------
-        int
-            Number of on-tissue transcripts
-        """
-        transcripts_image = data_processing.process_input(transcripts_image_input)
-        transcripts_mask = data_processing.process_input(transcripts_mask_input)
-
-        on_tissue_transcript_count = int(np.sum(transcripts_image[transcripts_mask == 1]))
-        return on_tissue_transcript_count
-
-    @staticmethod
-    def write_qc_summary(qc_summary_path: Union[str, Path], qc_dict: dict):
 
         # Check if the file exists and load existing data
         if os.path.exists(qc_summary_path):
@@ -636,10 +652,10 @@ class MerscopeExperiment:
                     dropout.draw_genes_dropped_per_fov(out_path=Path(self.output_dir, 'fov_dropout.png'))
 
         # 3. On-tissue metrics
-        self.on_tissue_filtered_transcript_count = Experiment.get_on_tissue_transcript_count(self.transcripts_image_path,
-                                                                                             self.transcripts_mask)
-        self.transcript_density_um2 = Experiment.get_transcript_density(self.transcripts_image_path,
-                                                                        self.transcripts_mask)
+        self.on_tissue_filtered_transcript_count = get_on_tissue_transcript_count(self.transcripts_image_path,
+                                                                                  self.transcripts_mask)
+        self.transcript_density_um2 = get_transcript_density(self.transcripts_image_path,
+                                                             self.transcripts_mask)
         self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
 
         # 4. Periodicity
@@ -671,4 +687,4 @@ class MerscopeExperiment:
             metrics_dict[key] = getattr(self, key, np.nan)
 
         if save_metrics:
-            Experiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"), metrics_dict)
+            MerscopeExperiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"), metrics_dict)
