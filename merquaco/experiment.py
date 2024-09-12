@@ -746,7 +746,105 @@ class XeniumExperiment:
 
         # Begin processing transcripts dataframe
         print('Processing transcripts dataframe')
-        transcripts = data_processing.process_input(transcripts_input)
+        transcripts = read_transcripts(transcripts_input)  # Reads both .csv and .parquet
         # Rename columns to fit MERSCOPE names
+        print('renaming columns')
         self.transcripts = transcripts.rename(columns={'x_location': 'global_x', 'y_location': 'global_y',
                                                        'fov_name': 'fov', 'feature_name': 'gene'})
+        # Filter low quality transcripts / blanks
+        print('removing blanks')
+        filtered_transcripts = self.remove_low_quality_transcripts(self.transcripts)
+        self.filtered_transcripts = self.remove_controls(filtered_transcripts)
+        # Get basic experiment information
+        print('')
+        self.n_genes = self.filtered_transcripts['gene'].nunique()
+        self.genes = [g for g in self.filtered_transcripts['gene'].unique()]
+        self.total_transcript_counts = len(self.transcripts)
+        self.filtered_transcript_counts = len(self.filtered_transcripts)
+        # Store FOV information
+        print('Creating FOV dataframe')
+        self.fovs_df = get_fovs_dataframe(self.filtered_transcripts)
+
+        # Create transcripts mask if parameters are provided
+        self.transcripts_mask = None
+        if self.ilastik_program_path is not None:
+            if not os.path.exists(self.transcripts_mask_path) or force_mask:
+                print('Generating transcripts mask')
+                self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
+                                                                     self.ilastik_program_path,
+                                                                     self.transcripts_mask_pixel_path,
+                                                                     self.transcripts_mask_object_path,
+                                                                     self.filtered_transcripts)
+            else:
+                print('Reading in trancsript mask')
+                self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
+
+    @staticmethod
+    def remove_low_quality_transcripts(transcripts: pd.Dataframe, val: int = 20):
+        """
+        Filters transcripts dataframe by Quality Value score
+
+        Parameters
+        ----------
+        transcripts : pd.DataFrame
+            Dataframe of detected transcripts
+        val : int, optional
+            Quality Value score to filter by. Default is 20.
+
+        Returns
+        -------
+        filtered_transcripts : pd.DataFrame
+            Dataframe of detected transcripts with Quality Value scores > `val`
+
+        Raises
+        ------
+        KeyError
+            If `qv` is not a column in the transcripts dataframe
+
+        Examples
+        --------
+        >>> transcripts = read_transcripts('/path/to/transcripts.parquet')
+        >>> quality_transcripts = XeniumExperiment.filter_low_quality_transcripts(transcripts)
+        """
+        if 'qv' not in transcripts.columns:
+            raise KeyError('transcripts dataframe must include "qv" column')
+
+        filtered_transcripts = transcripts[transcripts['qv'] >= val]
+        return filtered_transcripts
+
+    @staticmethod
+    def remove_controls(transcripts: pd.DataFrame, which: str = 'all'):
+        """
+        Filters transcripts dataframe of control codewords
+
+        Parameters
+        ----------
+        transcripts : pd.DataFrame
+            Dataframe of detected transcripts
+        which : ['all', 'NegControlCodeword', 'NegControlProbe', 'UnassignedCodeword, 'DeprecatedCodeword']
+            Which control codewords to filter. Default is 'all'.
+
+        Returns
+        -------
+        filtered_transcripts : pd.DataFrame
+            Dataframe of detected transcripts excluding specified control codewords
+
+        Examples
+        --------
+        >>> transcripts = read_transcripts('/path/to/transcripts.csv')
+        >>> filtered_transcripts = XeniumExperiment.filter_controls(transcripts)
+        """
+        valid_which = ['all', 'NegControlCodeword', 'NegControlProbe', 'UnassignedCodeword', 'DeprecatedCodeword']
+        if which not in valid_which:
+            raise KeyError(f'`which` parameter is invalid. must be one of {valid_which}')
+
+        if which == 'all':
+            filtered_transcripts = transcripts[~transcripts['gene'].str.startswith('NegControl',
+                                                                                   'Unassigned',
+                                                                                   'Deprecated')]
+
+        else:
+            filtered_transcripts = transcripts[~transcripts['gene'].str.startswith(which)]
+
+        return filtered_transcripts
+    
