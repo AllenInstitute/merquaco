@@ -688,3 +688,65 @@ class MerscopeExperiment:
 
         if save_metrics:
             MerscopeExperiment.write_qc_summary(Path(self.output_dir, "qc_summary.json"), metrics_dict)
+
+
+class XeniumExperiment:
+
+    def __init__(self,
+                 transcripts_input: Union[pd.DataFrame, str, Path],
+                 ilastik_program_path: Union[str, Path] = None,
+                 dapi_high_res_image_path: Union[str, Path] = None,
+                 output_dir: Union[str, Path] = None,
+                 ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a",
+                                               "Dsg2",  "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"],
+                 force_mask: bool = False,
+                 ) -> None:
+        """
+        Initialize XeniumExperiment instance from transcripts table dataframe and probably other stuff
+        """
+        # Assign mask paths as attributes if they exist
+        if output_dir is None:
+            output_dir = Path(os.getcwd(), 'qc_output')
+
+        # Create output directory if it doesn't exist
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Create necessary attributes for pixel classification
+        self.transcripts_image_path = Path(output_dir, 'transcripts.tiff')
+        self.transcripts_mask_path = Path(output_dir, 'transcripts_mask.tiff')
+        self.dapi_image_path = Path(output_dir, 'dapi.tiff')
+        self.dapi_mask_path = Path(output_dir, 'dapi_mask.tiff')
+        self.detachment_mask_path = Path(output_dir, 'detachment_mask.tiff')
+        self.ventricle_image_path = Path(output_dir, 'ventricles.tiff')
+        self.ventricle_mask_path = Path(output_dir, 'ventricles_mask.tiff')
+        self.damage_mask_path = Path(output_dir, 'damage_mask.tiff')
+        self.pixel_classification_path = Path(output_dir, 'pixel_classification.tiff')
+
+        # Assign data paths as attributes (even if None)
+        self.ilastik_program_path = ilastik_program_path
+        self.dapi_high_res_image_path = dapi_high_res_image_path
+        self.output_dir = output_dir
+        self.ventricle_genes_list = ventricle_genes_list
+
+        # Paths to ilastik models assigned as attributes
+        ilastik_models_dir = os.path.join(os.path.dirname(__file__), '..', 'ilastik_models')
+        self.transcripts_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                 'TissueMaskPixelClassification_v1.0.ilp'))
+        self.transcripts_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                  'TissueMaskObjects_v1.1.ilp'))
+        self.dapi_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                          'DapiMaskPixelClassification_Mouse.ilp'))
+        self.dapi_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                           'DapiMaskObjectClassification_Mouse.ilp'))
+        self.ventricle_mask_pixel_path = os.path.normpath(Path(ilastik_models_dir,
+                                                               'VentriclesPixelClassification.ilp'))
+        self.ventricle_mask_object_path = os.path.normpath(Path(ilastik_models_dir,
+                                                                'VentriclesObjectClassification.ilp'))
+
+        # Begin processing transcripts dataframe
+        print('Processing transcripts dataframe')
+        transcripts = data_processing.process_input(transcripts_input)
+        # Rename columns to fit MERSCOPE names
+        self.transcripts = transcripts.rename(columns={'x_location': 'global_x', 'y_location': 'global_y',
+                                                       'fov_name': 'fov', 'feature_name': 'gene'})
