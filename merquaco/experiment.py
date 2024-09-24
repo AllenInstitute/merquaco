@@ -383,7 +383,7 @@ class MerscopeExperiment:
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
         print('Creating FOVs dataframe')
-        self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
+        self.fovs_df = get_fovs_dataframe(self.filtered_transcripts)
         # Get version
         self.merquaco_version = version
 
