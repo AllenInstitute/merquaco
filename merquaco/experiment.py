@@ -101,7 +101,7 @@ def find_fovs(transcripts: pd.DataFrame) -> pd.DataFrame:
 
     # Counts per gene
     counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
-    fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
+    fovs = fovs.join(counts_per_gene, how='left')
 
     return fovs
 
@@ -275,7 +275,7 @@ def get_fovs_dataframe(transcripts: pd.DataFrame) -> pd.DataFrame:
 
     # Counts per gene
     counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
-    fovs = fovs.merge(counts_per_gene.reset_index(), on='fov', how='left')
+    fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
     return fovs
 
 
@@ -367,7 +367,7 @@ class MerscopeExperiment:
         print('Processing transcripts dataframe')
         transcripts = data_processing.process_input(transcripts_input)
         # Adjust (x,y) locations
-        self.transcripts = scale_transcripts_xy(transcripts)
+        self.transcripts = self.scale_transcripts_xy(transcripts)
         # Counts per gene (including blanks)
         self.counts_per_gene = self.transcripts.groupby('gene').size().to_dict()
         # Remove 'Blank' codewords
@@ -383,7 +383,7 @@ class MerscopeExperiment:
         self.num_planes = self.filtered_transcripts['global_z'].nunique()
         # DataFrame grouped by FOVs and storing FOV information
         print('Creating FOVs dataframe')
-        self.fovs_df = get_fovs_dataframe(self.filtered_transcripts)
+        self.fovs_df = self.get_fovs_dataframe(self.filtered_transcripts)
         # Get version
         self.merquaco_version = version
 
@@ -780,7 +780,7 @@ class XeniumExperiment:
                 self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
 
     @staticmethod
-    def remove_low_quality_transcripts(transcripts: pd.DataFrame, val: int = 20):
+    def remove_low_quality_transcripts(transcripts: pd.Datarame, val: int = 20):
         """
         Filters transcripts dataframe by Quality Value score
 
