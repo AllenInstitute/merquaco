@@ -275,7 +275,7 @@ def get_fovs_dataframe(transcripts: pd.DataFrame) -> pd.DataFrame:
 
     # Counts per gene
     counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
-    fovs = fovs.merge(counts_per_gene, left_index=True, right_index=True, how='left')
+    fovs = fovs.merge(counts_per_gene.reset_index(), on='fov', how='left')
     return fovs
 
 
