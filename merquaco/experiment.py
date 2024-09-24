@@ -99,10 +99,6 @@ def find_fovs(transcripts: pd.DataFrame) -> pd.DataFrame:
     for i in range(planes):
         fovs[f'z{i}_count'] = transcripts[transcripts['global_z'] == i].groupby('fov').size()
 
-    # Counts per gene
-    counts_per_gene = transcripts.groupby(['fov'])['gene'].value_counts().unstack(fill_value=0)
-    fovs = fovs.join(counts_per_gene, how='left')
-
     return fovs
 
 
