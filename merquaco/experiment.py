@@ -367,7 +367,7 @@ class MerscopeExperiment:
         print('Processing transcripts dataframe')
         transcripts = data_processing.process_input(transcripts_input)
         # Adjust (x,y) locations
-        self.transcripts = self.scale_transcripts_xy(transcripts)
+        self.transcripts = scale_transcripts_xy(transcripts)
         # Counts per gene (including blanks)
         self.counts_per_gene = self.transcripts.groupby('gene').size().to_dict()
         # Remove 'Blank' codewords
