@@ -847,4 +847,3 @@ class XeniumExperiment:
             filtered_transcripts = transcripts[~transcripts['gene'].str.startswith(which)]
 
         return filtered_transcripts
-    
