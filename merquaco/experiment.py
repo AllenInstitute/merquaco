@@ -780,7 +780,7 @@ class XeniumExperiment:
                 self.transcripts_mask = data_processing.process_path(self.transcripts_mask_path)
 
     @staticmethod
-    def remove_low_quality_transcripts(transcripts: pd.Datarame, val: int = 20):
+    def remove_low_quality_transcripts(transcripts: pd.DataFrame, val: int = 20):
         """
         Filters transcripts dataframe by Quality Value score
 
