@@ -302,7 +302,7 @@ class FOVDropout:
         """
         # Create dataframe to store information on imaging rounds (3 codebook bits to a round)
         bits = codebook.shape[1]
-        round_df = codebook.groupby((np.arange(bits) // 3) + 1, axis=1).sum()
+        round_df = codebook.T.groupby((np.arange(bits) // 3) + 1).sum()
 
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=pd.errors.PerformanceWarning)
