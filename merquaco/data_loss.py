@@ -231,7 +231,6 @@ class FOVDropout:
 
         return fovs
 
-
     @staticmethod
     def compare_codebook_fov_genes(fovs: pd.DataFrame, codebook: pd.DataFrame) -> pd.DataFrame:
         """
