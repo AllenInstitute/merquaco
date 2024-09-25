@@ -696,10 +696,12 @@ class XeniumExperiment:
                  ventricle_genes_list: list = ["Crb2", "Glis3", "Inhbb", "Naaa", "Cd24a",
                                                "Dsg2",  "Hdc", "Shroom3", "Vit", "Rgs12", "Trp73"],
                  force_mask: bool = False,
+                 fov_dimensions: tuple = (623, 740)
                  ) -> None:
         """
         Initialize XeniumExperiment instance from transcripts table dataframe and probably other stuff
         """
+        self.fov_dimensions = fov_dimensions
         # Assign mask paths as attributes if they exist
         if output_dir is None:
             output_dir = Path(os.getcwd(), 'qc_output')
@@ -887,5 +889,7 @@ class XeniumExperiment:
 
         # 3. Periodicity
         print('Calculating periodicity')
-        self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts,
-                                                                 )
+        self.periodicity_list = periodicity.get_periodicity_vals_all_z(self.filtered_transcripts, self.fov_dimensions)
+
+        # 4. Save metrics
+        # TODO: figure this out
