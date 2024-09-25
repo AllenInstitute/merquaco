@@ -843,3 +843,49 @@ class XeniumExperiment:
             filtered_transcripts = transcripts[~transcripts['gene'].str.startswith(which)]
 
         return filtered_transcripts
+
+    def run_all_qc(self,
+                   run_pixel_classification: bool = True,
+                   plot_figures: bool = True,
+                   save_metrics: bool = True):
+        """
+        Runs all standard QC functions and prints results
+
+        Parameters
+        ----------
+        run_pixel_classification : bool, optional
+            Whether to run pixel classification workflow. Default is True.
+        plot_figures : bool, optional
+            Whether to plot figures. Default is True.
+        save_metrics : bool, optional
+            Whether to save metrics. Default is True.
+        """
+        # 1. Run pixel classification workflow
+        if run_pixel_classification:
+            # TODO: make this global method (or xenium method?)
+            MerscopeExperiment.run_full_pixel_classification(save_metrics)
+
+            if plot_figures:
+                figures.plot_full_pixel_fig(self.pixel_classification,
+                                            self.dapi_mask,
+                                            self.detachment_mask,
+                                            self.transcripts_percent,
+                                            self.detachment_percent,
+                                            self.damage_mask,
+                                            self.ventricle_mask,
+                                            self.damage_percent,
+                                            self.ventricle_percent,
+                                            Path(self.output_dir, "pixel_classification_plot.png"))
+                plt.show()
+
+        # 2. On-tissue metrics
+        self.on_tissue_transcript_count = get_on_tissue_transcript_count(self.transcripts_image_path,
+                                                                         self.transcripts_mask)
+        self.transcript_density_um2 = get_transcript_density(self.transcripts_image_path,
+                                                             self.transcripts_mask)
+        self.transcript_density_um2_per_gene = self.transcript_density_um2 / self.n_genes
+
+        # 3. Periodicity
+        print('Calculating periodicity')
+        self.periodicity_list = periodicity.get_periodicity_list(self.filtered_transcripts,
+                                                                 )

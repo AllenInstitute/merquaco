@@ -23,16 +23,27 @@ def get_periodicity_list(transcripts: pd.DataFrame, num_planes: int = 7, fov_dim
     image_dimensions = get_image_dimensions(transcripts)
 
     periodicity_list = []
-    for plane_number in range(num_planes):
-        # Subset transcripts by z plane
-        plane = transcripts[transcripts['global_z'] == plane_number]
-        plane_x = np.asarray(plane['global_x'])
-        plane_y = np.asarray(plane['global_y'])
-        _, chunk_x = get_chunk_values(plane_x, image_dimensions, fov_dimensions=fov_dimensions[0])
-        _, chunk_y = get_chunk_values(plane_y, image_dimensions, fov_dimensions=fov_dimensions[1])
+
+    if num_planes == 0:
+        x = np.asarray(transcripts['global_x'])
+        y = np.asarray(transcripts['global_y'])
+        _, chunk_x = get_chunk_values(x, image_dimensions, fov_dimensions=fov_dimensions[0])
+        _, chunk_y = get_chunk_values(y, image_dimensions, fov_dimensions=fov_dimensions[1])
         periodicity_x = np.nanmin(chunk_x) / np.max(chunk_x)
         periodicity_y = np.nanmin(chunk_y) / np.max(chunk_y)
         periodicity_list.append((periodicity_x, periodicity_y))
+
+    else:
+        for plane_number in range(num_planes):
+            # Subset transcripts by z plane
+            plane = transcripts[transcripts['global_z'] == plane_number]
+            plane_x = np.asarray(plane['global_x'])
+            plane_y = np.asarray(plane['global_y'])
+            _, chunk_x = get_chunk_values(plane_x, image_dimensions, fov_dimensions=fov_dimensions[0])
+            _, chunk_y = get_chunk_values(plane_y, image_dimensions, fov_dimensions=fov_dimensions[1])
+            periodicity_x = np.nanmin(chunk_x) / np.max(chunk_x)
+            periodicity_y = np.nanmin(chunk_y) / np.max(chunk_y)
+            periodicity_list.append((periodicity_x, periodicity_y))
 
     return periodicity_list
 
@@ -54,7 +65,7 @@ def get_chunk_values(transcripts: np.ndarray, image_dimensions: int, fov_dimensi
     -------
     tuple of np.ndarray
         periodicity_hist : np.ndarray
-            Histogram values
+            Histram values
         periodicity_chunk : np.ndarry
             Periodicity metric chunk values
     """
