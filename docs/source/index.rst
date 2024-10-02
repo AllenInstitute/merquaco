@@ -10,14 +10,12 @@ All analyses ignore cell segmentation boundaries and only use information pertai
    :maxdepth: 2
    :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+**merquaco**'s key applications
+-------------------------------
+- Calculate total tissue area and quantify extent of tissue damage or detachment from coverslip.
+- Measure transcript density for on-tissue regions; easily comparable metric between experiments.
+- Quantify nonuniform transcript detection in x, y, z axes.
+- Detect fields-of-view with missing transcript species.
 
 Contents
 --------
