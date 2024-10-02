@@ -38,3 +38,7 @@ Installation
     $ git clone https://github.com/AllenInstitute/merquaco.git
     $ cd merquaco
     $ pip install .
+
+Contact
+-------
+paul.olsen@alleninstitute.org and naomi.martin@alleninstitute.org
