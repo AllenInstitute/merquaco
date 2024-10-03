@@ -486,6 +486,11 @@ class Experiment:
         self.ventricle_mask = None
         self.damage_mask = None
 
+        # If no ventricle genes, print statement that ventricles and damage are not classified
+        if not any(np.isin(self.genes, self.ventricle_genes_list)):
+            print(f"None of the provided ventricle genes {self.ventricle_genes_list} are present in detected transcripts. \
+                  Ventricles and damage pixels cannot be classified.")
+
         if self.transcripts_mask is None:
             print("Generating transcript mask...")
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
