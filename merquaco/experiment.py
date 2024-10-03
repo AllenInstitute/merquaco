@@ -506,12 +506,16 @@ class Experiment:
                                                 self.dapi_mask_pixel_path,
                                                 self.dapi_mask_object_path,
                                                 self.dapi_high_res_image_path)
+        else:
+            self.dapi_mask = data_processing.process_path(self.dapi_mask_path)
 
         if not os.path.exists(self.detachment_mask_path):
             print("Generating detachment mask...")
             self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
                                                             self.dapi_mask_path,
                                                             self.detachment_mask_path)
+        else:
+            self.detachment_mask = data_processing.process_path(self.detachment_mask_path)
 
         if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
             if not os.path.exists(self.ventricle_mask_path):
@@ -524,6 +528,10 @@ class Experiment:
                                                                 self.ventricle_mask_object_path,
                                                                 self.filtered_transcripts,
                                                                 self.ventricle_genes_list)
+                
+            else:
+                self.ventricle_mask = data_processing.process_path(self.ventricle_mask_path)
+
             if not os.path.exists(self.damage_mask_path):
                 print("Generating damage mask...")
                 self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
@@ -531,6 +539,9 @@ class Experiment:
                                                         self.dapi_mask_path,
                                                         self.transcripts_mask_path,
                                                         self.ventricle_mask_path)
+                
+            else:
+                self.damage_mask = data_processing.process_path(self.damage_mask_path)
 
             # Resize all masks by transcripts mask
             self.transcripts_mask, self.dapi_mask, self.detachment_mask, \
