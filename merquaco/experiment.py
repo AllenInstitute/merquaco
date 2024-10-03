@@ -465,7 +465,7 @@ class Experiment:
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs_df, self.output_dir)
 
-    def run_full_pixel_classification(self, save_metrics: bool = True):
+    def run_full_pixel_classification(self, save_metrics: bool = True, regenerate=False):
         """
         Runs entire pixel classification workflow:
             - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
@@ -499,7 +499,7 @@ class Experiment:
                                                                  self.transcripts_mask_object_path,
                                                                  self.filtered_transcripts)
 
-        if not os.path.exists(self.dapi_mask_path):
+        if not os.path.exists(self.dapi_mask_path) or regenerate == True:
             print("Generating DAPI mask...")
             self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
                                                 self.ilastik_program_path,
@@ -509,7 +509,7 @@ class Experiment:
         else:
             self.dapi_mask = data_processing.process_path(self.dapi_mask_path)
 
-        if not os.path.exists(self.detachment_mask_path):
+        if not os.path.exists(self.detachment_mask_path) or regenerate == True:
             print("Generating detachment mask...")
             self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
                                                             self.dapi_mask_path,
@@ -518,7 +518,7 @@ class Experiment:
             self.detachment_mask = data_processing.process_path(self.detachment_mask_path)
 
         if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
-            if not os.path.exists(self.ventricle_mask_path):
+            if not os.path.exists(self.ventricle_mask_path) or regenerate == True:
                 print("Generating ventricle mask...")
                 self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
                                                                 self.dapi_mask_path,
@@ -532,7 +532,7 @@ class Experiment:
             else:
                 self.ventricle_mask = data_processing.process_path(self.ventricle_mask_path)
 
-            if not os.path.exists(self.damage_mask_path):
+            if not os.path.exists(self.damage_mask_path) or regenerate == True:
                 print("Generating damage mask...")
                 self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
                                                         self.dapi_image_path,
