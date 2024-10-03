@@ -499,7 +499,7 @@ class Experiment:
                                                                  self.transcripts_mask_object_path,
                                                                  self.filtered_transcripts)
 
-        if self.dapi_mask is None:
+        if not os.path.exists(self.dapi_mask_path):
             print("Generating DAPI mask...")
             self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
                                                 self.ilastik_program_path,
@@ -507,14 +507,14 @@ class Experiment:
                                                 self.dapi_mask_object_path,
                                                 self.dapi_high_res_image_path)
 
-        if self.detachment_mask is None:
+        if not os.path.exists(self.detachment_mask_path):
             print("Generating detachment mask...")
             self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
                                                             self.dapi_mask_path,
                                                             self.detachment_mask_path)
 
         if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
-            if self.ventricle_mask is None:
+            if not os.path.exists(self.ventricle_mask_path):
                 print("Generating ventricle mask...")
                 self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
                                                                 self.dapi_mask_path,
@@ -524,7 +524,7 @@ class Experiment:
                                                                 self.ventricle_mask_object_path,
                                                                 self.filtered_transcripts,
                                                                 self.ventricle_genes_list)
-            if self.damage_mask is None:
+            if not os.path.exists(self.damage_mask_path):
                 print("Generating damage mask...")
                 self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
                                                         self.dapi_image_path,
