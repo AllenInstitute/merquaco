@@ -491,7 +491,7 @@ class Experiment:
             print(f"None of the provided ventricle genes {self.ventricle_genes_list} are present in detected transcripts. \
                   Ventricles and damage pixels cannot be classified.")
 
-        if self.transcripts_mask is None:
+        if self.transcripts_mask is None: 
             print("Generating transcript mask...")
             self.transcripts_mask = pc.generate_transcripts_mask(self.transcripts_image_path,
                                                                  self.ilastik_program_path,
@@ -499,35 +499,38 @@ class Experiment:
                                                                  self.transcripts_mask_object_path,
                                                                  self.filtered_transcripts)
 
-        print("Generating DAPI mask...")
-        self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
-                                               self.ilastik_program_path,
-                                               self.dapi_mask_pixel_path,
-                                               self.dapi_mask_object_path,
-                                               self.dapi_high_res_image_path)
+        if self.dapi_mask is None:
+            print("Generating DAPI mask...")
+            self.dapi_mask = pc.generate_dapi_mask(self.dapi_image_path,
+                                                self.ilastik_program_path,
+                                                self.dapi_mask_pixel_path,
+                                                self.dapi_mask_object_path,
+                                                self.dapi_high_res_image_path)
 
-        print("Generating lifting mask...")
-        self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
-                                                           self.dapi_mask_path,
-                                                           self.detachment_mask_path)
+        if self.detachment_mask is None:
+            print("Generating detachment mask...")
+            self.detachment_mask = pc.generate_detachment_mask(self.transcripts_mask_path,
+                                                            self.dapi_mask_path,
+                                                            self.detachment_mask_path)
 
         if any(np.isin(self.genes, self.ventricle_genes_list)):  # If ventricle genes exist
-            print("Generating ventricle mask...")
-            self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
-                                                             self.dapi_mask_path,
-                                                             self.transcripts_mask_path,
-                                                             self.ilastik_program_path,
-                                                             self.ventricle_mask_pixel_path,
-                                                             self.ventricle_mask_object_path,
-                                                             self.filtered_transcripts,
-                                                             self.ventricle_genes_list)
-
-            print("Generating damage mask...")
-            self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
-                                                       self.dapi_image_path,
-                                                       self.dapi_mask_path,
-                                                       self.transcripts_mask_path,
-                                                       self.ventricle_mask_path)
+            if self.ventricle_mask is None:
+                print("Generating ventricle mask...")
+                self.ventricle_mask = pc.generate_ventricle_mask(self.ventricle_image_path,
+                                                                self.dapi_mask_path,
+                                                                self.transcripts_mask_path,
+                                                                self.ilastik_program_path,
+                                                                self.ventricle_mask_pixel_path,
+                                                                self.ventricle_mask_object_path,
+                                                                self.filtered_transcripts,
+                                                                self.ventricle_genes_list)
+            if self.damage_mask is None:
+                print("Generating damage mask...")
+                self.damage_mask = pc.generate_damage_mask(self.damage_mask_path,
+                                                        self.dapi_image_path,
+                                                        self.dapi_mask_path,
+                                                        self.transcripts_mask_path,
+                                                        self.ventricle_mask_path)
 
             # Resize all masks by transcripts mask
             self.transcripts_mask, self.dapi_mask, self.detachment_mask, \
