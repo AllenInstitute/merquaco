@@ -465,7 +465,7 @@ class Experiment:
         if self.output_dir is not None:
             FOVDropout.save_fov_tsv(self.fovs_df, self.output_dir)
 
-    def run_full_pixel_classification(self, save_metrics: bool = True, regenerate=False):
+    def run_full_pixel_classification(self, save_metrics: bool = True, regenerate = False):
         """
         Runs entire pixel classification workflow:
             - generates binary masks for transcripts, DAPI, gel lifting, ventricles, and damage
