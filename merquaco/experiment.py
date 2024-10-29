@@ -659,7 +659,7 @@ class Experiment:
 
         # 5. z-plane transcript ratio
         print('Computing z-plane metrics')
-        self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, self.num_planes)
+        self.z_ratio = zp.compute_z_ratio(self.filtered_transcripts, 7)
         self.transcripts_per_z = zp.get_transcripts_per_z(self.filtered_transcripts, self.num_planes).tolist()
         if plot_figures:
             figures.plot_every_z_plane(self.transcripts, out_file=Path(self.output_dir, "transcripts_per_z.png"))
