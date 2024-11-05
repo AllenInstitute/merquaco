@@ -41,7 +41,7 @@ Installation
 
 Usage
 -----
-Refer to the demo notebook and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
+Refer to the `demo notebook <https://github.com/AllenInstitute/merquaco/blob/main/demo_notebook.ipynb>`_ and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
 
 
 Contact
