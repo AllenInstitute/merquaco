@@ -41,7 +41,7 @@ Installation
 
 Usage
 -----
-Refer to the demo notebook and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>` for example usage
+Refer to the demo notebook and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
 
 
 Contact
