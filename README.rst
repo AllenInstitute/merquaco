@@ -3,6 +3,10 @@ MERQuaCo
 
 **MERQuaCo** is a tool for assessing the quality of spatial transcriptomics experiments on the Vizgen MERSCOPE platform. **MERQuaCo** computes a range of metrics to assess transcript detection efficiency in space, tissue integrity, and data loss using the transcripts table, codebook, and DAPI image. All analyses ignore cell segmentation boundaries and only use information pertaining to transcript locations.
 
+Usage
+-----
+Refer to the `demo notebook <https://github.com/AllenInstitute/merquaco/blob/main/demo_notebook.ipynb>`_ and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
+
 Key Metrics
 -----------
 
@@ -38,10 +42,6 @@ Installation
     $ git clone https://github.com/AllenInstitute/merquaco.git
     $ cd merquaco
     $ pip install .
-
-Usage
------
-Refer to the `demo notebook <https://github.com/AllenInstitute/merquaco/blob/main/demo_notebook.ipynb>`_ and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
 
 
 Contact
