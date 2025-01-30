@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"attached_datasets": [
+		{
+			"id": "068cd2cc-4988-4d8d-b0e5-189b44842876",
+			"mount": "mouse_atlas"
+		},
+		{
+			"id": "0fc48d1f-e46c-46ec-bbf4-ada86fad4cb6",
+			"mount": "dev_mouse_data"
+		}
+	]
+}

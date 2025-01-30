@@ -1,0 +1,65 @@
+{
+	"version": 1,
+	"base_image": "codeocean/mambaforge3:24.5.0-0-python3.12.4-ubuntu22.04",
+	"options": {
+		"registry_host_arg": true,
+		"git_ask_pass": true
+	},
+	"installers": {
+		"apt": {
+			"packages": [
+				{
+					"name": "libgl1-mesa-glx",
+					"version": "23.0.4-0ubuntu1~22.04.1"
+				}
+			],
+			"install_software_properties_common": true
+		},
+		"conda": {
+			"packages": [
+				{
+					"name": "jupyterlab",
+					"version": "4.3.4"
+				}
+			]
+		},
+		"pip": {
+			"packages": [
+				{
+					"name": "imagecodecs",
+					"version": "2024.1.1"
+				},
+				{
+					"name": "matplotlib",
+					"version": "3.9.0"
+				},
+				{
+					"name": "numpy",
+					"version": "1.26.4"
+				},
+				{
+					"name": "opencv-python",
+					"version": "4.9.0.80"
+				},
+				{
+					"name": "pandas",
+					"version": "2.2.2"
+				},
+				{
+					"name": "scikit-image",
+					"version": "0.23.2"
+				},
+				{
+					"name": "sphinx-rtd-theme",
+					"version": "2.0.0"
+				},
+				{
+					"name": "tifffile",
+					"version": "2024.5.10"
+				}
+			],
+			"options": {},
+			"pre_install_options": {}
+		}
+	}
+}
