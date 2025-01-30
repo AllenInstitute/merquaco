@@ -1,4 +1,4 @@
-# hash:sha256:4b7401ec3bee6e53a57122521e5c84959555bcbdb7f51013ff9a58146f8ed344
+# hash:sha256:0f35ebf4ef55d33814299a4996fb6faa2393d971b9a945272598b97e7b79d267
 ARG REGISTRY_HOST
 FROM $REGISTRY_HOST/codeocean/mambaforge3:24.5.0-0-python3.12.4-ubuntu22.04
 
@@ -8,21 +8,16 @@ ARG GIT_ASKPASS
 ARG GIT_ACCESS_TOKEN
 COPY git-askpass /
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libgl1-mesa-glx=23.0.4-0ubuntu1~22.04.1 \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN conda install -y \
         jupyterlab==4.3.4 \
     && conda clean -ya
 
 RUN pip install -U --no-cache-dir \
-    imagecodecs==2024.1.1 \
-    matplotlib==3.9.0 \
+    imagecodecs==2024.12.30 \
+    matplotlib==3.10.0 \
     numpy==1.26.4 \
-    opencv-python==4.9.0.80 \
-    pandas==2.2.2 \
-    scikit-image==0.23.2 \
-    sphinx-rtd-theme==2.0.0 \
-    tifffile==2024.5.10
+    opencv-python-headless==4.11.0.86 \
+    pandas==2.2.3 \
+    scikit-image==0.25.0 \
+    sphinx-rtd-theme==3.0.2 \
+    tifffile==2025.1.10
