@@ -209,6 +209,7 @@ class Experiment:
             Codebook dataframe, excluding blanks
         """
         codebook = pd.read_csv(codebook_input, index_col=False)
+        print(codebook)
         codebook = codebook.drop(columns=['id', 'barcodeType'], errors='ignore').set_index('name')
         codebook = codebook[~codebook.index.str.startswith('Blank')]
 
