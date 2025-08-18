@@ -16,6 +16,10 @@ Usage
 -----
 Refer to the `demo notebook <https://github.com/AllenInstitute/merquaco/blob/main/demo_notebook.ipynb>`_ and `documentation <https://merquaco.readthedocs.io/en/latest/api.html>`_ for example usage
 
+Manuscript
+----------
+Refer to our manuscript `Martin, Olsen, et al. (2025) <https://elifesciences.org/reviewed-preprints/105149>` in eLife
+
 Key Metrics
 -----------
 
