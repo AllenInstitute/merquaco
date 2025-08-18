@@ -18,7 +18,7 @@ Refer to the `demo notebook <https://github.com/AllenInstitute/merquaco/blob/mai
 
 Manuscript
 ----------
-Refer to our manuscript `Martin, Olsen, et al. (2025) <https://elifesciences.org/reviewed-preprints/105149>` in eLife
+Refer to our manuscript `Martin, Olsen, et al. (2025) <https://elifesciences.org/reviewed-preprints/105149>`_ in eLife
 
 Key Metrics
 -----------
